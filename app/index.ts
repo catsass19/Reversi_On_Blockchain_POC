@@ -1,6 +1,6 @@
 import * as ReactDOM from 'react-dom';
-import { AppMain } from '@/component/Main/';
-import { appService } from '@/service/app';
+import AppMain from '@/component/Main/';
+import appService from '@/service/app';
 
 (async () => {
 

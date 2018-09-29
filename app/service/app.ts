@@ -8,6 +8,4 @@ class AppService {
 
 const appService = new AppService();
 
-export {
-    appService
-};
+export default appService;

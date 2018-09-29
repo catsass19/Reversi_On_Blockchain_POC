@@ -27,6 +27,4 @@ class DebugService {
 
 const debugService = new DebugService();
 
-export {
-    debugService
-};
+export default debugService;
