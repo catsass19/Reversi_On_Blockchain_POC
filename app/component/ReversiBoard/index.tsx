@@ -63,6 +63,8 @@ class Board extends React.Component<{}, { width : number }> {
                                     <Grid
                                         item={data}
                                         key={index}
+                                        y={index}
+                                        x={key}
                                     />
                                 ))}
                             </Row>

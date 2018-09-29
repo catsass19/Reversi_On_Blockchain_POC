@@ -7,14 +7,12 @@ import gameService from '@/service/game';
 
 const Wrapper = styled.div`
     padding: 20px;
-    border: 1px solid white;
     flex: 1;
     display: flex;
     flex-direction: column;
     color: #13BF99;
 `;
 const Row = styled.div`
-    border: 1px solid purple;
     display: flex;
     align-items: center;
     flex: 1;
@@ -71,7 +69,9 @@ export default class Kickoff extends React.Component {
                         <FundRaising>已獲得<Fund>{gameService.trumpKickoffFund}</Fund>個Dexon</FundRaising>
                     </TeamBox>
                     <VS>VS</VS>
-                    <TeamBox>
+                    <TeamBox
+                        onClick={this.chooseTeam}
+                    >
                         <ImgWrapper>
                             <TeamImg src={kim} />
                         </ImgWrapper>
@@ -86,5 +86,10 @@ export default class Kickoff extends React.Component {
                 </Description>
             </Wrapper>
         );
+    }
+    private chooseTeam = () => {
+        const fund = prompt('請問你要下注多少給team Kim?');
+        alert('我是metamask, 請confirm transaction');
+        gameService.setTeam(false);
     }
 }

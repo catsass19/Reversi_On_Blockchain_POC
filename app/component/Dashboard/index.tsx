@@ -3,9 +3,9 @@ import { observer } from 'mobx-react';
 import styled from 'styled-components';
 import gameService from '@/service/game';
 import Kickoff from './component/Kickoff';
+import Turn from './component/Turn';
 
 const Container = styled.div`
-    border-left: 1px solid #13BF99;
     background-color: black;
     flex: 1;
     display: flex;
@@ -20,11 +20,16 @@ const Title = styled.div`
 `;
 
 @observer
-const Dashboard = () => (
-    <Container>
-        <Title>黑白棋大亂鬥</Title>
-        {!gameService.start && <Kickoff />}
-    </Container>
-);
+class Dashboard extends React.Component {
+    public render() {
+        return(
+            <Container>
+                <Title>黑白棋大亂鬥</Title>
+                {!gameService.start && <Kickoff />}
+                {gameService.start && <Turn />}
+            </Container>
+        );
+    }
+}
 
 export default Dashboard;

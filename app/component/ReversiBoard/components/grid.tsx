@@ -27,6 +27,10 @@ const Chess = styled.div`
     width: 80%;
     border-radius: 5%;
     background-color: ${(p) => p.color};
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
 `;
 
 const getColor = (type) => {
@@ -37,15 +41,32 @@ const getColor = (type) => {
             return 'rgba(255, 255, 255, 0.8)';
         case gameService.gridStatus.AVAILABLE:
             return 'rgba(0, 0, 0, 0.3)';
+        case gameService.gridStatus.PROPOSED:
+            return 'rgba(255, 215, 0, 0.5)';
     }
 };
 
-const Grid = ({ item }) => (
+const Grid = ({ item, x, y }) => (
     <Wrapper>
         <InnerGrid>
             <Chess
                 color={getColor(item)}
-            />
+                onClick={() => {
+                    if (item === gameService.gridStatus.AVAILABLE) {
+                        confirm('您確定要提案並且支付1234個Dexon嗎?');
+                    }
+                    if (item === gameService.gridStatus.PROPOSED) {
+                        confirm('您確定要投此提案一票嗎?');
+                    }
+                }}
+            >
+                {(item === gameService.gridStatus.PROPOSED) && (
+                    <>
+                        {(x === 3) && (y === 1) && ('1')}
+                        {(x === 4) && (y === 2) && ('2')}
+                    </>
+                )}
+            </Chess>
         </InnerGrid>
     </Wrapper>
 );

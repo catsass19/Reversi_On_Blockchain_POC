@@ -8,6 +8,7 @@ class GameService {
         BLACK: Symbol('black'),
         WHITE: Symbol('white'),
         AVAILABLE: Symbol('available'),
+        PROPOSED: Symbol('proposed'),
     };
     public team = {
         TRUMP: Symbol('trump'),
@@ -20,9 +21,15 @@ class GameService {
     @observable public kimKickoffFund : number = 0;
     @observable public trumpKickoffFund : number = 0;
     @observable public myTeam : symbol = null;
+    @observable public turn : number = 1;
 
     private kimKickoffInterval = null;
     private trumpKickoffInterval = null;
+
+    @observable private rank1Fund = 100;
+    @observable private rank2Fund = 80;
+    private rank1interval = null;
+    private rank2interval = null;
 
     constructor() {
         this.resetState();
@@ -31,6 +38,10 @@ class GameService {
 
     public setTeam(isTrump : boolean) {
         this.myTeam = isTrump ? this.team.TRUMP : this.team.KIM;
+        this.stopKickOffFundRaising();
+        this.start = true;
+        this.addAvailableGrid();
+        this.startRank();
     }
 
     private resetState() {
@@ -43,6 +54,11 @@ class GameService {
         state[this.size / 2][(this.size / 2) - 1] = state[(this.size / 2) - 1][this.size / 2] = this.gridStatus.WHITE;
         this.state = state;
     }
+    private addAvailableGrid() {
+        const state = this.state;
+        state[1][3] = state[2][4] = this.gridStatus.AVAILABLE;
+        state[3][1] = state[4][2] = this.gridStatus.PROPOSED;
+    }
     private startKickoff() {
         this.kimKickoffInterval = setInterval(() => {
             this.kimKickoffFund += 4;
@@ -51,7 +67,19 @@ class GameService {
             this.trumpKickoffFund += 6;
         }, 1000);
     }
+    private stopKickOffFundRaising() {
+        clearInterval(this.kimKickoffInterval);
+        clearInterval(this.trumpKickoffInterval);
+    }
 
+    private startRank() {
+        this.rank1interval = setInterval(() => {
+            this.rank1Fund += 5;
+        }, 1000);
+        this.rank2interval = setInterval(() => {
+            this.rank2Fund += 4;
+        }, 3000);
+    }
 
 }
 
