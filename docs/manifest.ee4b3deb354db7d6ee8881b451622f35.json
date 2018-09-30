@@ -1,27 +1,27 @@
 {
   "icons": [
     {
-      "src": "/icon_512x512.e08eec7e50100c1351bf5c0255338cb9.png",
+      "src": "/Reversi_On_Smart_Contract_POC/icon_512x512.e08eec7e50100c1351bf5c0255338cb9.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "/icon_256x256.3f2f8bd993bd916e22cb52a9ab1a3dbd.png",
+      "src": "/Reversi_On_Smart_Contract_POC/icon_256x256.3f2f8bd993bd916e22cb52a9ab1a3dbd.png",
       "sizes": "256x256",
       "type": "image/png"
     },
     {
-      "src": "/icon_192x192.b44084e313119d9d98724fb59e776262.png",
+      "src": "/Reversi_On_Smart_Contract_POC/icon_192x192.b44084e313119d9d98724fb59e776262.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icon_128x128.1c970212c1699ab3a9357013510dae11.png",
+      "src": "/Reversi_On_Smart_Contract_POC/icon_128x128.1c970212c1699ab3a9357013510dae11.png",
       "sizes": "128x128",
       "type": "image/png"
     },
     {
-      "src": "/icon_96x96.16f6f7e313935dd587f9d9bb710c8807.png",
+      "src": "/Reversi_On_Smart_Contract_POC/icon_96x96.16f6f7e313935dd587f9d9bb710c8807.png",
       "sizes": "96x96",
       "type": "image/png"
     }
