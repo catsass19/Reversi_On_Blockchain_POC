@@ -27,6 +27,7 @@ class GameService {
     @observable public rank1Fund = 100;
     @observable public rank2Fund = 80;
     @observable public rank3Fund = 0;
+    @observable public second = 59;
 
     private kimKickoffInterval = null;
     private trumpKickoffInterval = null;
@@ -36,6 +37,12 @@ class GameService {
     constructor() {
         this.resetState();
         this.startKickoff();
+        setInterval(() => {
+            this.second = this.second - 1;
+            if (this.second < 0) {
+                this.second = 59;
+            }
+        }, 1000);
     }
 
     public setTeam(isTrump : boolean) {

@@ -80,9 +80,9 @@ export default class Kickoff extends React.Component {
                     </TeamBox>
                 </Row>
                 <Description>
-                    <div>選擇你的隊伍並且下注, 下注的金額越多分到的獎金越多!</div>
+                    <div>選擇你的隊伍並且投資, 投資的金額越多獎金的份額越多!</div>
                     <div>在現階段獲得較多資金的隊伍將獲得先手的機會</div>
-                    <div>比賽將於1個小時後開始</div>
+                    <div>比賽將於 1 小時 23 分鐘 {gameService.second} 秒後開始</div>
                 </Description>
             </Wrapper>
         );

@@ -39,15 +39,18 @@ const Btn = styled.div`
     }
 `;
 const StyledImg = styled.img`
-    height: 200px;
+    height: 150px;
 `;
 const Text = styled.div`
     text-align: center;
-    padding: 20px;
     font-size: xx-large;
 `;
 const Padding = styled.div`
     flex: 1;
+`;
+const Small = styled.div`
+    text-align: center;
+    margin-bottom: 20px;
 `;
 @observer
 export default class Turn extends React.Component {
@@ -64,6 +67,7 @@ export default class Turn extends React.Component {
                 <Padding />
                 <StyledImg src={kim} />
                 <Text>Team Kim 的回合!</Text>
+                <Small>本回合還剩下 1 個小時 36 分鐘 {gameService.second} 秒</Small>
             </Wrapper>
         );
     }
@@ -72,7 +76,7 @@ export default class Turn extends React.Component {
         return (
             <Proposal>
                 <Rank>{rank}</Rank>
-                <Fund>已獲得{gameService[fund]}個Dexon</Fund>
+                <Fund>已獲得<span style={{ margin: '5px' }}>{gameService[fund]}</span>個Dexon</Fund>
                 <Btn
                     onClick={() => {
                         confirm(`您確定要投此提案一票嗎?`);
