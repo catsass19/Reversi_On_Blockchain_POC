@@ -14,9 +14,9 @@ const Container = styled.div`
 
 const Title = styled.div`
     color: #13BF99;
-    font-size: xx-large;
     text-align: center;
-    padding: 20px;
+    padding-top: 40px;
+    font-size: 50px;
 `;
 
 @observer
@@ -24,7 +24,7 @@ class Dashboard extends React.Component {
     public render() {
         return(
             <Container>
-                <Title>黑白棋大亂鬥</Title>
+                <Title>Deversi</Title>
                 {!gameService.start && <Kickoff />}
                 {gameService.start && <Turn />}
             </Container>

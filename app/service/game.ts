@@ -22,12 +22,14 @@ class GameService {
     @observable public trumpKickoffFund : number = 0;
     @observable public myTeam : symbol = null;
     @observable public turn : number = 1;
+    @observable public proposed = null;
+
+    @observable public rank1Fund = 100;
+    @observable public rank2Fund = 80;
+    @observable public rank3Fund = 0;
 
     private kimKickoffInterval = null;
     private trumpKickoffInterval = null;
-
-    @observable private rank1Fund = 100;
-    @observable private rank2Fund = 80;
     private rank1interval = null;
     private rank2interval = null;
 
@@ -42,6 +44,10 @@ class GameService {
         this.start = true;
         this.addAvailableGrid();
         this.startRank();
+    }
+
+    public propose(x, y) {
+        this.proposed = { x, y };
     }
 
     private resetState() {

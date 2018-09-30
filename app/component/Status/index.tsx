@@ -45,9 +45,6 @@ class Status extends React.Component {
                         <Row>若Team Kim獲勝, 您將可獲得總獎金的8.7%, 大約是9487個Dexon</Row>
                     </>
                 )}
-
-
-
         </Container>
         );
     }

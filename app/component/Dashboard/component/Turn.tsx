@@ -58,10 +58,12 @@ export default class Turn extends React.Component {
                 <Title>目前的提案</Title>
                 {this.renderProposal(1, 'rank1Fund')}
                 {this.renderProposal(2, 'rank2Fund')}
+                {gameService.proposed && (
+                    this.renderProposal(3, 'rank3Fund')
+                )}
                 <Padding />
                 <StyledImg src={kim} />
-                <Text>Team Kim的回合!</Text>
-                <Padding />
+                <Text>Team Kim 的回合!</Text>
             </Wrapper>
         );
     }

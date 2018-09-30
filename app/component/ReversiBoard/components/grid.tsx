@@ -33,7 +33,10 @@ const Chess = styled.div`
     font-weight: bold;
 `;
 
-const getColor = (type) => {
+const getColor = (type, proposed) => {
+    if (proposed) {
+        return 'rgba(255, 215, 0, 0.5)';
+    }
     switch (type) {
         case gameService.gridStatus.BLACK:
             return 'rgba(0, 0, 0, 1)';
@@ -46,22 +49,24 @@ const getColor = (type) => {
     }
 };
 
-const Grid = ({ item, x, y }) => (
+const Grid = ({ item, x, y, proposed }) => (
     <Wrapper>
         <InnerGrid>
             <Chess
-                color={getColor(item)}
+                color={getColor(item, proposed)}
                 onClick={() => {
                     if (item === gameService.gridStatus.AVAILABLE) {
                         confirm('您確定要提案並且支付1234個Dexon嗎?');
+                        gameService.propose(x, y);
                     }
                     if (item === gameService.gridStatus.PROPOSED) {
                         confirm('您確定要投此提案一票嗎?');
                     }
                 }}
             >
-                {(item === gameService.gridStatus.PROPOSED) && (
+                {(proposed || (item === gameService.gridStatus.PROPOSED)) && (
                     <>
+                        {proposed && '3'}
                         {(x === 3) && (y === 1) && ('1')}
                         {(x === 4) && (y === 2) && ('2')}
                     </>

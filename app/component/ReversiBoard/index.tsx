@@ -50,6 +50,7 @@ class Board extends React.Component<{}, { width : number }> {
     public render() {
         const { width } = this.state;
         const state = gameService.state;
+        const proposed = gameService.proposed;
         return (
             <BoardOutline
                 width={width}
@@ -65,6 +66,11 @@ class Board extends React.Component<{}, { width : number }> {
                                         key={index}
                                         y={index}
                                         x={key}
+                                        proposed={
+                                            (proposed) &&
+                                            (proposed.x === key) &&
+                                            (proposed.y === index)
+                                        }
                                     />
                                 ))}
                             </Row>
