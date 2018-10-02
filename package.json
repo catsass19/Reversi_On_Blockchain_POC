@@ -10,9 +10,13 @@
   },
   "scripts": {
     "test": "jest --coverage",
-    "dev": "npm run test && webpack-dev-server --mode development --host 0.0.0.0",
+    "dev": "npm run build-contract && npm run migrate-contract && npm run test && webpack-dev-server --mode development --host 0.0.0.0",
     "build": "npm run test && webpack --mode production --progress",
-    "electron": "npm run test && export BASE_URL=./ && webpack --mode production --target electron-renderer && electron ./electron.js"
+    "electron": "npm run test && export BASE_URL=./ && webpack --mode production --target electron-renderer && electron ./electron.js",
+    "dev-chain": "ganache-cli -b",
+    "build-contract": "truffle compile",
+    "migrate-contract": "truffle migrate --reset",
+    "test-contract": "truffle test"
   },
   "jest": {
     "globals": {
@@ -43,8 +47,6 @@
   },
   "homepage": "https://github.com/catsass19/My-Webapp-Boilerplate#readme",
   "dependencies": {
-    "@material-ui/core": "^3.1.1",
-    "@material-ui/icons": "^3.0.1",
     "@types/jest": "^23.3.2",
     "@types/lodash-es": "^4.17.1",
     "@types/react": "^16.4.13",
@@ -56,7 +58,8 @@
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "react-loadable": "^5.5.0",
-    "styled-components": "^3.4.9"
+    "styled-components": "^3.4.9",
+    "web3": "^1.0.0-beta.36"
   },
   "devDependencies": {
     "cache-loader": "^1.2.2",
@@ -66,10 +69,12 @@
     "favicons-webpack-plugin": "0.0.9",
     "file-loader": "^1.1.11",
     "fork-ts-checker-webpack-plugin": "^0.4.9",
+    "ganache-cli": "^6.1.8",
     "html-webpack-plugin": "^3.2.0",
     "husky": "^1.0.0-rc.13",
     "jest": "^23.5.0",
     "thread-loader": "^1.2.0",
+    "truffle": "^4.1.14",
     "ts-jest": "^23.1.4",
     "ts-loader": "^4.5.0",
     "tslint": "^5.11.0",

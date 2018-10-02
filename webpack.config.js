@@ -6,11 +6,11 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");
-const WebpackPwaManifest = require('webpack-pwa-manifest');
+// const WebpackPwaManifest = require('webpack-pwa-manifest');
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 const MANIFEST = require('./app/manifest.json');
 
-const OUTPUT_FOLDER = './build';
+const OUTPUT_FOLDER = './build/app';
 const APP_ICON = './app/favicon.png';
 
 module.exports = (env, options) => {
@@ -30,7 +30,7 @@ module.exports = (env, options) => {
         // hope that we can get rid of this once WebpackPwaManifest supports favicon
         new FaviconsWebpackPlugin({
             logo: APP_ICON,
-            persistentCache: true,
+            persistentCache: false,
             icons: {
                 android: false,
                 appleIcon: false,
@@ -66,6 +66,7 @@ module.exports = (env, options) => {
             new CleanTerminalPlugin()
         ),
         new DuplicatePackageCheckerPlugin(),
+        /*
         new WebpackPwaManifest({
             name: MANIFEST.name,
             short_name: MANIFEST.short_name,
@@ -76,16 +77,17 @@ module.exports = (env, options) => {
             icons: [
               {
                 src: path.resolve(APP_ICON),
-                sizes: [96, 128, 192, 256, 512] // multiple sizes
+                sizes: [96, 128, 192, 256, 512]
               }
             ]
           })
+        */
     ];
 
     return {
         devtool: isProduction? '' : 'inline-source-map',
         entry: {
-            vendor: ['react', 'react-dom', 'react-loadable'],
+            vendor: ['react', 'react-dom', 'react-loadable', 'mobx'],
             client: './app/index.ts',
         },
         output: {
@@ -145,7 +147,10 @@ module.exports = (env, options) => {
         resolve: {
             extensions: [".tsx", ".ts", ".js"],
             alias: {
-                '@': path.resolve(__dirname, 'app/')
+                '@': path.resolve(__dirname, 'app/'),
+                '#': path.resolve(__dirname, 'build/contracts/'),
+                'bn.js': path.resolve(__dirname, 'node_modules/bn.js'),
+                'eth-lib': path.resolve(__dirname, 'node_modules/eth-lib'),
             }
         },
         devServer: {

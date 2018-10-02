@@ -1,8 +1,10 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 import styled from 'styled-components';
-import ReversiBoard from '@/component/ReversiBoard/Lodable';
-import Dasboard from '@/component/Dashboard/Loadable';
-import Status from '@/component/Status/Loadable';
+import contractService from '@/service/contract';
+// import ReversiBoard from '@/component/ReversiBoard/Lodable';
+// import Dasboard from '@/component/Dashboard/Loadable';
+// import Status from '@/component/Status/Loadable';
 
 const Container = styled.div`
     display: flex;
@@ -15,15 +17,28 @@ const Section = styled.div`
     flex-direction: column;
 `;
 
+@observer
 class Main extends React.Component {
+
+    public componentDidMount() {
+
+    }
+
     public render() {
         return (
             <Container>
-                <Section>
+                {!contractService.loaded && (
+                    'LOADING.....'
+                )}
+
+                {contractService.loaded && (
+                    'Loaded!!!!!'
+                )}
+                {/* <Section>
                     <ReversiBoard />
                     <Status />
                 </Section>
-                <Dasboard />
+                <Dasboard /> */}
 
             </Container>
         );

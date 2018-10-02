@@ -12,12 +12,14 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./app/*"],
+      "#/*": ["./build/contracts/*"],
       "lodash/*": ["node_modules/@types/lodash-es/*"],
     }
   },
   "include": [
     "./app/**/*.ts",
-    "./app/**/*.tsx"
+    "./app/**/*.tsx",
+    "./build/contracts/*.json",
   ],
   "exclude": [
     "node_modules",
