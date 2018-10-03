@@ -1,13 +1,17 @@
-interface Var {
-    call : () => void;
+interface Variable<T> {
+    call : () => T;
 }
 interface Method {
     send : (param : { from : string }) => any;
 }
 
-export interface ContractMethods {
-    myString : () => Var;
+interface ContractMethods {
+    myString : () => Variable<string>;
     set : (str : string) => Method;
+}
+
+export interface ContractHandlerInterface {
+    methods : ContractMethods;
 }
 
 export interface ContractInterface {

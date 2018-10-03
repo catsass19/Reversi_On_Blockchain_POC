@@ -1,5 +1,5 @@
 import { observable } from 'mobx';
-import { ContractInterface, NetworkInterface } from './interface';
+import { ContractInterface, NetworkInterface, ContractHandlerInterface } from './interface';
 
 interface ManifestInterface {
     abi : Array<any>;
@@ -17,7 +17,7 @@ class Contract implements ContractInterface {
     @observable public address : string;
     @observable public myString : string;
 
-    private contractHandler;
+    private contractHandler : ContractHandlerInterface;
     private contractManifest : ManifestInterface;
     private network : NetworkInterface;
 

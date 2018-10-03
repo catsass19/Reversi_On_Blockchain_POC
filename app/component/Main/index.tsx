@@ -39,9 +39,15 @@ class Main extends React.Component {
                         {contract && (
                             <div>
                                 Contract Address: {contract.address}
+                                <div>
+                                    string: {contract.myString}
+                                </div>
                                 <button
                                     onClick={() => {
-                                        contract.setString('123');
+                                        const str = prompt('Please input new string');
+                                        if (str) {
+                                            contract.setString(str);
+                                        }
                                     }}
                                 >
                                     set string
