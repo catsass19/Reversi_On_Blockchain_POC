@@ -19,10 +19,9 @@
   "include": [
     "./app/**/*.ts",
     "./app/**/*.tsx",
-    "./build/contracts/*.json",
   ],
   "exclude": [
     "node_modules",
-    "./app/**/*/__tests__"
+    "./app/**/*/__tests__",
   ]
 }

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
 import styled from 'styled-components';
-import contractService from '@/service/contract';
+import networkService from '@/service/network';
 // import ReversiBoard from '@/component/ReversiBoard/Lodable';
 // import Dasboard from '@/component/Dashboard/Loadable';
 // import Status from '@/component/Status/Loadable';
@@ -25,14 +25,30 @@ class Main extends React.Component {
     }
 
     public render() {
+        const { contract } = networkService;
         return (
             <Container>
-                {!contractService.loaded && (
+                {!networkService.loaded && (
                     'LOADING.....'
                 )}
 
-                {contractService.loaded && (
-                    'Loaded!!!!!'
+                {networkService.loaded && (
+                    <div>
+                        {networkService.network}
+                        <div>Wallet: {networkService.wallet}</div>
+                        {contract && (
+                            <div>
+                                Contract Address: {contract.address}
+                                <button
+                                    onClick={() => {
+                                        contract.setString('123');
+                                    }}
+                                >
+                                    set string
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 )}
                 {/* <Section>
                     <ReversiBoard />
