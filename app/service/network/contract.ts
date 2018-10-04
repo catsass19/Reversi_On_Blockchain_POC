@@ -28,15 +28,20 @@ class Contract implements ContractInterface {
         this.init();
     }
 
-    public setString(str : string) {
-        this.walletHandler
-          .methods
-          .set(str)
-          .send({ from: this.network.wallet })
-          .on('confirmation', () => {})
-          .on('receipt', (data) => {
-              console.log(data);
-          });
+    public setString = (str : string) => this.writeWrapper('set')(str);
+
+    private writeWrapper = (method : string) => {
+        return (...arr) => {
+            if (this.walletHandler) {
+                this.walletHandler
+                    .methods[method](...arr)
+                    .send({ from: this.network.wallet })
+                    .on('confirmation', () => {})
+                    .on('receipt', (data) => {
+                        console.log(`Successfully performed [${method}] with parameters: ${arr}`);
+                    });
+            }
+        };
     }
 
     private async init() {
@@ -59,7 +64,6 @@ class Contract implements ContractInterface {
         if (this.contractHandler) {
             const myStr = await this.contractHandler.methods.myString().call();
             this.myString = myStr;
-            console.log(myStr);
         }
     }
     private eventListener() {
