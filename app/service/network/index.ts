@@ -4,6 +4,7 @@ import Contract from './contract';
 
 declare global {
     interface Window {
+        ethereum : any;
         web3 : any;
     }
 }
@@ -26,7 +27,7 @@ class Network implements NetworkInterface {
     private walletHandler;
 
     constructor() {
-        this.loadResource();
+        this.init();
     }
 
     @computed public get network() : string {
@@ -53,14 +54,23 @@ class Network implements NetworkInterface {
         };
     }
 
-    private loadResource = async () => {
-        const blockchainHandler = await  import(/* webpackChunkName: "web3" */'web3');
-        this.blockchainHandler = new blockchainHandler.default(this.getWebsocketProvider());
-        this.walletHandler = (window.web3) ? new blockchainHandler.default(window.web3.currentProvider) : null;
-        this.connect();
+    private init = async () => {
+        const web3 = await  import(/* webpackChunkName: "web3" */'web3');
+        if (window.ethereum) {
+            this.walletHandler = new web3.default(window.ethereum);
+            await window.ethereum.enable();
+        } else if (window.web3) {
+            this.walletHandler = new web3.default(window.web3.currentProvider);
+        }
+        await this.connectWallet();
+        this.blockchainHandler = new web3.default(this.getWebsocketProvider());
+        runInAction(() => {
+            this.loaded = true;
+            this.contract = new Contract(this);
+        });
     }
 
-    private connect = async () => {
+    private connectWallet = async () => {
         let wallet;
         let netId;
         if (this.walletHandler) {
@@ -73,15 +83,12 @@ class Network implements NetworkInterface {
             ]);
             wallet = walletAddr;
             netId = id;
-
         } else {
-            netId = 4;
+            netId = 4; // If we dont get net id from wallet, use Rinkeby
         }
         runInAction(() => {
-            this.loaded = true;
             this.wallet = wallet;
             this.netId = netId;
-            this.contract = new Contract(this);
         });
     }
 
@@ -91,6 +98,7 @@ class Network implements NetworkInterface {
     }
     private getNetId = () : Promise<number> => this.walletHandler.eth.net.getId();
     private getWebsocketProvider() {
+        console.log(this.netId);
         switch(this.netId) {
             case 1:
                 return 'wss://mainnet.infura.io/_ws';

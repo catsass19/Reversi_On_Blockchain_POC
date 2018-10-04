@@ -10,12 +10,13 @@
   },
   "scripts": {
     "test": "jest --coverage",
-    "dev": "npm run build-contract && npm run migrate-contract && npm run test && webpack-dev-server --mode development --host 0.0.0.0",
+    "dev": "npm run build-contract && npm run migrate-contract-dev && npm run test && webpack-dev-server --mode development --host 0.0.0.0",
     "build": "npm run test && webpack --mode production --progress",
     "electron": "npm run test && export BASE_URL=./ && webpack --mode production --target electron-renderer && electron ./electron.js",
     "dev-chain": "ganache-cli -b",
     "build-contract": "truffle compile",
-    "migrate-contract": "truffle migrate --reset",
+    "migrate-contract-dev": "truffle migrate --network development --reset",
+    "migrate-contract-rinkeby": "truffle migrate --network rinkeby --reset",
     "test-contract": "truffle test"
   },
   "jest": {
@@ -75,6 +76,7 @@
     "jest": "^23.5.0",
     "thread-loader": "^1.2.0",
     "truffle": "^4.1.14",
+    "truffle-hdwallet-provider": "0.0.6",
     "ts-jest": "^23.1.4",
     "ts-loader": "^4.5.0",
     "tslint": "^5.11.0",
