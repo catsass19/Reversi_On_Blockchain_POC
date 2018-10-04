@@ -1,4 +1,4 @@
-import { observable } from 'mobx';
+import { observable, action, runInAction } from 'mobx';
 import { ContractInterface, NetworkInterface, HandlerInterface } from './interface';
 
 interface ManifestInterface {
@@ -14,6 +14,7 @@ interface ManifestInterface {
 
 class Contract implements ContractInterface {
 
+    @observable public updatedTime : Date = new Date();
     @observable public address : string;
     @observable public myString : string;
 
@@ -30,30 +31,32 @@ class Contract implements ContractInterface {
 
     public setString = (str : string) => this.writeWrapper('set')(str);
 
+    private loadManifest = () => import('#/Deversi.json');
+
     private writeWrapper = (method : string) => {
         return (...arr) => {
-            if (this.walletHandler) {
+            if (this.walletHandler && this.network.wallet) {
                 this.walletHandler
                     .methods[method](...arr)
                     .send({ from: this.network.wallet })
                     .on('confirmation', () => {})
                     .on('receipt', (data) => {
                         console.log(`Successfully performed [${method}] with parameters: ${arr}`);
-                    });
+                    })
+                    .on('error', () => console.log('unexpected error'));
             }
         };
     }
 
     private async init() {
         this.contractManifest = (await this.loadManifest()).default;
-        this.address = await this.getContractAddress();
+        const address = await this.getContractAddress();
+        runInAction(() => this.address = address);
         this.contractHandler = this.network.getContractHandler(this.contractManifest.abi, this.address);
         this.walletHandler = this.network.getWalletHandler(this.contractManifest.abi, this.address);
         this.getContractState();
         this.eventListener();
     }
-
-    private loadManifest = () => import('#/Deversi.json');
     private getContractAddress() : string {
         const netId = this.network.netId;
         const infoOnNetwork = this.contractManifest.networks[`${netId}`];
@@ -63,13 +66,20 @@ class Contract implements ContractInterface {
     private async getContractState() {
         if (this.contractHandler) {
             const myStr = await this.contractHandler.methods.myString().call();
-            this.myString = myStr;
+            this.updateContractState(myStr);
         }
     }
+
+    @action
+    private updateContractState(str : string) {
+        this.myString = str;
+        this.updatedTime = new Date();
+    }
+
     private eventListener() {
         if (this.contractHandler) {
             this.contractHandler.events.StringUpdated({}, (...arr) => {
-                console.log('received event!', ...arr);
+                this.getContractState();
             });
         }
     }

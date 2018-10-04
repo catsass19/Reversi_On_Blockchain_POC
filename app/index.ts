@@ -1,6 +1,11 @@
 import * as ReactDOM from 'react-dom';
+import { configure } from 'mobx';
 import AppMain from '@/component/Main/';
 import appService from '@/service/app';
+
+configure({
+  enforceActions: 'always',
+});
 
 (async () => {
 

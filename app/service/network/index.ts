@@ -1,4 +1,4 @@
-import { observable, computed } from 'mobx';
+import { observable, computed, runInAction } from 'mobx';
 import { NetworkInterface } from './interface';
 import Contract from './contract';
 
@@ -55,28 +55,34 @@ class Network implements NetworkInterface {
 
     private loadResource = async () => {
         const blockchainHandler = await  import(/* webpackChunkName: "web3" */'web3');
-        this.loaded = true;
         this.blockchainHandler = new blockchainHandler.default(this.getWebsocketProvider());
         this.walletHandler = (window.web3) ? new blockchainHandler.default(window.web3.currentProvider) : null;
         this.connect();
     }
 
     private connect = async () => {
+        let wallet;
+        let netId;
         if (this.walletHandler) {
             const [
                 walletAddr,
-                netId,
+                id,
             ] = await Promise.all([
                 this.getWalletAddress(),
                 this.getNetId(),
             ]);
-            this.wallet = walletAddr;
-            this.netId = netId;
+            wallet = walletAddr;
+            netId = id;
 
         } else {
-            this.netId = 4;
+            netId = 4;
         }
-        this.contract = new Contract(this);
+        runInAction(() => {
+            this.loaded = true;
+            this.wallet = wallet;
+            this.netId = netId;
+            this.contract = new Contract(this);
+        });
     }
 
     private getWalletAddress = async () : Promise<string> => {
