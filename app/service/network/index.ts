@@ -23,6 +23,7 @@ class Network implements NetworkInterface {
     @observable public contract : Contract;
 
     private blockchainHandler;
+    private walletHandler;
 
     constructor() {
         this.loadResource();
@@ -41,35 +42,59 @@ class Network implements NetworkInterface {
         }
     }
 
-    public getContractHandler = (abi : Array<any>, addr : string) => new this.blockchainHandler.eth.Contract(abi, addr);
+    public getContractHandler = (abi : Array<any>, addr : string) => this.getHandler('blockchainHandler')(abi, addr);
+    public getWalletHandler = (abi : Array<any>, addr : string) => this.getHandler('walletHandler')(abi, addr);
+
+    private getHandler = (target : string) => {
+        return (abi : Array<any>, addr : string) => {
+            if (this[target] && abi.length && addr) {
+                return new this[target].eth.Contract(abi, addr);
+            }
+        };
+    }
 
     private loadResource = async () => {
         const blockchainHandler = await  import(/* webpackChunkName: "web3" */'web3');
         this.loaded = true;
-        this.blockchainHandler = (window.web3)
-            ? new blockchainHandler.default(window.web3.currentProvider)
-            : new blockchainHandler.default(window.web3.currentProvider); // should be replaced as external provider
+        this.blockchainHandler = new blockchainHandler.default(this.getWebsocketProvider());
+        this.walletHandler = (window.web3) ? new blockchainHandler.default(window.web3.currentProvider) : null;
         this.connect();
     }
 
     private connect = async () => {
-        const [
-            walletAddr,
-            netId,
-        ] = await Promise.all([
-            this.getWalletAddress(),
-            this.getNetId(),
-        ]);
-        this.wallet = walletAddr;
-        this.netId = netId;
+        if (this.walletHandler) {
+            const [
+                walletAddr,
+                netId,
+            ] = await Promise.all([
+                this.getWalletAddress(),
+                this.getNetId(),
+            ]);
+            this.wallet = walletAddr;
+            this.netId = netId;
+
+        } else {
+            this.netId = 4;
+        }
         this.contract = new Contract(this);
     }
 
     private getWalletAddress = async () : Promise<string> => {
-        const addr = await this.blockchainHandler.eth.getAccounts();
+        const addr = await this.walletHandler.eth.getAccounts();
         return addr[0];
     }
-    private getNetId = () : Promise<number> => this.blockchainHandler.eth.net.getId();
+    private getNetId = () : Promise<number> => this.walletHandler.eth.net.getId();
+    private getWebsocketProvider() {
+        switch(this.netId) {
+            case 1:
+                return 'wss://mainnet.infura.io/_ws';
+            case 4:
+                return 'wss://rinkeby.infura.io/ws';
+            case 5777:
+            default:
+                return 'ws://localhost:8545';
+        }
+    }
 }
 
 const contractService = new Network();

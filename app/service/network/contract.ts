@@ -1,5 +1,5 @@
 import { observable } from 'mobx';
-import { ContractInterface, NetworkInterface, ContractHandlerInterface } from './interface';
+import { ContractInterface, NetworkInterface, HandlerInterface } from './interface';
 
 interface ManifestInterface {
     abi : Array<any>;
@@ -17,7 +17,9 @@ class Contract implements ContractInterface {
     @observable public address : string;
     @observable public myString : string;
 
-    private contractHandler : ContractHandlerInterface;
+    private contractHandler : HandlerInterface;
+    private walletHandler : HandlerInterface;
+
     private contractManifest : ManifestInterface;
     private network : NetworkInterface;
 
@@ -27,7 +29,7 @@ class Contract implements ContractInterface {
     }
 
     public setString(str : string) {
-        this.contractHandler
+        this.walletHandler
           .methods
           .set(str)
           .send({ from: this.network.wallet })
@@ -40,9 +42,10 @@ class Contract implements ContractInterface {
     private async init() {
         this.contractManifest = (await this.loadManifest()).default;
         this.address = await this.getContractAddress();
-        this.contractHandler = this.getContractHandler();
+        this.contractHandler = this.network.getContractHandler(this.contractManifest.abi, this.address);
+        this.walletHandler = this.network.getWalletHandler(this.contractManifest.abi, this.address);
         this.getContractState();
-
+        this.eventListener();
     }
 
     private loadManifest = () => import('#/Deversi.json');
@@ -51,14 +54,20 @@ class Contract implements ContractInterface {
         const infoOnNetwork = this.contractManifest.networks[`${netId}`];
         return infoOnNetwork ? infoOnNetwork.address : '';
     }
-    private getContractHandler() {
-        const { abi } = this.contractManifest;
-        return this.network.getContractHandler(abi, this.address);
-    }
+
     private async getContractState() {
-        const myStr = await this.contractHandler.methods.myString().call();
-        this.myString = myStr;
-        console.log(myStr);
+        if (this.contractHandler) {
+            const myStr = await this.contractHandler.methods.myString().call();
+            this.myString = myStr;
+            console.log(myStr);
+        }
+    }
+    private eventListener() {
+        if (this.contractHandler) {
+            this.contractHandler.events.StringUpdated({}, (...arr) => {
+                console.log('received event!', ...arr);
+            });
+        }
     }
 }
 

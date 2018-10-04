@@ -5,13 +5,27 @@ interface Method {
     send : (param : { from : string }) => any;
 }
 
+type EventSubscriber = (
+    options : {
+        filter? : any,
+        fromBlock? : number,
+        topics?  : Array<any>,
+    },
+    callback : () => void,
+) => void;
+
 interface ContractMethods {
-    myString : () => Variable<string>;
-    set : (str : string) => Method;
+  myString : () => Variable<string>;
+  set : (str : string) => Method;
 }
 
-export interface ContractHandlerInterface {
+interface ContractEvents {
+    StringUpdated : EventSubscriber;
+}
+
+export interface HandlerInterface {
     methods : ContractMethods;
+    events : ContractEvents;
 }
 
 export interface ContractInterface {
@@ -27,4 +41,5 @@ export interface NetworkInterface {
     contract : ContractInterface;
     netId : number;
     getContractHandler : (abi : Array<any>, addr : string) => any;
+    getWalletHandler : (abi : Array<any>, addr : string) => any;
 }
