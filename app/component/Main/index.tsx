@@ -39,9 +39,12 @@ class Main extends React.Component {
                         {contract && (
                             <div>
                                 Contract Address: {contract.address}
-                                <div>
-                                    string: {contract.myString}
-                                </div>
+                                <div>string: {contract.myString}</div>
+                                <div>currentSize: {contract.currentSize}</div>
+                                <div>fundRaisingPeriod: {contract.fundRaisingPeriod}</div>
+                                <div>turnPeriod: {contract.turnPeriod}</div>
+                                <div>currentSharePrice: {contract.currentSharePrice}</div>
+                                <div>fundRaisingCountingDown: {contract.fundRaisingCountingDown ? 'true' : 'false'}</div>
                                 <button
                                     onClick={() => {
                                         const str = prompt('Please input new string');

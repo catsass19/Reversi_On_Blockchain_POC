@@ -17,10 +17,16 @@ type EventSubscriber = (
 interface ContractMethods {
   myString : () => Variable<string>;
   set : (str : string) => Method;
+  currentSize : () => Variable<string>;
+  fundRaisingPeriod : () => Variable<string>;
+  turnPeriod : () => Variable<string>;
+  currentSharePrice : () => Variable<string>;
+  fundRaisingCountingDown : () => Variable<boolean>;
 }
 
 interface ContractEvents {
     StringUpdated : EventSubscriber;
+    NewGameStarted : EventSubscriber;
 }
 
 export interface HandlerInterface {

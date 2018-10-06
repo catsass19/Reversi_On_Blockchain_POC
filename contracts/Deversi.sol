@@ -7,11 +7,11 @@ contract Deversi {
     uint32 public INIT_TURN_PERIOD = 60;
     uint256 public INIT_SHARE_PRICE = 1000000000000000;
     uint8 public INIT_SHARE_GROWTH_RATE = 5;
-    enum _TEAM { BULL, BEAR, NONE }
+    enum _TEAM { CAT, DOG, NONE }
 
     struct Ledger {
-        uint256 BULL;
-        uint256 BEAR;
+        uint256 CAT;
+        uint256 DOG;
     }
     struct User {
         _TEAM team;
@@ -28,6 +28,7 @@ contract Deversi {
 
     // Game control
     uint32 public gameRound;
+    uint8 public currentSize;
     uint16 public currentTurn;
     uint256 public currentSharePrice;
     bool public fundRaisingCountingDown;
@@ -38,6 +39,7 @@ contract Deversi {
 
     string public myString = "Hello World2";
     event StringUpdated();
+    event NewGameStarted(uint32 round, uint time);
 
     constructor() public {
         owner = msg.sender;
@@ -54,10 +56,12 @@ contract Deversi {
 
     function startNewGame() private {
         gameRound = gameRound + 1;
+        currentSize = size;
         currentTurn = 0;
         currentSharePrice = baseSharePrice;
         fundRaisingCountingDown = false;
         currentTeam = _TEAM.NONE;
+        emit NewGameStarted(gameRound, now);
     }
 
     function set(string x) public {

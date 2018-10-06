@@ -1,5 +1,11 @@
 const DeversiContract = artifacts.require("./Deversi.sol");
 
+const TEAM_ENUM = {
+  CAT: '0',
+  DOG: '1',
+  NONE: '2',
+};
+
 contract("Deversi", accounts => {
   it("should store the string 'Hey there!'", async () => {
     const Deversi = await DeversiContract.deployed();
@@ -26,10 +32,14 @@ contract("Deversi", accounts => {
     const turnPeriod = await Deversi.turnPeriod.call();
     const baseSharePrice = await Deversi.baseSharePrice.call();
     const shareGrowthRate = await Deversi.shareGrowthRate.call();
+    const currentTeam = await Deversi.currentTeam.call();
+    const currentSize = await Deversi.currentSize.call();
 
     assert.equal(owner, accounts[0], 'owner is not set to contract initiator');
     assert.equal(gameRound, 1, 'game round is not set to 1');
+    assert.equal(currentTeam, TEAM_ENUM.NONE, 'currentTeam is not set to NONE');
     assert.equal(size.toFixed(), init_size.toFixed(), 'size is not set to init value');
+    assert.equal(currentSize.toFixed(), size.toFixed(), 'currentSize is not set to correct value');
     assert.equal(fundRaisingPeriod.toFixed(), init_raising_period.toFixed(), 'fundRaisingPeriod is not set to init value');
     assert.equal(turnPeriod.toFixed(), init_turn_period.toFixed(), 'turnPeriod is not set to init value');
     assert.equal(baseSharePrice.toFixed(), init_share_price.toFixed(), 'baseSharePrice is not set to init value');

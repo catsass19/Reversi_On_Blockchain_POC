@@ -18,6 +18,12 @@ class Contract implements ContractInterface {
     @observable public address : string;
     @observable public myString : string;
 
+    @observable public currentSize : string;
+    @observable public fundRaisingPeriod : string;
+    @observable public turnPeriod : string;
+    @observable public currentSharePrice : string;
+    @observable public fundRaisingCountingDown : boolean;
+
     private contractHandler : HandlerInterface;
     private walletHandler : HandlerInterface;
 
@@ -66,14 +72,28 @@ class Contract implements ContractInterface {
     private async getContractState() {
         if (this.contractHandler) {
             const myStr = await this.contractHandler.methods.myString().call();
-            this.updateContractState(myStr);
+            const [
+                currentSize,
+                fundRaisingPeriod,
+                turnPeriod,
+                currentSharePrice,
+                fundRaisingCountingDown,
+            ] = await Promise.all([
+                this.contractHandler.methods.currentSize().call(),
+                this.contractHandler.methods.fundRaisingPeriod().call(),
+                this.contractHandler.methods.turnPeriod().call(),
+                this.contractHandler.methods.currentSharePrice().call(),
+                this.contractHandler.methods.fundRaisingCountingDown().call(),
+            ]);
+            runInAction(() => {
+                this.myString = myStr;
+                this.currentSize = currentSize;
+                this.fundRaisingPeriod = fundRaisingPeriod;
+                this.turnPeriod = turnPeriod;
+                this.currentSharePrice = currentSharePrice;
+                this.fundRaisingCountingDown = fundRaisingCountingDown;
+            });
         }
-    }
-
-    @action
-    private updateContractState(str : string) {
-        this.myString = str;
-        this.updatedTime = new Date();
     }
 
     private eventListener() {
