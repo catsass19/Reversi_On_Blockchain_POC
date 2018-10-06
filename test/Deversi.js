@@ -34,6 +34,7 @@ contract("Deversi", accounts => {
     const shareGrowthRate = await Deversi.shareGrowthRate.call();
     const currentTeam = await Deversi.currentTeam.call();
     const currentSize = await Deversi.currentSize.call();
+    const currentSharePrice = await Deversi.currentSharePrice.call();
 
     assert.equal(owner, accounts[0], 'owner is not set to contract initiator');
     assert.equal(gameRound, 1, 'game round is not set to 1');
@@ -44,6 +45,7 @@ contract("Deversi", accounts => {
     assert.equal(turnPeriod.toFixed(), init_turn_period.toFixed(), 'turnPeriod is not set to init value');
     assert.equal(baseSharePrice.toFixed(), init_share_price.toFixed(), 'baseSharePrice is not set to init value');
     assert.equal(shareGrowthRate.toFixed(), init_share_growth_rate.toFixed(), 'shareGrowthRate is not set to init value');
+    assert.equal(currentSharePrice.toFixed(), baseSharePrice.toFixed(), 'currentSharePrice is not set to init value');
   });
   it('non-Owner should not be able to configure', async() => {
     const Deversi = await DeversiContract.deployed();
@@ -74,5 +76,55 @@ contract("Deversi", accounts => {
     assert.equal(turnPeriod.toFixed(), '62', 'turnPeriod is not configured');
     assert.equal(baseSharePrice.toFixed(), '2000000000000000', 'baseSharePrice is not configured');
     assert.equal(shareGrowthRate.toFixed(), '6', 'shareGrowthRate is not configured');
+  });
+  it('zero funding should fail', async () => {
+    const Deversi = await DeversiContract.deployed();
+    try {
+      await Deversi.funding(
+        TEAM_ENUM.CAT,
+        { from: accounts[0], value: '0' }
+      );
+    } catch(e) {
+      return;
+    }
+    throw new Error('should not get here');
+  });
+  it('should be able to fund on the first time', async () => {
+    const Deversi = await DeversiContract.deployed();
+    const currentSharePrice = await Deversi.currentSharePrice.call();
+    const [ catFund, dogFund ] = await Deversi.getTeamFundingStatus.call();
+    assert.equal(catFund.toFixed(), '0', 'Invalid team fund');
+    assert.equal(dogFund.toFixed(), '0', 'Invalid team fund');
+    await Deversi.funding(
+      TEAM_ENUM.CAT,
+      { from: accounts[0], value: currentSharePrice.times(2).toFixed() }
+    );
+    const [
+      isExist,
+      team,
+      CAT,
+      DOG,
+    ] = await Deversi.getUserStatus.call(accounts[0]);
+    const [ catFundAfter, dogFundAfter ] = await Deversi.getTeamFundingStatus.call();
+    assert.equal(catFundAfter.toFixed(), '2', 'Invalid team fund');
+    assert.equal(dogFundAfter.toFixed(), '0', 'Invalid team fund');
+    assert.equal(CAT.toFixed(), '2', 'Invalid share amount in team CAT');
+    assert.equal(DOG.toFixed(), '0', 'Invalid share amount in team DOG');
+    assert.equal(team.toFixed(), `${TEAM_ENUM.CAT}`, 'team should be CAT');
+    assert.equal(isExist, true, 'isExist should be true');
+  });
+
+  it('fund again with the same account should fail', async () => {
+    const Deversi = await DeversiContract.deployed();
+    const currentSharePrice = await Deversi.currentSharePrice.call();
+    try {
+      await Deversi.funding(
+        TEAM_ENUM.CAT,
+        { from: accounts[0], value: currentSharePrice.times(2).toFixed() }
+      );
+    } catch(e) {
+      return;
+    }
+    throw new Error('should not get here');
   });
 });

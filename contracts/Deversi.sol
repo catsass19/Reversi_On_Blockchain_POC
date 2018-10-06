@@ -1,9 +1,10 @@
 pragma solidity ^0.4.24;
+pragma experimental ABIEncoderV2;
 
 contract Deversi {
 
     uint8 public INIT_SIZE = 6;
-    uint32 public INIT_RAISING_PERIOD = 60;
+    uint32 public INIT_RAISING_PERIOD = 120;
     uint32 public INIT_TURN_PERIOD = 60;
     uint256 public INIT_SHARE_PRICE = 1000000000000000;
     uint8 public INIT_SHARE_GROWTH_RATE = 5;
@@ -16,6 +17,7 @@ contract Deversi {
     struct User {
         _TEAM team;
         Ledger ledger;
+        bool isExist;
     }
 
     // System config
@@ -31,6 +33,7 @@ contract Deversi {
     uint8 public currentSize;
     uint16 public currentTurn;
     uint256 public currentSharePrice;
+    Ledger public currentFundingStatus;
     bool public fundRaisingCountingDown;
     uint256 public countingStartedTime;
     _TEAM public currentTeam;
@@ -61,9 +64,54 @@ contract Deversi {
         currentSharePrice = baseSharePrice;
         fundRaisingCountingDown = false;
         currentTeam = _TEAM.NONE;
+        currentFundingStatus.CAT = 0;
+        currentFundingStatus.DOG = 0;
         emit NewGameStarted(gameRound, now);
     }
 
+    function funding(_TEAM teamChoosen) public payable {
+        require(currentTurn == 0, "funding is only allowed at turn 0");
+        require(msg.value > 0, "Funds required");
+        if (fundRaisingCountingDown) {
+            require(now < (countingStartedTime + fundRaisingPeriod), "funding is over");
+            // turn start trigger point
+        }
+        require(userStatus[gameRound][msg.sender].isExist != true, "Already funded!");
+
+        uint shareAmount = msg.value / currentSharePrice;
+        if (teamChoosen == _TEAM.CAT) {
+            userStatus[gameRound][msg.sender].ledger.CAT = shareAmount;
+            currentFundingStatus.CAT += shareAmount;
+        } else if (teamChoosen == _TEAM.DOG) {
+            userStatus[gameRound][msg.sender].ledger.DOG = shareAmount;
+            currentFundingStatus.DOG += shareAmount;
+        } else {
+            revert("Invalid team");
+        }
+        userStatus[gameRound][msg.sender].team = teamChoosen;
+        userStatus[gameRound][msg.sender].isExist = true;
+    }
+
+    function getUserStatus(address addr) public view returns (
+        bool isExist,
+        _TEAM team,
+        uint256 CAT,
+        uint256 DOG
+    ) {
+        isExist = userStatus[gameRound][addr].isExist;
+        team = userStatus[gameRound][addr].team;
+        CAT = userStatus[gameRound][addr].ledger.CAT;
+        DOG = userStatus[gameRound][addr].ledger.DOG;
+        return (isExist, team, CAT, DOG);
+    }
+    function getTeamFundingStatus() public view returns(
+        uint256 CAT,
+        uint256 DOG
+    ) {
+        CAT = currentFundingStatus.CAT;
+        DOG = currentFundingStatus.DOG;
+        return (CAT, DOG);
+    }
     function set(string x) public {
         myString = x;
         emit StringUpdated();
