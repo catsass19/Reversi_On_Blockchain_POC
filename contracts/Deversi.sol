@@ -1,5 +1,4 @@
 pragma solidity ^0.4.24;
-pragma experimental ABIEncoderV2;
 
 contract Deversi {
 
@@ -43,6 +42,7 @@ contract Deversi {
     string public myString = "Hello World2";
     event StringUpdated();
     event NewGameStarted(uint32 round, uint time);
+    event fundRaisingCountdown(uint32 round, uint time);
 
     constructor() public {
         owner = msg.sender;
@@ -90,6 +90,16 @@ contract Deversi {
         }
         userStatus[gameRound][msg.sender].team = teamChoosen;
         userStatus[gameRound][msg.sender].isExist = true;
+        if (fundRaisingCountingDown == false) {
+            if (
+                (currentFundingStatus.CAT > 0) &&
+                (currentFundingStatus.DOG > 0)
+            ) {
+                fundRaisingCountingDown = true;
+                countingStartedTime = now;
+                emit fundRaisingCountdown(gameRound, now);
+            }
+        }
     }
 
     function getUserStatus(address addr) public view returns (

@@ -2,7 +2,7 @@ interface Variable<T> {
     call : () => T;
 }
 interface Method {
-    send : (param : { from : string }) => any;
+    send : (param : { from : string, value? : string }) => any;
 }
 
 type EventSubscriber = (
@@ -22,11 +22,15 @@ interface ContractMethods {
   turnPeriod : () => Variable<string>;
   currentSharePrice : () => Variable<string>;
   fundRaisingCountingDown : () => Variable<boolean>;
+  countingStartedTime : () => Variable<string>;
+  funding : (team : number, amount : string) => Method;
+  getTeamFundingStatus : () => Variable<[string, string]>;
 }
 
 interface ContractEvents {
     StringUpdated : EventSubscriber;
     NewGameStarted : EventSubscriber;
+    fundRaisingCountdown : EventSubscriber;
 }
 
 export interface HandlerInterface {
@@ -41,6 +45,7 @@ export interface ContractInterface {
 }
 
 export interface NetworkInterface {
+    web3 : any;
     loaded : boolean;
     wallet : string;
     network : string;

@@ -45,15 +45,40 @@ class Main extends React.Component {
                                 <div>turnPeriod: {contract.turnPeriod}</div>
                                 <div>currentSharePrice: {contract.currentSharePrice}</div>
                                 <div>fundRaisingCountingDown: {contract.fundRaisingCountingDown ? 'true' : 'false'}</div>
+                                {contract.countingStartedTime && (
+                                    <div>countingStartedTime: {contract.countingStartedTime} - {(new Date(Number(contract.countingStartedTime) * 1000)).toLocaleString()}</div>
+                                )}
+                                <div>teamCatFunding: {contract.teamCatFunding}</div>
+                                <div>teamDogFunding: {contract.teamDogFunding}</div>
                                 <button
                                     onClick={() => {
-                                        const str = prompt('Please input new string');
-                                        if (str) {
-                                            contract.setString(str);
+                                        const string = prompt('new string');
+                                        if (string) {
+                                            contract.setString(string);
                                         }
                                     }}
                                 >
                                     set string
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        const value = prompt('How much do you want to fund for cat?');
+                                        if (value) {
+                                            contract.fund(contract.TEAM.CAT, value);
+                                        }
+                                    }}
+                                >
+                                    fund cat
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        const value = prompt('How much do you want to fund for dog?');
+                                        if (value) {
+                                            contract.fund(contract.TEAM.DOG, value);
+                                        }
+                                    }}
+                                >
+                                    fund dog
                                 </button>
                             </div>
                         )}

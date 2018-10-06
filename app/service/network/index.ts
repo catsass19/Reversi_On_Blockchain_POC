@@ -23,6 +23,8 @@ class Network implements NetworkInterface {
     @observable public netId : number;
     @observable public contract : Contract;
 
+    public web3 : any;
+
     private blockchainHandler;
     private walletHandler;
 
@@ -56,6 +58,7 @@ class Network implements NetworkInterface {
 
     private init = async () => {
         const web3 = await  import(/* webpackChunkName: "web3" */'web3');
+        this.web3 = web3;
         if (window.ethereum) {
             this.walletHandler = new web3.default(window.ethereum);
             await window.ethereum.enable();
