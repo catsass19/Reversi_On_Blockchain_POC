@@ -46,10 +46,23 @@ class Main extends React.Component {
                                 <div>currentSharePrice: {contract.currentSharePrice}</div>
                                 <div>fundRaisingCountingDown: {contract.fundRaisingCountingDown ? 'true' : 'false'}</div>
                                 {contract.countingStartedTime && (
-                                    <div>countingStartedTime: {contract.countingStartedTime} - {(new Date(Number(contract.countingStartedTime) * 1000)).toLocaleString()}</div>
+                                    <>
+                                        <div>countingStartedTime: {contract.countingStartedTime} - {(new Date(Number(contract.countingStartedTime) * 1000)).toLocaleString()}</div>
+                                        <div>funding end time: {(
+                                            new Date(
+                                                (Number(contract.countingStartedTime) + Number(contract.fundRaisingPeriod)) * 1000
+                                            )).toLocaleString()} </div>
+                                    </>
                                 )}
                                 <div>teamCatFunding: {contract.teamCatFunding}</div>
                                 <div>teamDogFunding: {contract.teamDogFunding}</div>
+                                {contract.userStatus && (
+                                    <>
+                                        <div>team {contract.userStatus.team}</div>
+                                        <div>cat share {contract.userStatus.catShare}</div>
+                                        <div>dog share {contract.userStatus.dogShare}</div>
+                                    </>
+                                )}
                                 <button
                                     onClick={() => {
                                         const string = prompt('new string');

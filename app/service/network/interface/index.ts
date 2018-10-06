@@ -25,6 +25,7 @@ interface ContractMethods {
   countingStartedTime : () => Variable<string>;
   funding : (team : number, amount : string) => Method;
   getTeamFundingStatus : () => Variable<[string, string]>;
+  getUserStatus : (addr : string) => Variable<[boolean, string, string, string]>;
 }
 
 interface ContractEvents {

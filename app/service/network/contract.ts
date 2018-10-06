@@ -12,6 +12,12 @@ interface ManifestInterface {
     };
 }
 
+interface UserStatus {
+    team : string;
+    catShare : string;
+    dogShare : string;
+};
+
 class Contract implements ContractInterface {
 
     public TEAM = {
@@ -32,6 +38,7 @@ class Contract implements ContractInterface {
     @observable public countingStartedTime : string;
     @observable public teamCatFunding : string;
     @observable public teamDogFunding : string;
+    @observable public userStatus : UserStatus;
 
     private contractHandler : HandlerInterface;
     private walletHandler : HandlerInterface;
@@ -94,6 +101,7 @@ class Contract implements ContractInterface {
                 fundRaisingCountingDown,
                 countingStartedTime,
                 teamFundingStatus,
+                userStatus,
             ] = await Promise.all([
                 this.contractHandler.methods.currentSize().call(),
                 this.contractHandler.methods.fundRaisingPeriod().call(),
@@ -102,6 +110,7 @@ class Contract implements ContractInterface {
                 this.contractHandler.methods.fundRaisingCountingDown().call(),
                 this.contractHandler.methods.countingStartedTime().call(),
                 this.contractHandler.methods.getTeamFundingStatus().call(),
+                this.contractHandler.methods.getUserStatus(this.network.wallet).call(),
             ]);
             runInAction(() => {
                 this.myString = myStr;
@@ -113,6 +122,11 @@ class Contract implements ContractInterface {
                 this.countingStartedTime = countingStartedTime;
                 this.teamCatFunding = teamFundingStatus[0];
                 this.teamDogFunding = teamFundingStatus[1];
+                this.userStatus = {
+                    team: userStatus[1],
+                    catShare: userStatus[2],
+                    dogShare: userStatus[3],
+                }
             });
         }
     }
