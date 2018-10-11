@@ -10,6 +10,7 @@ import CountDown from '@/component/CountDown';
 const Container = styled.div`
     display: flex;
     height: 100vh;
+    padding: 10px;
 `;
 
 const Section = styled.div`
@@ -102,6 +103,21 @@ class Main extends React.Component {
                                 </button>
                             </div>
                         )}
+                    </div>
+                )}
+                {networkService.loaded && (
+                    <div style={{ textAlign: 'right', width: '100%' }}>
+                        calculated status on UI
+                        <div>calculated turn: {contract.autoTurn}</div>
+                        <div>
+                            <b>{contract.gameResolvedAuto && 'Game is expected to be ended'}</b>
+                        </div>
+                        <div>current time: <b><CountDown /></b></div>
+                        <div>currentTurnEndTime:<b>{
+                            contract.autoTurnEndTime
+                            ? new Date(contract.autoTurnEndTime * 1000).toLocaleString()
+                            : ''}</b>
+                        </div>
                     </div>
                 )}
                 {/* <Section>

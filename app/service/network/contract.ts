@@ -40,6 +40,22 @@ class Contract implements ContractInterface {
     @observable public userStatus : UserStatus;
     @observable public currentTurn : string;
 
+    @observable public autoTurn : string = '0';
+    @observable public turnGap : number = 0;
+
+    @computed public get autoTurnEndTime() {
+        if (Number(this.autoTurn) > 0) {
+            const endTime =
+                Number(this.countingStartedTime) +
+                Number(this.fundRaisingPeriod) +
+                (Number(this.autoTurn) * Number(this.turnPeriod));
+            return endTime;
+        }
+    }
+    @computed public get gameResolvedAuto() {
+        return (this.turnGap >= 2);
+    }
+
     @computed public get currentTurnEndTime() {
         if (Number(this.currentTurn) > 0) {
             const endTime =
@@ -55,6 +71,8 @@ class Contract implements ContractInterface {
 
     private contractManifest : ManifestInterface;
     private network : NetworkInterface;
+
+    private looper;
 
     constructor(network : NetworkInterface) {
         this.network = network;
@@ -75,9 +93,7 @@ class Contract implements ContractInterface {
         ]);
         const sharePriceBig = new this.network.web3.utils.BN(sharePrice);
         const sharesPerProposalBig = new this.network.web3.utils.BN(sharesPerProposal);
-        console.log(sharePriceBig);
         const total = sharePriceBig.mul(sharesPerProposalBig);
-        console.log('total', this.network.web3.utils.fromWei(total.toString()));
         this.writeWrapper('propose')([], total.toString());
     }
 
@@ -106,6 +122,7 @@ class Contract implements ContractInterface {
         this.walletHandler = this.network.getWalletHandler(this.contractManifest.abi, this.address);
         this.getContractState();
         this.eventListener();
+        this.looper = setInterval(() => this.loop(), 1000);
     }
     private getContractAddress() : string {
         const netId = this.network.netId;
@@ -154,6 +171,7 @@ class Contract implements ContractInterface {
                 };
                 this.currentSharePerProposal = currentSharePerProposal;
                 this.currentTurn = currentTurn;
+                this.autoTurn = currentTurn;
             });
         }
     }
@@ -172,6 +190,29 @@ class Contract implements ContractInterface {
                 console.log('new turn start!', arr);
                 this.getContractState();
             });
+        }
+    }
+
+    @action
+    private loop() {
+        let turn = 0;
+        const contractTurn = Number(this.currentTurn);
+        if (this.fundRaisingCountingDown) {
+            const now = Math.floor(new Date().getTime() / 1000);
+            const fundingEndTime = Number(this.countingStartedTime) + Number(this.fundRaisingPeriod);
+            if (now > fundingEndTime) {
+                turn = Math.ceil((now - fundingEndTime) / Number(this.turnPeriod));
+            }
+        }
+
+        if (turn > contractTurn) {
+            const turnGap = turn - Number(contractTurn);
+            if (turnGap >= 2) {
+                console.log('game is exptected to be ended!!');
+                clearInterval(this.looper);
+            }
+            this.autoTurn = `${turn}`;
+            this.turnGap = turnGap;
         }
     }
 }
