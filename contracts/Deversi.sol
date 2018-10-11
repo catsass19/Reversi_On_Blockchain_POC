@@ -2,12 +2,7 @@ pragma solidity ^0.4.24;
 
 contract Deversi {
 
-    uint8 public INIT_SIZE = 6;
-    uint32 public INIT_RAISING_PERIOD = 120;
-    uint32 public INIT_TURN_PERIOD = 60;
-    uint256 public INIT_SHARE_PRICE = 1000000000000000;
-    uint8 public INIT_SHARE_GROWTH_RATE = 5;
-    enum _TEAM { CAT, DOG, NONE }
+    enum _TEAM { NONE, DOG, CAT }
 
     struct Ledger {
         uint256 CAT;
@@ -20,39 +15,46 @@ contract Deversi {
     }
 
     // System config
-    uint8 public size; // board size
+    uint256 public size; // board size
     address public owner;
-    uint32 public fundRaisingPeriod;
-    uint32 public turnPeriod;
+    uint256 public fundRaisingPeriod;
+    uint256 public turnPeriod;
     uint256 public baseSharePrice;
-    uint8 public shareGrowthRate;
+    uint256 public shareGrowthRate;
+    uint256 public sharesPerProposal;
 
     // Game control
-    uint32 public gameRound;
-    uint8 public currentSize;
-    uint16 public currentTurn;
+    bool public inGame;
+    uint256 public gameRound;
+    uint256 public currentSize;
+    uint256 public currentTurn;
     uint256 public currentSharePrice;
+    uint256 public currentSharePerProposal;
+    uint256 public currentShareGrowthRate;
     Ledger public currentFundingStatus;
     bool public fundRaisingCountingDown;
     uint256 public countingStartedTime;
     _TEAM public currentTeam;
 
-    mapping(uint32 => mapping(address => User)) public userStatus;
+    mapping(uint256 => mapping(address => User)) public userStatus;
+    mapping(uint256 => mapping(uint256 => bool)) public roundPropsedStatus;
 
-    string public myString = "Hello World2";
-    event StringUpdated();
-    event NewGameStarted(uint32 round, uint time);
-    event fundRaisingCountdown(uint32 round, uint time);
+    event funded();
+    event NewGameStarted(uint256 round, uint time);
+    event fundRaisingCountdown(uint256 round, uint time);
+    event turnStart(uint256 round, uint256 turn, uint time);
 
     constructor() public {
         owner = msg.sender;
         gameRound = 0;
+        inGame = false;
         configure(
-            INIT_SIZE,
-            INIT_RAISING_PERIOD,
-            INIT_TURN_PERIOD,
-            INIT_SHARE_PRICE,
-            INIT_SHARE_GROWTH_RATE
+            6,
+            40, // funding period
+            30,  // turn period
+            1000000000000000,
+            5,
+            10
         );
         startNewGame();
     }
@@ -62,10 +64,14 @@ contract Deversi {
         currentSize = size;
         currentTurn = 0;
         currentSharePrice = baseSharePrice;
+        currentSharePerProposal = sharesPerProposal;
+        currentShareGrowthRate = shareGrowthRate;
+        sharesPerProposal = 10;
         fundRaisingCountingDown = false;
         currentTeam = _TEAM.NONE;
         currentFundingStatus.CAT = 0;
         currentFundingStatus.DOG = 0;
+        inGame = true;
         emit NewGameStarted(gameRound, now);
     }
 
@@ -73,7 +79,7 @@ contract Deversi {
         require(currentTurn == 0, "funding is only allowed at turn 0");
         require(msg.value > 0, "Funds required");
         if (fundRaisingCountingDown) {
-            require(now < (countingStartedTime + fundRaisingPeriod), "funding is over");
+            require(now <= (countingStartedTime + fundRaisingPeriod), "funding is over");
             // turn start trigger point
         }
         require(userStatus[gameRound][msg.sender].isExist != true, "Already funded!");
@@ -90,6 +96,7 @@ contract Deversi {
         }
         userStatus[gameRound][msg.sender].team = teamChoosen;
         userStatus[gameRound][msg.sender].isExist = true;
+        emit funded();
         if (fundRaisingCountingDown == false) {
             if (
                 (currentFundingStatus.CAT > 0) &&
@@ -100,6 +107,51 @@ contract Deversi {
                 emit fundRaisingCountdown(gameRound, now);
             }
         }
+    }
+
+    function propose() public payable {
+        uint256 proposalPrice = currentSharePrice * currentSharePerProposal;
+        require(msg.value >= proposalPrice, "Not enough fund");
+        uint256 gameStartTime = countingStartedTime + fundRaisingPeriod;
+        require((fundRaisingCountingDown == true) && (now > gameStartTime), "not yet started");
+        if (currentTurn == 0) {
+            currentTurn += 1;
+            currentTeam = (currentFundingStatus.CAT > currentFundingStatus.DOG)
+                ? _TEAM.CAT
+                : _TEAM.DOG;
+            emit turnStart(gameRound, currentTurn, now);
+        }
+        uint256 currentRoundEndTime = gameStartTime + (currentTurn * turnPeriod);
+        uint256 currentRoundStartTime = currentRoundEndTime - turnPeriod;
+        if (now > currentRoundEndTime) {
+            if (roundPropsedStatus[gameRound][currentTurn] != true) {
+                // game over!
+                revert("game over because previous round isnt played");
+            } else {
+                uint256 nextRoundEndTime = currentRoundEndTime + turnPeriod;
+                if (now > nextRoundEndTime) {
+                    // game over here as well;
+                    revert("game over!");
+                } else {
+                    currentTurn += 1;
+                    updateGame();
+                    doPropose();
+                }
+            }
+        } else if ((now < currentRoundEndTime) && (now >= currentRoundStartTime)) {
+            doPropose();
+        }
+    }
+
+    function doPropose() private {
+        User userTeam = userStatus[gameRound][msg.sender];
+        require(userTeam.team == currentTeam, "You are not on this team");
+        roundPropsedStatus[gameRound][currentTurn] = true;
+    }
+
+    function updateGame() private {
+        currentTeam = (currentTeam == _TEAM.CAT) ? _TEAM.DOG : _TEAM.CAT;
+        emit turnStart(gameRound, currentTurn, now);
     }
 
     function getUserStatus(address addr) public view returns (
@@ -122,23 +174,21 @@ contract Deversi {
         DOG = currentFundingStatus.DOG;
         return (CAT, DOG);
     }
-    function set(string x) public {
-        myString = x;
-        emit StringUpdated();
-    }
 
     function configure(
-        uint8 _size,
-        uint32 _fundRaisingPeriod,
-        uint32 _turnPeriod,
+        uint256 _size,
+        uint256 _fundRaisingPeriod,
+        uint256 _turnPeriod,
         uint256 _baseSharePrice,
-        uint8 _shareGrowthRate
+        uint256 _shareGrowthRate,
+        uint256 _sharesPerProposal
     ) public onlyOwner {
         size = _size;
         fundRaisingPeriod = _fundRaisingPeriod;
         turnPeriod = _turnPeriod;
         baseSharePrice = _baseSharePrice;
         shareGrowthRate = _shareGrowthRate;
+        sharesPerProposal = _sharesPerProposal;
     }
 
     modifier onlyOwner() {

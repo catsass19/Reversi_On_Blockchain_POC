@@ -1,4 +1,4 @@
-import { observable, action, runInAction } from 'mobx';
+import { observable, action, runInAction, computed } from 'mobx';
 import { ContractInterface, NetworkInterface, HandlerInterface } from './interface';
 
 interface ManifestInterface {
@@ -16,29 +16,39 @@ interface UserStatus {
     team : string;
     catShare : string;
     dogShare : string;
-};
+}
 
 class Contract implements ContractInterface {
 
     public TEAM = {
-        CAT: 0,
+        CAT: 2,
         DOG: 1,
-        NONE: 2,
+        NONE: 0,
     };
 
     @observable public updatedTime : Date = new Date();
     @observable public address : string;
-    @observable public myString : string;
-
     @observable public currentSize : string;
     @observable public fundRaisingPeriod : string;
     @observable public turnPeriod : string;
     @observable public currentSharePrice : string;
+    @observable public currentSharePerProposal : string;
     @observable public fundRaisingCountingDown : boolean;
     @observable public countingStartedTime : string;
     @observable public teamCatFunding : string;
     @observable public teamDogFunding : string;
     @observable public userStatus : UserStatus;
+    @observable public currentTurn : string;
+
+    @computed public get currentTurnEndTime() {
+        if (Number(this.currentTurn) > 0) {
+            const endTime =
+                Number(this.countingStartedTime) +
+                Number(this.fundRaisingPeriod) +
+                (Number(this.currentTurn) * Number(this.turnPeriod));
+            return endTime;
+        }
+    }
 
     private contractHandler : HandlerInterface;
     private walletHandler : HandlerInterface;
@@ -51,11 +61,24 @@ class Contract implements ContractInterface {
         this.init();
     }
 
-    public setString = (str : string) => this.writeWrapper('set')([str]);
     public fund = (team : number, value : string) => {
         const wei = this.network.web3.utils.toWei(value);
-        console.log(wei);
         this.writeWrapper('funding')([team], wei);
+    }
+    public propose = async () => {
+        const [
+            sharePrice,
+            sharesPerProposal,
+        ] = await Promise.all([
+            this.contractHandler.methods.currentSharePrice().call(),
+            this.contractHandler.methods.currentSharePerProposal().call(),
+        ]);
+        const sharePriceBig = new this.network.web3.utils.BN(sharePrice);
+        const sharesPerProposalBig = new this.network.web3.utils.BN(sharesPerProposal);
+        console.log(sharePriceBig);
+        const total = sharePriceBig.mul(sharesPerProposalBig);
+        console.log('total', this.network.web3.utils.fromWei(total.toString()));
+        this.writeWrapper('propose')([], total.toString());
     }
 
     private loadManifest = () => import('#/Deversi.json');
@@ -92,7 +115,6 @@ class Contract implements ContractInterface {
 
     private async getContractState() {
         if (this.contractHandler) {
-            const myStr = await this.contractHandler.methods.myString().call();
             const [
                 currentSize,
                 fundRaisingPeriod,
@@ -102,6 +124,8 @@ class Contract implements ContractInterface {
                 countingStartedTime,
                 teamFundingStatus,
                 userStatus,
+                currentSharePerProposal,
+                currentTurn,
             ] = await Promise.all([
                 this.contractHandler.methods.currentSize().call(),
                 this.contractHandler.methods.fundRaisingPeriod().call(),
@@ -111,9 +135,10 @@ class Contract implements ContractInterface {
                 this.contractHandler.methods.countingStartedTime().call(),
                 this.contractHandler.methods.getTeamFundingStatus().call(),
                 this.contractHandler.methods.getUserStatus(this.network.wallet).call(),
+                this.contractHandler.methods.currentSharePerProposal().call(),
+                this.contractHandler.methods.currentTurn().call(),
             ]);
             runInAction(() => {
-                this.myString = myStr;
                 this.currentSize = currentSize;
                 this.fundRaisingPeriod = fundRaisingPeriod;
                 this.turnPeriod = turnPeriod;
@@ -126,18 +151,25 @@ class Contract implements ContractInterface {
                     team: userStatus[1],
                     catShare: userStatus[2],
                     dogShare: userStatus[3],
-                }
+                };
+                this.currentSharePerProposal = currentSharePerProposal;
+                this.currentTurn = currentTurn;
             });
         }
     }
 
     private eventListener() {
         if (this.contractHandler) {
-            this.contractHandler.events.StringUpdated({}, (...arr) => {
+            this.contractHandler.events.funded({}, (...arr) => {
+                console.log('a team gets funded');
                 this.getContractState();
             });
             this.contractHandler.events.fundRaisingCountdown({}, (...arr) => {
                 console.log('start counting down!!!');
+                this.getContractState();
+            });
+            this.contractHandler.events.turnStart({}, (...arr) => {
+                console.log('new turn start!', arr);
                 this.getContractState();
             });
         }

@@ -15,23 +15,25 @@ type EventSubscriber = (
 ) => void;
 
 interface ContractMethods {
-  myString : () => Variable<string>;
-  set : (str : string) => Method;
   currentSize : () => Variable<string>;
   fundRaisingPeriod : () => Variable<string>;
+  gameRound : () => Variable<string>;
   turnPeriod : () => Variable<string>;
   currentSharePrice : () => Variable<string>;
+  currentSharePerProposal : () => Variable<string>;
   fundRaisingCountingDown : () => Variable<boolean>;
   countingStartedTime : () => Variable<string>;
   funding : (team : number, amount : string) => Method;
   getTeamFundingStatus : () => Variable<[string, string]>;
   getUserStatus : (addr : string) => Variable<[boolean, string, string, string]>;
+  currentTurn : () => Variable<string>;
 }
 
 interface ContractEvents {
-    StringUpdated : EventSubscriber;
+    funded : EventSubscriber;
     NewGameStarted : EventSubscriber;
     fundRaisingCountdown : EventSubscriber;
+    turnStart : EventSubscriber;
 }
 
 export interface HandlerInterface {
@@ -41,8 +43,6 @@ export interface HandlerInterface {
 
 export interface ContractInterface {
     address : string;
-    myString : string;
-    setString : (str : string) => void;
 }
 
 export interface NetworkInterface {
