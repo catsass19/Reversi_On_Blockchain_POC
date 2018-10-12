@@ -49,6 +49,7 @@ contract Deversi {
     event fundRaisingCountdown(uint256 round, uint time);
     event turnStart(uint256 round, uint256 turn, uint time);
     event proposed(uint256 round, uint256 turn, address proposer);
+    event gameCleared(uint256, address clearer);
 
     constructor() public {
         owner = msg.sender;
@@ -65,7 +66,7 @@ contract Deversi {
         startNewGame();
     }
 
-    function startNewGame() private {
+    function startNewGame() private onlyOwner {
         gameRound = gameRound + 1;
         currentSize = size;
         currentTurn = 0;
@@ -81,7 +82,7 @@ contract Deversi {
         emit NewGameStarted(gameRound, now);
     }
 
-    function funding(_TEAM teamChoosen) public payable {
+    function funding(_TEAM teamChoosen) public payable onlyInGame {
         require(currentTurn == 0, "funding is only allowed at turn 0");
         require(msg.value > 0, "Funds required");
         if (fundRaisingCountingDown) {
@@ -115,7 +116,7 @@ contract Deversi {
         }
     }
 
-    function propose() public payable {
+    function propose() public payable onlyInGame {
         uint256 gameStartTime = countingStartedTime + fundRaisingPeriod;
         require((fundRaisingCountingDown == true) && (now > gameStartTime), "not yet started");
         if (currentTurn == 0) {
@@ -172,8 +173,12 @@ contract Deversi {
         emit turnStart(gameRound, currentTurn, now);
     }
 
-    function clearGame() public {
-        revert("game over!");
+    function clearGame() public onlyInGame {
+        // revert("game over!");
+        inGame = false;
+        // distribute money
+        emit gameCleared(gameRound, msg.sender);
+
     }
 
     function getUserStatus(address addr) public view returns (
@@ -215,6 +220,10 @@ contract Deversi {
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner is allowed");
+        _;
+    }
+    modifier onlyInGame() {
+        require(inGame == true, "Not in game period");
         _;
     }
 }

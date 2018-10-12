@@ -35,13 +35,13 @@ class Main extends React.Component {
                 )}
 
                 {networkService.loaded && (
-                    <div>
+                    <div style={{ width: '100%' }}>
                         {networkService.network}
-                        <div>Wallet: {networkService.wallet}</div>
+                        {/* <div>Wallet: {networkService.wallet}</div> */}
                         {contract && (
                             <div>
-                                Contract Address: {contract.address}
-                                <div>currentSize: {contract.currentSize}</div>
+                                {/* Contract Address: {contract.address}
+                                <div>currentSize: {contract.currentSize}</div> */}
                                 <div>fundRaisingPeriod: {contract.fundRaisingPeriod}</div>
                                 <div>turnPeriod: {contract.turnPeriod}</div>
                                 <div>currentSharePrice: {contract.currentSharePrice}</div>

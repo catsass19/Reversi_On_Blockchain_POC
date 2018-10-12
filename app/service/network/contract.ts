@@ -197,7 +197,10 @@ class Contract implements ContractInterface {
                 this.getContractState();
                 console.log('someonehad proposed', round, turn, proposer);
             });
-
+            this.contractHandler.events.gameCleared({}, (t, { returnValues }) => {
+                const { round, clearer } = returnValues;
+                console.log('game is cleared by', clearer);
+            });
         }
     }
 

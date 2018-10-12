@@ -40,6 +40,7 @@ interface ContractEvents {
     fundRaisingCountdown : EventSubscriber<any>;
     turnStart : EventSubscriber<any>;
     proposed : EventSubscriber<{ round : string, turn : string, proposer : string, }>;
+    gameCleared : EventSubscriber<{ round : string, clearer : string }>;
 }
 
 export interface HandlerInterface {
