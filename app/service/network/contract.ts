@@ -43,6 +43,8 @@ class Contract implements ContractInterface {
     @observable public autoTurn : string = '0';
     @observable public turnGap : number = 0;
 
+    // @observable public proposed : Array<any> = [];
+
     @computed public get autoTurnEndTime() {
         if (Number(this.autoTurn) > 0) {
             const endTime =
@@ -190,6 +192,12 @@ class Contract implements ContractInterface {
                 console.log('new turn start!', arr);
                 this.getContractState();
             });
+            this.contractHandler.events.proposed({}, (t, { returnValues }) => {
+                const { round, turn, proposer } = returnValues;
+                this.getContractState();
+                console.log('someonehad proposed', round, turn, proposer);
+            });
+
         }
     }
 

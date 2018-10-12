@@ -5,13 +5,18 @@ interface Method {
     send : (param : { from : string, value? : string }) => any;
 }
 
-type EventSubscriber = (
+type EventSubscriber<T> = (
     options : {
         filter? : any,
         fromBlock? : number,
         topics?  : Array<any>,
     },
-    callback : () => void,
+    callback : (
+        y : null,
+        params : {
+            returnValues : T
+        }
+    ) => void,
 ) => void;
 
 interface ContractMethods {
@@ -30,10 +35,11 @@ interface ContractMethods {
 }
 
 interface ContractEvents {
-    funded : EventSubscriber;
-    NewGameStarted : EventSubscriber;
-    fundRaisingCountdown : EventSubscriber;
-    turnStart : EventSubscriber;
+    funded : EventSubscriber<any>;
+    NewGameStarted : EventSubscriber<any>;
+    fundRaisingCountdown : EventSubscriber<any>;
+    turnStart : EventSubscriber<any>;
+    proposed : EventSubscriber<{ round : string, turn : string, proposer : string, }>;
 }
 
 export interface HandlerInterface {

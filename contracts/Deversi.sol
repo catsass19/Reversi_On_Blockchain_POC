@@ -13,6 +13,10 @@ contract Deversi {
         Ledger ledger;
         bool isExist;
     }
+    struct Proposal {
+        uint256 vote;
+        bool isExist;
+    }
 
     // System config
     uint256 public size; // board size
@@ -37,12 +41,14 @@ contract Deversi {
     _TEAM public currentTeam;
 
     mapping(uint256 => mapping(address => User)) public userStatus;
-    mapping(uint256 => mapping(uint256 => bool)) public roundPropsedStatus;
+    mapping(uint256 => mapping(uint => bool)) public roundPropsedStatus;
+    mapping(uint256 => mapping(uint256 => mapping(address => Proposal))) public proposals;
 
     event funded();
     event NewGameStarted(uint256 round, uint time);
     event fundRaisingCountdown(uint256 round, uint time);
     event turnStart(uint256 round, uint256 turn, uint time);
+    event proposed(uint256 round, uint256 turn, address proposer);
 
     constructor() public {
         owner = msg.sender;
@@ -50,7 +56,7 @@ contract Deversi {
         inGame = false;
         configure(
             6,
-            40, // funding period
+            5, // funding period
             30,  // turn period
             1000000000000000,
             5,
@@ -110,8 +116,6 @@ contract Deversi {
     }
 
     function propose() public payable {
-        uint256 proposalPrice = currentSharePrice * currentSharePerProposal;
-        require(msg.value >= proposalPrice, "Not enough fund");
         uint256 gameStartTime = countingStartedTime + fundRaisingPeriod;
         require((fundRaisingCountingDown == true) && (now > gameStartTime), "not yet started");
         if (currentTurn == 0) {
@@ -126,12 +130,12 @@ contract Deversi {
         if (now > currentRoundEndTime) {
             if (roundPropsedStatus[gameRound][currentTurn] != true) {
                 // game over!
-                revert("game over because previous round isnt played");
+                // revert("game over because previous round isnt played");
+                clearGame();
             } else {
                 uint256 nextRoundEndTime = currentRoundEndTime + turnPeriod;
                 if (now > nextRoundEndTime) {
-                    // game over here as well;
-                    revert("game over!");
+                    clearGame();
                 } else {
                     currentTurn += 1;
                     updateGame();
@@ -147,11 +151,29 @@ contract Deversi {
         User userTeam = userStatus[gameRound][msg.sender];
         require(userTeam.team == currentTeam, "You are not on this team");
         roundPropsedStatus[gameRound][currentTurn] = true;
+        if (proposals[gameRound][currentTurn][msg.sender].isExist != true) {
+            uint256 shares = msg.value / currentSharePrice;
+            require(shares >= sharesPerProposal, "Not enough fund");
+            proposals[gameRound][currentTurn][msg.sender].vote = msg.value - (currentSharePrice * sharesPerProposal);
+            proposals[gameRound][currentTurn][msg.sender].isExist = true;
+            if (userTeam.team == _TEAM.CAT) {
+                userStatus[gameRound][msg.sender].ledger.CAT += shares;
+            } else if (userTeam.team == _TEAM.DOG) {
+                userStatus[gameRound][msg.sender].ledger.DOG += shares;
+            }
+            emit proposed(gameRound, currentTurn, msg.sender);
+        } else {
+            revert("You've already propsed in this turn");
+        }
     }
 
     function updateGame() private {
         currentTeam = (currentTeam == _TEAM.CAT) ? _TEAM.DOG : _TEAM.CAT;
         emit turnStart(gameRound, currentTurn, now);
+    }
+
+    function clearGame() public {
+        revert("game over!");
     }
 
     function getUserStatus(address addr) public view returns (

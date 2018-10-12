@@ -118,6 +118,10 @@ class Main extends React.Component {
                             ? new Date(contract.autoTurnEndTime * 1000).toLocaleString()
                             : ''}</b>
                         </div>
+                        <div>
+                            Proposed:
+
+                        </div>
                     </div>
                 )}
                 {/* <Section>
