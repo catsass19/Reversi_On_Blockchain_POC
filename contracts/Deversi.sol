@@ -48,8 +48,8 @@ contract Deversi {
     event funded();
     event NewGameStarted(uint256 round, uint time);
     event fundRaisingCountdown(uint256 round, uint time);
-    event turnStart(uint256 round, uint256 turn, uint time);
-    event proposed(uint256 round, uint256 turn, address proposer);
+    event turnStart(uint256 indexed round, uint256 turn, uint time);
+    event proposed(uint256 indexed round, uint256 turn, address proposer);
     event gameCleared(uint256, address clearer);
 
     constructor() public {

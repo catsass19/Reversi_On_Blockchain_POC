@@ -261,7 +261,6 @@ class Contract implements ContractInterface {
 
     @action
     private loop() {
-        console.log('loop');
         let turn = 0;
         const contractTurn = Number(this.currentTurn);
         if (this.fundRaisingCountingDown) {
