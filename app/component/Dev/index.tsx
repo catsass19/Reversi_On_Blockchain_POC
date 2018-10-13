@@ -8,19 +8,18 @@ import CountDown from '@/component/CountDown';
 // import Status from '@/component/Status/Loadable';
 
 const Container = styled.div`
+    position: fixed;
     display: flex;
     height: 100vh;
-    padding: 10px;
-`;
-
-const Section = styled.div`
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+    width: 100vw;
+    border: 1px solid red;
+    left: 0;
+    top: 0;
+    background-color: white;
 `;
 
 @observer
-class Main extends React.Component {
+export default class Dev extends React.Component {
 
     public componentDidMount() {
 
@@ -168,7 +167,3 @@ class Main extends React.Component {
         );
     }
 }
-
-const AppMain = <Main />;
-
-export default AppMain;

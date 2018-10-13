@@ -1,6 +1,6 @@
 import * as ReactDOM from 'react-dom';
 import { configure } from 'mobx';
-import AppMain from '@/component/Main/';
+import AppMain from '@/component/Home/';
 import appService from '@/service/app';
 
 configure({
