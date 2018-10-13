@@ -67,7 +67,7 @@ class Contract implements ContractInterface {
         }
     }
     @computed public get gameResolvedAuto() {
-        return (this.turnGap >= 2);
+        return this.fundRaisingCountingDown && (this.turnGap >= 2);
     }
 
     @computed public get currentTurnEndTime() {
@@ -94,6 +94,8 @@ class Contract implements ContractInterface {
     }
 
     public getProposalId = (turn : string, addr : string) => `${turn}-${addr}`;
+    public clearGame = () => this.writeWrapper('clearGame')([]);
+    public startNewGame = () => this.writeWrapper('startNewGame')([]);
 
     public fund = (team : number, value : string) => {
         const wei = this.network.web3.utils.toWei(value);
@@ -138,7 +140,7 @@ class Contract implements ContractInterface {
         this.walletHandler = this.network.getWalletHandler(this.contractManifest.abi, this.address);
         this.getContractState();
         this.eventListener();
-        this.looper = setInterval(() => this.loop(), 1000);
+        this.startLoop();
     }
     private getContractAddress() : string {
         const netId = this.network.netId;
@@ -219,6 +221,11 @@ class Contract implements ContractInterface {
 
     private eventListener() {
         if (this.contractHandler) {
+            this.contractHandler.events.NewGameStarted({}, (...arr) => {
+                console.log('NewGameStarted');
+                this.getContractState();
+                this.startLoop();
+            });
             this.contractHandler.events.funded({}, (...arr) => {
                 console.log('a team gets funded');
                 this.getContractState();
@@ -245,8 +252,16 @@ class Contract implements ContractInterface {
         }
     }
 
+    private startLoop() {
+        if (this.looper) {
+            clearInterval(this.looper);
+        }
+        this.looper = setInterval(() => this.loop(), 1000);
+    }
+
     @action
     private loop() {
+        console.log('loop');
         let turn = 0;
         const contractTurn = Number(this.currentTurn);
         if (this.fundRaisingCountingDown) {
@@ -263,9 +278,9 @@ class Contract implements ContractInterface {
                 console.log('game is exptected to be ended!!');
                 clearInterval(this.looper);
             }
-            this.autoTurn = `${turn}`;
             this.turnGap = turnGap;
         }
+        this.autoTurn = `${turn}`;
     }
 }
 

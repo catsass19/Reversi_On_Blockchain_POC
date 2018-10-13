@@ -67,7 +67,8 @@ contract Deversi {
         startNewGame();
     }
 
-    function startNewGame() private onlyOwner {
+    function startNewGame() public {
+        require(inGame == false, "game is going on");
         gameRound = gameRound + 1;
         currentSize = size;
         currentTurn = 0;
@@ -76,6 +77,7 @@ contract Deversi {
         currentShareGrowthRate = shareGrowthRate;
         sharesPerProposal = 10;
         fundRaisingCountingDown = false;
+        countingStartedTime = 0;
         currentTeam = _TEAM.NONE;
         currentFundingStatus.CAT = 0;
         currentFundingStatus.DOG = 0;
@@ -131,13 +133,11 @@ contract Deversi {
         uint256 currentRoundStartTime = currentRoundEndTime - turnPeriod;
         if (now > currentRoundEndTime) {
             if (roundPropsedStatus[gameRound][currentTurn] != true) {
-                // game over!
-                // revert("game over because previous round isnt played");
-                clearGame();
+                revert("Game should be cleared because previous turn isn't played");
             } else {
                 uint256 nextRoundEndTime = currentRoundEndTime + turnPeriod;
                 if (now > nextRoundEndTime) {
-                    clearGame();
+                    revert("Game over");
                 } else {
                     currentTurn += 1;
                     updateGame();

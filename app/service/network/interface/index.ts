@@ -33,6 +33,8 @@ interface ContractMethods {
   getUserStatus : (addr : string) => Variable<[boolean, string, string, string]>;
   getProposalStatus : (round : string, turn : string, addr : string) => Variable<{ vote : string, time : string }>;
   currentTurn : () => Variable<string>;
+  startNewGame : () => Method;
+  clearGame : () => Method;
 }
 
 interface ContractEvents {

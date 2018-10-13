@@ -102,6 +102,18 @@ class Main extends React.Component {
                                 >
                                     Propose
                                 </button>
+                                <div>
+                                <button
+                                        onClick={() => contract.clearGame()}
+                                    >
+                                        Clear game
+                                    </button>
+                                    <button
+                                        onClick={() => contract.startNewGame()}
+                                    >
+                                        New game
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
