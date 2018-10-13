@@ -162,8 +162,10 @@ contract Deversi {
             proposals[gameRound][currentTurn][msg.sender].time = now;
             if (userTeam.team == _TEAM.CAT) {
                 userStatus[gameRound][msg.sender].ledger.CAT += shares;
+                currentFundingStatus.CAT += shares;
             } else if (userTeam.team == _TEAM.DOG) {
                 userStatus[gameRound][msg.sender].ledger.DOG += shares;
+                currentFundingStatus.DOG += shares;
             }
             emit proposed(gameRound, currentTurn, msg.sender);
         } else {
@@ -183,8 +185,10 @@ contract Deversi {
             proposals[round][turn][proposer].vote += sharesToVote;
             if (currentTeam == _TEAM.CAT) {
                 userStatus[gameRound][msg.sender].ledger.CAT += sharesToVote;
+                currentFundingStatus.CAT += sharesToVote;
             } else if (currentTeam == _TEAM.DOG) {
                 userStatus[gameRound][msg.sender].ledger.DOG += sharesToVote;
+                currentFundingStatus.DOG += sharesToVote;
             }
             emit voted(gameRound, currentTurn, proposer, msg.sender, sharesToVote);
         } else {
