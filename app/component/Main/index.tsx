@@ -50,6 +50,7 @@ class Main extends React.Component {
                                 <div>fundRaisingCountingDown: {contract.fundRaisingCountingDown ? 'true' : 'false'}</div>
                                 <div>current time: <b><CountDown /></b></div>
                                 <div>currentTurn: {contract.currentTurn}</div>
+                                <div>currentTeam: {contract.currentTeam}</div>
                                 <div>currentTurnEndTime:<b>{
                                     contract.currentTurnEndTime
                                     ? new Date(contract.currentTurnEndTime * 1000).toLocaleString()
@@ -137,7 +138,16 @@ class Main extends React.Component {
                                 const id = contract.getProposalId(it.turn, it.proposer);
                                 const status = contract.proposalStatus[id];
                                 return (
-                                    <div key={id} style={{ border: '1px solid #DDD', margin: '3px', padding: '5px' }}>
+                                    <div
+                                        key={id}
+                                        style={{ border: '1px solid #DDD', margin: '3px', padding: '5px', cursor: 'pointer' }}
+                                        onClick={() => {
+                                            const value = prompt('How much do you want to vote?');
+                                            if (value) {
+                                                contract.vote(it.round, it.turn, it.proposer, value);
+                                            }
+                                        }}
+                                    >
                                         turn {it.turn} by {it.proposer}
                                         {status && (
                                             <div>vote: {status.vote} @ {status.time}</div>

@@ -33,8 +33,10 @@ interface ContractMethods {
   getUserStatus : (addr : string) => Variable<[boolean, string, string, string]>;
   getProposalStatus : (round : string, turn : string, addr : string) => Variable<{ vote : string, time : string }>;
   currentTurn : () => Variable<string>;
+  currentTeam : () => Variable<string>;
   startNewGame : () => Method;
   clearGame : () => Method;
+  vote : () => Method;
 }
 
 interface ContractEvents {
@@ -44,6 +46,7 @@ interface ContractEvents {
     turnStart : EventSubscriber<any>;
     proposed : EventSubscriber<{ round : string, turn : string, proposer : string, }>;
     gameCleared : EventSubscriber<{ round : string, clearer : string }>;
+    voted : EventSubscriber<any>;
 }
 
 export interface HandlerInterface {

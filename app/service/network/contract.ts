@@ -33,6 +33,7 @@ class Contract implements ContractInterface {
     @observable public turnPeriod : string;
     @observable public currentSharePrice : string;
     @observable public currentSharePerProposal : string;
+    @observable public currentTeam : string;
     @observable public fundRaisingCountingDown : boolean;
     @observable public countingStartedTime : string;
     @observable public teamCatFunding : string;
@@ -115,6 +116,11 @@ class Contract implements ContractInterface {
         this.writeWrapper('propose')([], total.toString());
     }
 
+    public vote = async (round : string, turn : string, proposer : string, value : string) => {
+        const wei = this.network.web3.utils.toWei(value);
+        this.writeWrapper('vote')([round, turn, proposer], wei);
+    }
+
     private loadManifest = () => import('#/Deversi.json');
 
     private writeWrapper = (method : string) => {
@@ -191,12 +197,19 @@ class Contract implements ContractInterface {
                 this.currentTurn = currentTurn;
                 this.autoTurn = currentTurn;
             });
-            const gameRound = await this.contractHandler.methods.gameRound().call();
+            const [
+                currentTeam,
+                gameRound,
+            ] = await Promise.all([
+                this.contractHandler.methods.currentTeam().call(),
+                this.contractHandler.methods.gameRound().call()
+            ]);
             const pastProposed : Array<any> = await this.contractHandler.getPastEvents<any>(
                 'proposed',
                 { filter: { round: gameRound }, fromBlock: 0, toBlock: 'latest' }
             );
             runInAction(() => {
+                this.currentTeam = currentTeam;
                 this.gameRound = gameRound;
                 const turn = this.currentTurn;
                 this.proposed = pastProposed.map(({ returnValues }) => {
@@ -238,7 +251,6 @@ class Contract implements ContractInterface {
                 console.log('new turn start!', arr);
                 this.getContractState();
             });
-
             this.contractHandler.events.proposed({}, (t, { returnValues }) => {
                 const { round, turn, proposer } = returnValues;
                 this.getContractState();
@@ -248,6 +260,10 @@ class Contract implements ContractInterface {
                 const { round, clearer } = returnValues;
                 this.getContractState();
                 console.log('game is cleared by', clearer);
+            });
+            this.contractHandler.events.voted({}, () => {
+                console.log('someone voted!');
+                this.getContractState();
             });
         }
     }

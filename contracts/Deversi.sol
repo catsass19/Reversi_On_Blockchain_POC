@@ -51,6 +51,7 @@ contract Deversi {
     event turnStart(uint256 indexed round, uint256 turn, uint time);
     event proposed(uint256 indexed round, uint256 turn, address proposer);
     event gameCleared(uint256, address clearer);
+    event voted(uint roung, uint turn, address proposer, address voter, uint256 shares);
 
     constructor() public {
         owner = msg.sender;
@@ -59,7 +60,7 @@ contract Deversi {
         configure(
             6,
             5, // funding period
-            30,  // turn period
+            60,  // turn period
             1000000000000000,
             5,
             10
@@ -156,7 +157,7 @@ contract Deversi {
         if (proposals[gameRound][currentTurn][msg.sender].isExist != true) {
             uint256 shares = msg.value / currentSharePrice;
             require(shares >= sharesPerProposal, "Not enough fund");
-            proposals[gameRound][currentTurn][msg.sender].vote = msg.value - (currentSharePrice * sharesPerProposal);
+            proposals[gameRound][currentTurn][msg.sender].vote = shares - sharesPerProposal;
             proposals[gameRound][currentTurn][msg.sender].isExist = true;
             proposals[gameRound][currentTurn][msg.sender].time = now;
             if (userTeam.team == _TEAM.CAT) {
@@ -167,6 +168,27 @@ contract Deversi {
             emit proposed(gameRound, currentTurn, msg.sender);
         } else {
             revert("You've already propsed in this turn");
+        }
+    }
+
+    function vote(uint256 round, uint256 turn, address proposer) public payable onlyInGame {
+        require(gameRound == round, "not in current round");
+        require(currentTurn > 0, "not yet started");
+        uint256 gameStartTime = countingStartedTime + fundRaisingPeriod;
+        uint256 currentRoundEndTime = gameStartTime + (currentTurn * turnPeriod);
+        uint256 currentRoundStartTime = currentRoundEndTime - turnPeriod;
+        require((now < currentRoundEndTime) && (now >= currentRoundStartTime), "not in round period");
+        if (proposals[round][turn][proposer].isExist) {
+            uint256 sharesToVote = msg.value / currentSharePrice;
+            proposals[round][turn][proposer].vote += sharesToVote;
+            if (currentTeam == _TEAM.CAT) {
+                userStatus[gameRound][msg.sender].ledger.CAT += sharesToVote;
+            } else if (currentTeam == _TEAM.DOG) {
+                userStatus[gameRound][msg.sender].ledger.DOG += sharesToVote;
+            }
+            emit voted(gameRound, currentTurn, proposer, msg.sender, sharesToVote);
+        } else {
+            revert("proposal not exist");
         }
     }
 
