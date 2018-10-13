@@ -39,9 +39,21 @@ class Contract implements ContractInterface {
     @observable public teamDogFunding : string;
     @observable public userStatus : UserStatus;
     @observable public currentTurn : string;
+    @observable public gameRound : string;
 
     @observable public autoTurn : string = '0';
     @observable public turnGap : number = 0;
+    @observable public proposed : Array<{
+        round : string,
+        turn : string,
+        proposer : string,
+    }> = [];
+    @observable public proposalStatus : {
+        [proposal : string] : {
+            vote : string,
+            time : string,
+        },
+    } = {};
 
     // @observable public proposed : Array<any> = [];
 
@@ -80,6 +92,8 @@ class Contract implements ContractInterface {
         this.network = network;
         this.init();
     }
+
+    public getProposalId = (turn : string, addr : string) => `${turn}-${addr}`;
 
     public fund = (team : number, value : string) => {
         const wei = this.network.web3.utils.toWei(value);
@@ -175,6 +189,31 @@ class Contract implements ContractInterface {
                 this.currentTurn = currentTurn;
                 this.autoTurn = currentTurn;
             });
+            const gameRound = await this.contractHandler.methods.gameRound().call();
+            const pastProposed : Array<any> = await this.contractHandler.getPastEvents<any>(
+                'proposed',
+                { filter: { round: gameRound }, fromBlock: 0, toBlock: 'latest' }
+            );
+            runInAction(() => {
+                this.gameRound = gameRound;
+                const turn = this.currentTurn;
+                this.proposed = pastProposed.map(({ returnValues }) => {
+                    this.contractHandler.methods.getProposalStatus(
+                        gameRound,
+                        turn,
+                        returnValues.proposer,
+                    ).call().then(({ time, vote }) => {
+                        console.log(time, vote);
+                        runInAction(() => {
+                            this.proposalStatus[this.getProposalId(turn, returnValues.proposer)] = {
+                                time,
+                                vote
+                            };
+                        });
+                    });
+                    return returnValues;
+                });
+            });
         }
     }
 
@@ -192,6 +231,7 @@ class Contract implements ContractInterface {
                 console.log('new turn start!', arr);
                 this.getContractState();
             });
+
             this.contractHandler.events.proposed({}, (t, { returnValues }) => {
                 const { round, turn, proposer } = returnValues;
                 this.getContractState();
@@ -199,6 +239,7 @@ class Contract implements ContractInterface {
             });
             this.contractHandler.events.gameCleared({}, (t, { returnValues }) => {
                 const { round, clearer } = returnValues;
+                this.getContractState();
                 console.log('game is cleared by', clearer);
             });
         }

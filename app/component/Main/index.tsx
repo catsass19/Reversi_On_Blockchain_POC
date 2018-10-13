@@ -42,6 +42,7 @@ class Main extends React.Component {
                             <div>
                                 {/* Contract Address: {contract.address}
                                 <div>currentSize: {contract.currentSize}</div> */}
+                                <div>gameRound: {contract.gameRound}</div>
                                 <div>fundRaisingPeriod: {contract.fundRaisingPeriod}</div>
                                 <div>turnPeriod: {contract.turnPeriod}</div>
                                 <div>currentSharePrice: {contract.currentSharePrice}</div>
@@ -120,7 +121,18 @@ class Main extends React.Component {
                         </div>
                         <div>
                             Proposed:
-
+                            {contract.proposed.map((it) => {
+                                const id = contract.getProposalId(it.turn, it.proposer);
+                                const status = contract.proposalStatus[id];
+                                return (
+                                    <div key={id} style={{ border: '1px solid #DDD', margin: '3px', padding: '5px' }}>
+                                        turn {it.turn} by {it.proposer}
+                                        {status && (
+                                            <div>vote: {status.vote} @ {status.time}</div>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 )}

@@ -15,6 +15,7 @@ contract Deversi {
     }
     struct Proposal {
         uint256 vote;
+        uint256 time;
         bool isExist;
     }
 
@@ -157,6 +158,7 @@ contract Deversi {
             require(shares >= sharesPerProposal, "Not enough fund");
             proposals[gameRound][currentTurn][msg.sender].vote = msg.value - (currentSharePrice * sharesPerProposal);
             proposals[gameRound][currentTurn][msg.sender].isExist = true;
+            proposals[gameRound][currentTurn][msg.sender].time = now;
             if (userTeam.team == _TEAM.CAT) {
                 userStatus[gameRound][msg.sender].ledger.CAT += shares;
             } else if (userTeam.team == _TEAM.DOG) {
@@ -200,6 +202,16 @@ contract Deversi {
         CAT = currentFundingStatus.CAT;
         DOG = currentFundingStatus.DOG;
         return (CAT, DOG);
+    }
+
+    function getProposalStatus(uint256 round, uint256 turn, address proposer) public view returns (
+        uint256 vote,
+        uint256 time
+    ) {
+        Proposal status = proposals[round][turn][proposer];
+        if (status.isExist) {
+            return (status.vote, status.time);
+        }
     }
 
     function configure(

@@ -1,5 +1,5 @@
 interface Variable<T> {
-    call : () => T;
+    call : () => Promise<T>;
 }
 interface Method {
     send : (param : { from : string, value? : string }) => any;
@@ -31,6 +31,7 @@ interface ContractMethods {
   funding : (team : number, amount : string) => Method;
   getTeamFundingStatus : () => Variable<[string, string]>;
   getUserStatus : (addr : string) => Variable<[boolean, string, string, string]>;
+  getProposalStatus : (round : string, turn : string, addr : string) => Variable<{ vote : string, time : string }>;
   currentTurn : () => Variable<string>;
 }
 
@@ -46,6 +47,14 @@ interface ContractEvents {
 export interface HandlerInterface {
     methods : ContractMethods;
     events : ContractEvents;
+    getPastEvents : <T>(
+        eventName : string,
+        options? : {
+            filter : any,
+            fromBlock : number,
+            toBlock : number | string,
+        },
+    ) => Promise<Array<{ returnValues : T }>>;
 }
 
 export interface ContractInterface {
