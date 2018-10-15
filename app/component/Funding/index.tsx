@@ -34,7 +34,6 @@ const Profile : any = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    opacity: ${(p : any) => p.isSelected ? '1' : '0.9'};
     cursor: pointer;
     &:hover {
         opacity: 0.7;
