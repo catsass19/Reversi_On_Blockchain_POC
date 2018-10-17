@@ -34,20 +34,24 @@ const Vote = styled.div`
 export default class Proposals extends React.Component {
     public render() {
         const { contract } = networkService;
+        const proposals = contract.proposed.filter((it) => it.turn === contract.autoTurn);
         return (
             <Container>
 
-                {contract.proposed.length && (
+                {(proposals.length > 0) && (
                     <div>{contract.proposed.length} Proposals</div>
                 )}
-                {contract.proposed.map((it) => {
+                {proposals.map((it) => {
                     const id = contract.getProposalId(it.turn, it.proposer);
                     const status = contract.proposalStatus[id];
                     return (
                         <Proposal key={id}>
-                            {it.turn}
+                            turn: {it.turn}
                             {status && (
                                 <div>Received: {status.vote} Shares</div>
+                            )}
+                            {(it.proposer === networkService.wallet) && (
+                                <div>This is my proposal!</div>
                             )}
                             <Padding />
                             <Vote
