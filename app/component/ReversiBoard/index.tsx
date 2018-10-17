@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import styled, { StyledFunction } from 'styled-components';
-import gameService from '@/service/game';
+import range from 'lodash/range';
 import Grid from './components/grid';
 
 const Wrapper = styled.div`
@@ -12,12 +12,11 @@ const Wrapper = styled.div`
     background-color: black;
 `;
 
-const outline : StyledFunction<{ width : number }> = styled.div;
-const BoardOutline = outline`
+const BoardOutline = styled.div`
     border: 2px solid #13BF99;
     border-radius: 2%;
-    height: 80%;
-    width: ${(p) => p.width || 0}px;
+    width: 550px;
+    height: 550px;
     padding: 1.5%;
     display: flex;
     flex-direction: column;
@@ -35,42 +34,23 @@ const Row = styled.div`
 `;
 
 @observer
-class Board extends React.Component<{}, { width : number }> {
-
-    public state = {
-        width: 0,
-    };
-
-    private ref;
-
-    public componentDidMount() {
-        this.updateSize();
-    }
+class Board extends React.Component<{ size : string | number }> {
 
     public render() {
-        const { width } = this.state;
-        const state = gameService.state;
-        const proposed = gameService.proposed;
+        const { size } = this.props;
+        const boardIterator = range(Number(size));
         return (
-            <BoardOutline
-                width={width}
-                innerRef={ (ref) => this.ref = ref }
-            >
+            <BoardOutline>
                 <InnerBoard>
-                    {state.map((it, key) => {
+                    {boardIterator.map((it, key) => {
                         return (
                             <Row key={key}>
-                                {it.map((data, index) => (
+                                {boardIterator.map((data, index) => (
                                     <Grid
-                                        item={data}
                                         key={index}
                                         y={index}
                                         x={key}
-                                        proposed={
-                                            (proposed) &&
-                                            (proposed.x === key) &&
-                                            (proposed.y === index)
-                                        }
+                                        proposed={false}
                                     />
                                 ))}
                             </Row>
@@ -80,18 +60,11 @@ class Board extends React.Component<{}, { width : number }> {
             </BoardOutline>
         );
     }
-
-    private updateSize() {
-        setTimeout(() => {
-            this.setState({ width: this.ref.clientHeight });
-        }, 0);
-
-    }
 }
 
-const BoardWrapper = () => (
+const BoardWrapper = ({ size }) => (
     <Wrapper>
-        <Board />
+        <Board size={size} />
     </Wrapper>
 );
 

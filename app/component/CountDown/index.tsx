@@ -5,7 +5,11 @@ interface State {
   interval : any;
 }
 
-class Countdown extends React.Component<{}, State> {
+interface Props {
+    time : number;
+}
+
+class Countdown extends React.Component<Props, State> {
 
     constructor(props) {
       super(props);
@@ -23,10 +27,13 @@ class Countdown extends React.Component<{}, State> {
     }
 
     public render() {
+        const { time } = this.props;
+        const { now } = this.state;
+        const countDown = Math.floor(time - (now.getTime() / 1000));
         return (
-          <span>
-              {this.state.now.toLocaleString()}
-          </span>
+            <span>
+                {countDown < 0 ? 0 : countDown}
+            </span>
         );
     }
 }

@@ -38,11 +38,11 @@ class Contract implements ContractInterface {
     @observable public countingStartedTime : string;
     @observable public teamCatFunding : string;
     @observable public teamDogFunding : string;
-    @observable public userStatus : UserStatus;
+    @observable public userStatus : UserStatus = { team: '', catShare: '', dogShare: '' };
     @observable public currentTurn : string;
     @observable public gameRound : string;
 
-    @observable public autoTurn : string = '0';
+    @observable public autoTurn : string;
     @observable public turnGap : number = 0;
     @observable public proposed : Array<{
         round : string,
@@ -58,6 +58,12 @@ class Contract implements ContractInterface {
 
     // @observable public proposed : Array<any> = [];
 
+    @computed public get myTeam() {
+        return this.getTeamName(this.userStatus.team);
+    }
+    @computed public get currentTeamName() {
+        return this.getTeamName(this.currentTeam);
+    }
     @computed public get autoTurnEndTime() {
         if (Number(this.autoTurn) > 0) {
             const endTime =
@@ -98,9 +104,16 @@ class Contract implements ContractInterface {
     public clearGame = () => this.writeWrapper('clearGame')([]);
     public startNewGame = () => this.writeWrapper('startNewGame')([]);
 
-    public fund = (team : number, value : string) => {
-        const wei = this.network.web3.utils.toWei(value);
-        this.writeWrapper('funding')([team], wei);
+    public fund = async (team : number, shares : string) => {
+        const [
+            sharePrice,
+        ] = await Promise.all([
+            this.contractHandler.methods.currentSharePrice().call(),
+        ]);
+        const sharePriceBig = new this.network.web3.utils.BN(sharePrice);
+        const SharesBig = new this.network.web3.utils.BN(shares);
+        const wei = sharePriceBig.mul(SharesBig);
+        this.writeWrapper('funding')([team], wei.toString());
     }
     public propose = async () => {
         const [
@@ -116,8 +129,15 @@ class Contract implements ContractInterface {
         this.writeWrapper('propose')([], total.toString());
     }
 
-    public vote = async (round : string, turn : string, proposer : string, value : string) => {
-        const wei = this.network.web3.utils.toWei(value);
+    public vote = async (round : string, turn : string, proposer : string, shares : string) => {
+        const [
+            sharePrice,
+        ] = await Promise.all([
+            this.contractHandler.methods.currentSharePrice().call(),
+        ]);
+        const sharePriceBig = new this.network.web3.utils.BN(sharePrice);
+        const SharesBig = new this.network.web3.utils.BN(shares);
+        const wei = sharePriceBig.mul(SharesBig);
         this.writeWrapper('vote')([round, turn, proposer], wei);
     }
 
@@ -296,6 +316,17 @@ class Contract implements ContractInterface {
             this.turnGap = turnGap;
         }
         this.autoTurn = `${turn}`;
+    }
+
+    private getTeamName(team) {
+        switch(Number(team)) {
+            case this.TEAM.CAT:
+                return 'Cat Kōgekitai';
+            case this.TEAM.DOG:
+                return 'Dog Guerrilla';
+            default:
+                return;
+        }
     }
 }
 

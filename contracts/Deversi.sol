@@ -59,8 +59,8 @@ contract Deversi {
         inGame = false;
         configure(
             6,
-            5, // funding period
-            60,  // turn period
+            10, // funding period
+            600,  // turn period
             1000000000000000,
             5,
             10
@@ -176,6 +176,7 @@ contract Deversi {
     function vote(uint256 round, uint256 turn, address proposer) public payable onlyInGame {
         require(gameRound == round, "not in current round");
         require(currentTurn > 0, "not yet started");
+        require(turn == currentTurn, "Not in current turn");
         uint256 gameStartTime = countingStartedTime + fundRaisingPeriod;
         uint256 currentRoundEndTime = gameStartTime + (currentTurn * turnPeriod);
         uint256 currentRoundStartTime = currentRoundEndTime - turnPeriod;

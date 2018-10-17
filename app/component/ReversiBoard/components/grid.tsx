@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import gameService from '@/service/game';
+import networkService from '@/service/network';
 
 const Wrapper  = styled.div`
     flex: 1;
@@ -33,45 +33,16 @@ const Chess = styled.div`
     font-weight: bold;
 `;
 
-const getColor = (type, proposed) => {
-    if (proposed) {
-        return 'rgba(255, 215, 0, 0.5)';
-    }
-    switch (type) {
-        case gameService.gridStatus.BLACK:
-            return 'rgba(0, 0, 0, 1)';
-        case gameService.gridStatus.WHITE:
-            return 'rgba(255, 255, 255, 0.8)';
-        case gameService.gridStatus.AVAILABLE:
-            return 'rgba(0, 0, 0, 0.3)';
-        case gameService.gridStatus.PROPOSED:
-            return 'rgba(255, 215, 0, 0.5)';
-    }
-};
-
-const Grid = ({ item, x, y, proposed }) => (
+const Grid = ({ x, y, proposed }) => (
     <Wrapper>
         <InnerGrid>
             <Chess
-                color={getColor(item, proposed)}
+                color={''}
                 onClick={() => {
-                    if (item === gameService.gridStatus.AVAILABLE) {
-                        confirm('您確定要提案並且支付1234個Dexon嗎?');
-                        gameService.propose(x, y);
-                    }
-                    if (item === gameService.gridStatus.PROPOSED) {
-                        confirm('您確定要投此提案一票嗎?');
-                    }
+                    const { contract } = networkService;
+                    contract.propose();
                 }}
-            >
-                {(proposed || (item === gameService.gridStatus.PROPOSED)) && (
-                    <>
-                        {proposed && '3'}
-                        {(x === 3) && (y === 1) && ('1')}
-                        {(x === 4) && (y === 2) && ('2')}
-                    </>
-                )}
-            </Chess>
+            />
         </InnerGrid>
     </Wrapper>
 );

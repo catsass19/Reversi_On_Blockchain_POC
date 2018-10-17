@@ -2,7 +2,6 @@ import * as React from 'react';
 import { observer } from 'mobx-react';
 import styled from 'styled-components';
 import networkService from '@/service/network';
-import CountDown from '@/component/CountDown';
 // import ReversiBoard from '@/component/ReversiBoard/Lodable';
 // import Dasboard from '@/component/Dashboard/Loadable';
 // import Status from '@/component/Status/Loadable';
@@ -47,7 +46,6 @@ export default class Dev extends React.Component {
                                 <div>currentSharePrice: {contract.currentSharePrice}</div>
                                 <div>currentSharePerProposal {contract.currentSharePerProposal}</div>
                                 <div>fundRaisingCountingDown: {contract.fundRaisingCountingDown ? 'true' : 'false'}</div>
-                                <div>current time: <b><CountDown /></b></div>
                                 <div>currentTurn: {contract.currentTurn}</div>
                                 <div>currentTeam: {contract.currentTeam}</div>
                                 <div>currentTurnEndTime:<b>{
@@ -125,7 +123,6 @@ export default class Dev extends React.Component {
                         <div>
                             <b>{contract.gameResolvedAuto && 'Game is expected to be ended'}</b>
                         </div>
-                        <div>current time: <b><CountDown /></b></div>
                         <div>currentTurnEndTime:<b>{
                             contract.autoTurnEndTime
                             ? new Date(contract.autoTurnEndTime * 1000).toLocaleString()

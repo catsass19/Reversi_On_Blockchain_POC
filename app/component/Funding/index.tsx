@@ -2,33 +2,26 @@ import * as React from 'react';
 import { observer } from 'mobx-react';
 import styled from 'styled-components';
 import networkService from '@/service/network';
-import deversi from '@/assets/deversi.svg';
 import cat from '@/assets/cat.svg';
 import dog from '@/assets/dog.svg';
+import CountDown from '@/component/CountDown';
 
 const Container = styled.div`
     flex: 1;
     display: flex;
     flex-direction: column;
 `;
-
+const CountDownStyle = styled.div`
+    color: white;
+    margin: 0px 20px;
+`;
 const Section = styled.div`
     flex: 1;
     display: flex;
-    flex-direction: column;
-`;
-const Header = styled.div`
-    display: flex;
     align-items: center;
-    padding: 0px 30px;
+    justify-content: center;
 `;
-const Logo = styled.img`
-    height: 40px;
-`;
-const Title = styled.div`
-    font-size: 40px;
-    margin: 20px;
-`;
+
 const Profile : any = styled.div`
     flex: 2;
     display: flex;
@@ -47,7 +40,7 @@ const TeamName = styled.div`
     margin-top: 40px;
 `;
 const TeamFund = styled.div`
-    font-size: larger;
+    font-size: 25px;
 `;
 
 const Versus = styled.div`
@@ -57,13 +50,15 @@ const Versus = styled.div`
 const TeamArea = styled.div`
     display: flex;
     align-items: center;
-`;
-const Padding = styled.div`
-    flex: 1;
+    margin-top: 120px;
 `;
 const Check = styled.span`
     margin: 0px 10px;
     font-size: 50px;
+`;
+const CountDownText = styled.div`
+    font-size: 50px;
+    display: flex;
 `;
 @observer
 export default class Funding extends React.Component {
@@ -71,13 +66,6 @@ export default class Funding extends React.Component {
         const { contract } = networkService;
         return (
             <Container>
-                <Section>
-                    <Header>
-                        <Logo src={deversi} />
-                        <Title>Deversi</Title>
-                    </Header>
-                    <Padding />
-                </Section>
                 <TeamArea>
                     <Profile
                         onClick={() => this.fund('Cat Kōgekitai', contract.TEAM.CAT)}
@@ -96,20 +84,33 @@ export default class Funding extends React.Component {
                         isSelected={contract.userStatus.team === `${contract.TEAM.DOG}`}
                     >
                         <TeamLogo src={dog} />
-                        <TeamName>Dog Guerrilla</TeamName>
+                        <TeamName>
+                            Dog Guerrilla
+                            {(contract.userStatus.team === `${contract.TEAM.DOG}`) && <Check>✓</Check>}
+                        </TeamName>
                         <TeamFund>received {contract.teamDogFunding} shares</TeamFund>
-                        {(contract.userStatus.team === `${contract.TEAM.DOG}`) && <Check>✓</Check>}
                     </Profile>
                 </TeamArea>
-                <Section />
+                <Section>
+                    {(contract.fundRaisingCountingDown) && (
+                        <CountDownText>Game Starts In
+                            <CountDownStyle>
+                                <CountDown
+                                    time={Number(contract.countingStartedTime) + Number(contract.fundRaisingPeriod)}
+                                />
+                            </CountDownStyle>
+                            Seconds
+                        </CountDownText>
+                    )}
+                </Section>
             </Container>
         );
     }
 
     private fund(teamName : string, teamEnum : number) {
-        const value = prompt(`How much DEX do you want to invest in ${teamName}?`);
-        if (value && networkService.contract) {
-          networkService.contract.fund(teamEnum, value);
+        const shares = prompt(`How much Shares do you want to invest in ${teamName}?`);
+        if (shares && networkService.contract) {
+          networkService.contract.fund(teamEnum, shares);
       }
     }
 }

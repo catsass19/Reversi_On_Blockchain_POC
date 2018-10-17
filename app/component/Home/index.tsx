@@ -5,6 +5,7 @@ import networkService from '@/service/network';
 import Dev from '@/component/Dev';
 import Header from '@/component/Header';
 import Funding from '@/component/Funding';
+import Game from '@/component/Game';
 
 const Container = styled.div`
     display: flex;
@@ -39,7 +40,11 @@ class Home extends React.Component<{}, { dev : boolean }> {
                     <>
                         {dev && <Dev />}
                         {!dev && (
-                            (contract.currentTurn === '0') && <Funding />
+                            <>
+                                <Header />
+                                {(contract.autoTurn === '0') && <Funding />}
+                                {(Number(contract.autoTurn) > 0) && <Game />}
+                            </>
                         )}
                     </>
                 )}
