@@ -5,7 +5,6 @@ import networkService from '@/service/network';
 
 const Container = styled.div`
     border-bottom: 1px solid red;
-    padding: 20px 0px;
     flex: 1;
 `;
 

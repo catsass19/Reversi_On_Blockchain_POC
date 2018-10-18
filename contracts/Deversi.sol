@@ -94,6 +94,12 @@ contract Deversi {
         boardStatus[gameRound][(currentSize / 2)][(currentSize / 2)] = _GRID_STATUS.BLACK;
         boardStatus[gameRound][(currentSize / 2)][(currentSize / 2) - 1] = _GRID_STATUS.WHITE;
         boardStatus[gameRound][(currentSize / 2) - 1][(currentSize / 2)] = _GRID_STATUS.WHITE;
+
+        boardStatus[gameRound][(currentSize / 2) + 1][(currentSize / 2) - 1] = _GRID_STATUS.AVAILABLE;
+        boardStatus[gameRound][(currentSize / 2)][(currentSize / 2) - 2] = _GRID_STATUS.AVAILABLE;
+
+        boardStatus[gameRound][(currentSize / 2) - 1][(currentSize / 2) + 1] = _GRID_STATUS.AVAILABLE;
+        boardStatus[gameRound][(currentSize / 2) - 2][(currentSize / 2)] = _GRID_STATUS.AVAILABLE;
         emit NewGameStarted(gameRound, now);
     }
 

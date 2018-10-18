@@ -24,7 +24,7 @@ const GameInfo = styled.div`
 const ControlArea = styled.div`
     /* border: 1px solid red; */
     flex: 1;
-    padding: 20px 0px 20px 20px;
+    padding: 20px 40px;
     display: flex;
     flex-direction: column;
 `;

@@ -18,7 +18,7 @@ const InnerGrid = styled.div`
     justify-content: center;
     cursor: pointer;
     &:hover {
-        background-color: #1cffcc;
+        background-color: rgba(19, 191, 153, 1);
     }
 `;
 const Chess = styled.div`
@@ -41,18 +41,17 @@ const getColor = (status : string) => {
         case contract.GRID_STATUS.WHITE:
             return 'rgba(255, 255, 255, 1)';
         case contract.GRID_STATUS.AVAILABLE:
-            return 'green';
+            return 'rgba(0, 0, 0, 0.2)';
         case contract.GRID_STATUS.PROPOSED:
             return 'red';
         case contract.GRID_STATUS.EMPTY:
         default:
             return '';
     }
-}
+};
 
 const Grid = ({ x, y, proposed, status }) => (
     <Wrapper>
-        {(() => console.log(status))()}
         <InnerGrid>
             <Chess
                 color={getColor(status)}
