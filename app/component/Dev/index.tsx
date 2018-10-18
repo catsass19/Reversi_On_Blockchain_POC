@@ -101,7 +101,7 @@ export default class Dev extends React.Component {
                                     Propose
                                 </button>
                                 <div>
-                                <button
+                                    <button
                                         onClick={() => contract.clearGame()}
                                     >
                                         Clear game

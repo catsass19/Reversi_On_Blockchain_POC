@@ -5,6 +5,7 @@ import Board from '@/component/ReversiBoard';
 import networkService from '@/service/network';
 import ControlHeader from './components/ControlHeader';
 import Proposals from './components/Proposals';
+import GameOver from './components/GameOver';
 
 const Container = styled.div`
     flex: 1;
@@ -43,7 +44,8 @@ export default class Game extends React.Component {
                 </BoardArea>
                 <ControlArea>
                     <ControlHeader />
-                    <Proposals />
+                    {!contract.gameResolvedAuto && (<Proposals />)}
+                    {contract.gameResolvedAuto && (<GameOver />)}
                 </ControlArea>
             </Container>
         );

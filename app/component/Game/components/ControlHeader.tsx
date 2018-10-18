@@ -32,7 +32,6 @@ export default class ControlHeader extends React.Component {
                           <Item>
                               <DescrptionText>Turn</DescrptionText>
                               <VariableText>{contract.autoTurn}</VariableText>
-
                           </Item>
                           <Padding />
                           {contract.autoTurnEndTime && (

@@ -6,12 +6,12 @@ const Wrapper  = styled.div`
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 1%;
+    padding: 2px;
 `;
 const InnerGrid = styled.div`
     flex: 1;
     border-radius: 3%;
-    background-color: #13BF99;
+    background-color: rgba(19, 191, 153, 0.7);
     padding: 1%;
     display: flex;
     align-items: center;

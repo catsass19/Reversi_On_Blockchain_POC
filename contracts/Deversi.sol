@@ -3,6 +3,7 @@ pragma solidity ^0.4.24;
 contract Deversi {
 
     enum _TEAM { NONE, DOG, CAT }
+    enum _GRID_STATUS { EMPTY, BLACK, WHITE, AVAILABLE, PROPOSED }
 
     struct Ledger {
         uint256 CAT;
@@ -40,7 +41,11 @@ contract Deversi {
     bool public fundRaisingCountingDown;
     uint256 public countingStartedTime;
     _TEAM public currentTeam;
+    _TEAM public black;
+    _TEAM public white;
 
+    // mapping(uint256 => _GRID_STATUS[][]) public boardStatus;
+    mapping(uint256 => mapping(uint256 => mapping(uint256 => _GRID_STATUS))) public boardStatus;
     mapping(uint256 => mapping(address => User)) public userStatus;
     mapping(uint256 => mapping(uint => bool)) public roundPropsedStatus;
     mapping(uint256 => mapping(uint256 => mapping(address => Proposal))) public proposals;
@@ -58,9 +63,9 @@ contract Deversi {
         gameRound = 0;
         inGame = false;
         configure(
-            6,
+            8, // size
             10, // funding period
-            600,  // turn period
+            60,  // turn period
             1000000000000000,
             5,
             10
@@ -80,9 +85,15 @@ contract Deversi {
         fundRaisingCountingDown = false;
         countingStartedTime = 0;
         currentTeam = _TEAM.NONE;
+        black = _TEAM.NONE;
+        white = _TEAM.NONE;
         currentFundingStatus.CAT = 0;
         currentFundingStatus.DOG = 0;
         inGame = true;
+        boardStatus[gameRound][(currentSize / 2) - 1][(currentSize / 2) - 1] = _GRID_STATUS.BLACK;
+        boardStatus[gameRound][(currentSize / 2)][(currentSize / 2)] = _GRID_STATUS.BLACK;
+        boardStatus[gameRound][(currentSize / 2)][(currentSize / 2) - 1] = _GRID_STATUS.WHITE;
+        boardStatus[gameRound][(currentSize / 2) - 1][(currentSize / 2)] = _GRID_STATUS.WHITE;
         emit NewGameStarted(gameRound, now);
     }
 
@@ -91,7 +102,6 @@ contract Deversi {
         require(msg.value > 0, "Funds required");
         if (fundRaisingCountingDown) {
             require(now <= (countingStartedTime + fundRaisingPeriod), "funding is over");
-            // turn start trigger point
         }
         require(userStatus[gameRound][msg.sender].isExist != true, "Already funded!");
 
@@ -125,9 +135,14 @@ contract Deversi {
         require((fundRaisingCountingDown == true) && (now > gameStartTime), "not yet started");
         if (currentTurn == 0) {
             currentTurn += 1;
-            currentTeam = (currentFundingStatus.CAT > currentFundingStatus.DOG)
-                ? _TEAM.CAT
-                : _TEAM.DOG;
+            if (currentFundingStatus.CAT >= currentFundingStatus.DOG) {
+                currentTeam = _TEAM.CAT;
+                black = _TEAM.CAT;
+            } else {
+                currentTeam = _TEAM.DOG;
+                white = _TEAM.DOG;
+            }
+
             emit turnStart(gameRound, currentTurn, now);
         }
         uint256 currentRoundEndTime = gameStartTime + (currentTurn * turnPeriod);

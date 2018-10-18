@@ -17,7 +17,7 @@ const BoardOutline = styled.div`
     border-radius: 2%;
     width: 550px;
     height: 550px;
-    padding: 1.5%;
+    padding: 15px;
     display: flex;
     flex-direction: column;
     background-color: black;
