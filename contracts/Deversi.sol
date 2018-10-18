@@ -225,6 +225,18 @@ contract Deversi {
 
     }
 
+    function getBoardStatus() public view returns (
+        _GRID_STATUS[]
+    ) {
+        _GRID_STATUS[] memory ret = new _GRID_STATUS[](currentSize * currentSize);
+        for (uint i = 0; i < currentSize; i++) {
+            for (uint j = 0; j < currentSize; j++) {
+                ret[(i * currentSize) + j] = boardStatus[gameRound][i][j];
+            }
+        }
+        return (ret);
+    }
+
     function getUserStatus(address addr) public view returns (
         bool isExist,
         _TEAM team,

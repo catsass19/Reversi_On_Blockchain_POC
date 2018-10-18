@@ -25,6 +25,13 @@ class Contract implements ContractInterface {
         DOG: 1,
         NONE: 0,
     };
+    public GRID_STATUS = {
+        EMPTY: '0',
+        BLACK: '1',
+        WHITE: '2',
+        AVAILABLE: '3',
+        PROPOSED: '4',
+    };
 
     @observable public updatedTime : Date = new Date();
     @observable public address : string;
@@ -41,6 +48,7 @@ class Contract implements ContractInterface {
     @observable public userStatus : UserStatus = { team: '', catShare: '', dogShare: '' };
     @observable public currentTurn : string;
     @observable public gameRound : string;
+    @observable public boardStatus : Array<string>;
 
     @observable public autoTurn : string;
     @observable public turnGap : number = 0;
@@ -248,6 +256,10 @@ class Contract implements ContractInterface {
                     });
                     return returnValues;
                 });
+            });
+            const boardStatus = await this.contractHandler.methods.getBoardStatus().call();
+            runInAction(() => {
+                this.boardStatus = boardStatus;
             });
         }
     }

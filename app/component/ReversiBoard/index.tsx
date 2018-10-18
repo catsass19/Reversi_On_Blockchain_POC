@@ -1,6 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import styled, { StyledFunction } from 'styled-components';
+import networkService from '@/service/network';
 import range from 'lodash/range';
 import Grid from './components/grid';
 
@@ -37,8 +38,9 @@ const Row = styled.div`
 class Board extends React.Component<{ size : string | number }> {
 
     public render() {
-        const { size } = this.props;
+        const size = Number(this.props.size);
         const boardIterator = range(Number(size));
+        const { contract } = networkService;
         return (
             <BoardOutline>
                 <InnerBoard>
@@ -50,6 +52,7 @@ class Board extends React.Component<{ size : string | number }> {
                                         key={index}
                                         y={index}
                                         x={key}
+                                        status={contract.boardStatus[(size * key) + index]}
                                         proposed={false}
                                     />
                                 ))}

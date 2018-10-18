@@ -33,11 +33,29 @@ const Chess = styled.div`
     font-weight: bold;
 `;
 
-const Grid = ({ x, y, proposed }) => (
+const getColor = (status : string) => {
+    const { contract } = networkService;
+    switch(status) {
+        case contract.GRID_STATUS.BLACK:
+            return 'rgba(0, 0, 0, 1)';
+        case contract.GRID_STATUS.WHITE:
+            return 'rgba(255, 255, 255, 1)';
+        case contract.GRID_STATUS.AVAILABLE:
+            return 'green';
+        case contract.GRID_STATUS.PROPOSED:
+            return 'red';
+        case contract.GRID_STATUS.EMPTY:
+        default:
+            return '';
+    }
+}
+
+const Grid = ({ x, y, proposed, status }) => (
     <Wrapper>
+        {(() => console.log(status))()}
         <InnerGrid>
             <Chess
-                color={''}
+                color={getColor(status)}
                 onClick={() => {
                     const { contract } = networkService;
                     contract.propose();

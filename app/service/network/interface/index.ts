@@ -37,6 +37,7 @@ interface ContractMethods {
   startNewGame : () => Method;
   clearGame : () => Method;
   vote : () => Method;
+  getBoardStatus : () => Variable<Array<string>>;
 }
 
 interface ContractEvents {
