@@ -21,16 +21,18 @@ const InnerGrid = styled.div`
         background-color: rgba(19, 191, 153, 1);
     }
 `;
-const Chess = styled.div`
+const Chess : any = styled.div`
     border-radius: 10%;
     height: 80%;
     width: 80%;
     border-radius: 5%;
+    ${(p : any) => p.isProposed ? 'border: 1px solid yellow' : ''};
     background-color: ${(p) => p.color};
     display: flex;
     justify-content: center;
     align-items: center;
     font-weight: bold;
+    color: yellow;
 `;
 
 const getColor = (status : string) => {
@@ -41,25 +43,31 @@ const getColor = (status : string) => {
         case contract.GRID_STATUS.WHITE:
             return 'rgba(255, 255, 255, 1)';
         case contract.GRID_STATUS.AVAILABLE:
-            return 'rgba(0, 0, 0, 0.2)';
         case contract.GRID_STATUS.PROPOSED:
-            return 'red';
+            return 'rgba(0, 0, 0, 0.2)';
         case contract.GRID_STATUS.EMPTY:
         default:
             return '';
     }
 };
+const isProposed = (status : string) => {
+    const { contract } = networkService;
+    return status === contract.GRID_STATUS.PROPOSED;
+};
 
-const Grid = ({ x, y, proposed, status }) => (
+const Grid = ({ x, y, proposal, status }) => (
     <Wrapper>
         <InnerGrid>
             <Chess
                 color={getColor(status)}
+                isProposed={isProposed(status)}
                 onClick={() => {
                     const { contract } = networkService;
-                    contract.propose();
+                    contract.propose(x, y);
                 }}
-            />
+            >
+                {proposal && proposal.vote}
+            </Chess>
         </InnerGrid>
     </Wrapper>
 );

@@ -44,18 +44,28 @@ class Board extends React.Component<{ size : string | number }> {
         return (
             <BoardOutline>
                 <InnerBoard>
-                    {boardIterator.map((it, key) => {
+                    {boardIterator.map((iter, key) => {
+                        // console.log(contract.proposalStatusArray);
                         return (
                             <Row key={key}>
-                                {boardIterator.map((data, index) => (
-                                    <Grid
-                                        key={index}
-                                        y={index}
-                                        x={key}
-                                        status={contract.boardStatus[(size * key) + index]}
-                                        proposed={false}
-                                    />
-                                ))}
+                                {boardIterator.map((data, index) => {
+                                    const proposal = contract.proposalStatusArray.find((it) => {
+                                        return (Number(it.x) === key) && (Number(it.y) === index);
+                                    });
+                                    return (
+                                        <Grid
+                                            key={index}
+                                            y={index}
+                                            x={key}
+                                            status={
+                                                contract.boardStatus &&
+                                                contract.boardStatus.length &&
+                                                (contract.boardStatus[(size * key) + index])
+                                            }
+                                            proposal={proposal}
+                                        />
+                                    );
+                                })}
                             </Row>
                         );
                     })}

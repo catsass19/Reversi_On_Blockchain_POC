@@ -18,6 +18,8 @@ contract Deversi {
         uint256 vote;
         uint256 time;
         bool isExist;
+        uint256 x;
+        uint256 y;
     }
 
     // System config
@@ -54,7 +56,7 @@ contract Deversi {
     event NewGameStarted(uint256 round, uint time);
     event fundRaisingCountdown(uint256 round, uint time);
     event turnStart(uint256 indexed round, uint256 turn, uint time);
-    event proposed(uint256 indexed round, uint256 turn, address proposer);
+    event proposed(uint256 indexed round, uint256 turn, address proposer, uint256 x, uint256 y);
     event gameCleared(uint256, address clearer);
     event voted(uint roung, uint turn, address proposer, address voter, uint256 shares);
 
@@ -136,7 +138,7 @@ contract Deversi {
         }
     }
 
-    function propose() public payable onlyInGame {
+    function propose(uint256 x, uint256 y) public payable onlyInGame {
         uint256 gameStartTime = countingStartedTime + fundRaisingPeriod;
         require((fundRaisingCountingDown == true) && (now > gameStartTime), "not yet started");
         if (currentTurn == 0) {
@@ -163,21 +165,22 @@ contract Deversi {
                 } else {
                     currentTurn += 1;
                     updateGame();
-                    doPropose();
+                    doPropose(x, y);
                 }
             }
         } else if ((now < currentRoundEndTime) && (now >= currentRoundStartTime)) {
-            doPropose();
+            doPropose(x, y);
         }
     }
 
-    function doPropose() private {
+    function doPropose(uint256 x, uint256 y) private {
         User userTeam = userStatus[gameRound][msg.sender];
         require(userTeam.team == currentTeam, "You are not on this team");
         roundPropsedStatus[gameRound][currentTurn] = true;
         if (proposals[gameRound][currentTurn][msg.sender].isExist != true) {
             uint256 shares = msg.value / currentSharePrice;
             require(shares >= sharesPerProposal, "Not enough fund");
+            require(boardStatus[gameRound][x][y] == _GRID_STATUS.AVAILABLE, "Unavailable");
             proposals[gameRound][currentTurn][msg.sender].vote = shares - sharesPerProposal;
             proposals[gameRound][currentTurn][msg.sender].isExist = true;
             proposals[gameRound][currentTurn][msg.sender].time = now;
@@ -188,7 +191,10 @@ contract Deversi {
                 userStatus[gameRound][msg.sender].ledger.DOG += shares;
                 currentFundingStatus.DOG += shares;
             }
-            emit proposed(gameRound, currentTurn, msg.sender);
+            proposals[gameRound][currentTurn][msg.sender].x = x;
+            proposals[gameRound][currentTurn][msg.sender].y = y;
+            boardStatus[gameRound][x][y] = _GRID_STATUS.PROPOSED;
+            emit proposed(gameRound, currentTurn, msg.sender, x, y);
         } else {
             revert("You've already propsed in this turn");
         }
@@ -266,11 +272,13 @@ contract Deversi {
 
     function getProposalStatus(uint256 round, uint256 turn, address proposer) public view returns (
         uint256 vote,
-        uint256 time
+        uint256 time,
+        uint x,
+        uint y
     ) {
         Proposal status = proposals[round][turn][proposer];
         if (status.isExist) {
-            return (status.vote, status.time);
+            return (status.vote, status.time, status.x, status.y);
         }
     }
 

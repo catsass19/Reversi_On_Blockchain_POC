@@ -44,6 +44,7 @@ export default class Game extends React.Component {
                 </BoardArea>
                 <ControlArea>
                     <ControlHeader />
+                    <Proposals />
                     {!contract.gameResolvedAuto && (<Proposals />)}
                     {contract.gameResolvedAuto && (<GameOver />)}
                 </ControlArea>

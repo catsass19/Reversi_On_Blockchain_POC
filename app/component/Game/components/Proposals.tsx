@@ -34,6 +34,7 @@ export default class Proposals extends React.Component {
     public render() {
         const { contract } = networkService;
         const proposals = contract.proposed.filter((it) => it.turn === contract.autoTurn);
+        // const proposals = contract.proposed;
         return (
             <Container>
 

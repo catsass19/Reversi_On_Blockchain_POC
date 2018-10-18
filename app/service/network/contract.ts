@@ -48,7 +48,7 @@ class Contract implements ContractInterface {
     @observable public userStatus : UserStatus = { team: '', catShare: '', dogShare: '' };
     @observable public currentTurn : string;
     @observable public gameRound : string;
-    @observable public boardStatus : Array<string>;
+    @observable public boardStatus : Array<string> = [];
 
     @observable public autoTurn : string;
     @observable public turnGap : number = 0;
@@ -61,10 +61,10 @@ class Contract implements ContractInterface {
         [proposal : string] : {
             vote : string,
             time : string,
+            x : string,
+            y : string,
         },
     } = {};
-
-    // @observable public proposed : Array<any> = [];
 
     @computed public get myTeam() {
         return this.getTeamName(this.userStatus.team);
@@ -95,6 +95,11 @@ class Contract implements ContractInterface {
         }
     }
 
+    @computed public get proposalStatusArray() {
+        const keys = Object.keys(this.proposalStatus);
+        return keys.map((key) => this.proposalStatus[key]);
+    }
+
     private contractHandler : HandlerInterface;
     private walletHandler : HandlerInterface;
 
@@ -123,7 +128,7 @@ class Contract implements ContractInterface {
         const wei = sharePriceBig.mul(SharesBig);
         this.writeWrapper('funding')([team], wei.toString());
     }
-    public propose = async () => {
+    public propose = async (x : number, y : number) => {
         const [
             sharePrice,
             sharesPerProposal,
@@ -134,7 +139,7 @@ class Contract implements ContractInterface {
         const sharePriceBig = new this.network.web3.utils.BN(sharePrice);
         const sharesPerProposalBig = new this.network.web3.utils.BN(sharesPerProposal);
         const total = sharePriceBig.mul(sharesPerProposalBig);
-        this.writeWrapper('propose')([], total.toString());
+        this.writeWrapper('propose')([x, y], total.toString());
     }
 
     public vote = async (round : string, turn : string, proposer : string, shares : string) => {
@@ -245,14 +250,17 @@ class Contract implements ContractInterface {
                         gameRound,
                         turn,
                         returnValues.proposer,
-                    ).call().then(({ time, vote }) => {
-                        console.log(time, vote);
-                        runInAction(() => {
-                            this.proposalStatus[this.getProposalId(turn, returnValues.proposer)] = {
-                                time,
-                                vote
-                            };
-                        });
+                    ).call().then(({ time, vote, x, y }) => {
+                        if (time !== '0') {
+                            runInAction(() => {
+                                this.proposalStatus[this.getProposalId(turn, returnValues.proposer)] = {
+                                    time,
+                                    vote,
+                                    x,
+                                    y,
+                                };
+                            });
+                        }
                     });
                     return returnValues;
                 });

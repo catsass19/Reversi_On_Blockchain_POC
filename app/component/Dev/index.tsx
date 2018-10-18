@@ -96,7 +96,7 @@ export default class Dev extends React.Component {
                                     fund dog
                                 </button>
                                 <button
-                                    onClick={() => contract.propose()}
+                                    onClick={() => contract.propose(1, 1)}
                                 >
                                     Propose
                                 </button>
