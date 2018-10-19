@@ -11,7 +11,7 @@ const Wrapper  = styled.div`
 const InnerGrid = styled.div`
     flex: 1;
     border-radius: 3%;
-    background-color: rgba(19, 191, 153, 0.7);
+    background-color: rgba(19, 191, 153, 0.65);
     padding: 1%;
     display: flex;
     align-items: center;
@@ -25,7 +25,7 @@ const Chess : any = styled.div`
     border-radius: 10%;
     height: 80%;
     width: 80%;
-    border-radius: 5%;
+    border-radius: 10%;
     ${(p : any) => p.isProposed ? 'border: 1px solid yellow' : ''};
     background-color: ${(p) => p.color};
     display: flex;

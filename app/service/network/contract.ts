@@ -305,6 +305,9 @@ class Contract implements ContractInterface {
                 console.log('someone voted!');
                 this.getContractState();
             });
+            this.contractHandler.events.proposalSelected({}, (t, { returnValues }) => {
+                console.log('gsdf', returnValues);
+            });
         }
     }
 

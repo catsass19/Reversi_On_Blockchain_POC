@@ -51,6 +51,7 @@ contract Deversi {
     mapping(uint256 => mapping(address => User)) public userStatus;
     mapping(uint256 => mapping(uint => bool)) public roundPropsedStatus;
     mapping(uint256 => mapping(uint256 => mapping(address => Proposal))) public proposals;
+    mapping(uint256 => mapping(uint256 => address[])) public proposedAddress;
 
     event funded();
     event NewGameStarted(uint256 round, uint time);
@@ -58,7 +59,8 @@ contract Deversi {
     event turnStart(uint256 indexed round, uint256 turn, uint time);
     event proposed(uint256 indexed round, uint256 turn, address proposer, uint256 x, uint256 y);
     event gameCleared(uint256, address clearer);
-    event voted(uint roung, uint turn, address proposer, address voter, uint256 shares);
+    event voted(uint round, uint turn, address proposer, address voter, uint256 shares);
+    event proposalSelected(uint round, uint turn, address proposer, uint256 vote);
 
     constructor() public {
         owner = msg.sender;
@@ -67,7 +69,7 @@ contract Deversi {
         configure(
             8, // size
             10, // funding period
-            60,  // turn period
+            120,  // turn period
             1000000000000000,
             5,
             10
@@ -146,9 +148,11 @@ contract Deversi {
             if (currentFundingStatus.CAT >= currentFundingStatus.DOG) {
                 currentTeam = _TEAM.CAT;
                 black = _TEAM.CAT;
+                white = _TEAM.DOG;
             } else {
                 currentTeam = _TEAM.DOG;
-                white = _TEAM.DOG;
+                black = _TEAM.DOG;
+                white = _TEAM.CAT;
             }
 
             emit turnStart(gameRound, currentTurn, now);
@@ -163,7 +167,6 @@ contract Deversi {
                 if (now > nextRoundEndTime) {
                     revert("Game over");
                 } else {
-                    currentTurn += 1;
                     updateGame();
                     doPropose(x, y);
                 }
@@ -194,6 +197,7 @@ contract Deversi {
             proposals[gameRound][currentTurn][msg.sender].x = x;
             proposals[gameRound][currentTurn][msg.sender].y = y;
             boardStatus[gameRound][x][y] = _GRID_STATUS.PROPOSED;
+            proposedAddress[gameRound][currentTurn].push(msg.sender);
             emit proposed(gameRound, currentTurn, msg.sender, x, y);
         } else {
             revert("You've already propsed in this turn");
@@ -225,6 +229,19 @@ contract Deversi {
     }
 
     function updateGame() private {
+        uint256 proposedLength = proposedAddress[gameRound][currentTurn].length;
+        address highestAddress = proposedAddress[gameRound][currentTurn][0];
+        uint256 highestAmount = proposals[gameRound][currentTurn][highestAddress].vote;
+        for (uint i = 1; i < proposedLength; i++) {
+            address _addr = proposedAddress[gameRound][currentTurn][i];
+            Proposal _proposal = proposals[gameRound][currentTurn][_addr];
+            if (_proposal.vote > highestAmount) {
+                highestAddress = _addr;
+                highestAmount = _proposal.vote;
+            }
+        }
+        emit proposalSelected(gameRound, currentTurn, highestAddress, highestAmount);
+        currentTurn += 1;
         currentTeam = (currentTeam == _TEAM.CAT) ? _TEAM.DOG : _TEAM.CAT;
         emit turnStart(gameRound, currentTurn, now);
     }
