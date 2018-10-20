@@ -39,7 +39,7 @@ export default class ControlHeader extends React.Component {
                                 <VariableText>
                                     <CountDown time={contract.autoTurnEndTime} />
                                 </VariableText>
-                                <DescrptionText>Seconds Remaining </DescrptionText>
+                                <DescrptionText>Sec</DescrptionText>
                             </Item>
                           )}
                         </>

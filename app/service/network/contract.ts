@@ -156,7 +156,6 @@ class Contract implements ContractInterface {
                 teamFundingStatus,
                 userStatus,
                 currentSharePerProposal,
-                currentTurn,
             ] = await Promise.all([
                 this.contractHandler.methods.currentSize().call(),
                 this.contractHandler.methods.fundRaisingPeriod().call(),
@@ -167,7 +166,6 @@ class Contract implements ContractInterface {
                 this.contractHandler.methods.getTeamFundingStatus().call(),
                 this.contractHandler.methods.getUserStatus(this.network.wallet).call(),
                 this.contractHandler.methods.currentSharePerProposal().call(),
-                this.contractHandler.methods.currentTurn().call(),
             ]);
             runInAction(() => {
                 this.currentSize = currentSize;
@@ -184,8 +182,6 @@ class Contract implements ContractInterface {
                     dogShare: userStatus[3],
                 };
                 this.currentSharePerProposal = currentSharePerProposal;
-                this.currentTurn = currentTurn;
-                this.autoTurn = currentTurn;
             });
             const [
                 currentTeam,
@@ -193,12 +189,14 @@ class Contract implements ContractInterface {
                 boardStatus,
                 black,
                 white,
+                currentTurn,
             ] = await Promise.all([
                 this.contractHandler.methods.currentTeam().call(),
                 this.contractHandler.methods.gameRound().call(),
                 this.contractHandler.methods.getBoardStatus().call(),
                 this.contractHandler.methods.black().call(),
-                this.contractHandler.methods.white().call()
+                this.contractHandler.methods.white().call(),
+                this.contractHandler.methods.currentTurn().call(),
             ]);
             const pastProposed : Array<any> = await this.contractHandler.getPastEvents<any>(
                 'proposed',
@@ -210,6 +208,8 @@ class Contract implements ContractInterface {
                 this.white = white;
                 this.currentTeam = currentTeam;
                 this.gameRound = gameRound;
+                this.currentTurn = currentTurn;
+                this.autoTurn = currentTurn;
                 const turn = this.currentTurn;
                 this.proposed = pastProposed.map(({ returnValues }) => {
                     this.contractHandler.methods.getProposalStatus(

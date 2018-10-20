@@ -76,8 +76,8 @@ contract Deversi {
         inGame = false;
         configure(
             8, // size
-            10, // funding period
-            30,  // turn period
+            30, // funding period
+            60,  // turn period
             1000000000000000,
             5,
             10
@@ -257,10 +257,10 @@ contract Deversi {
         }
         // reverting calculation here...
         flip(selected.x, selected.y);
-        emit proposalSelected(gameRound, currentTurn, highestAddress, highestAmount);
+        // emit proposalSelected(gameRound, currentTurn, highestAddress, highestAmount);
         currentTurn += 1;
         currentTeam = (currentTeam == _TEAM.CAT) ? _TEAM.DOG : _TEAM.CAT;
-        emit turnStart(gameRound, currentTurn, now);
+        // emit turnStart(gameRound, currentTurn, now);
     }
 
     function flip(uint256 x, uint256 y) {
