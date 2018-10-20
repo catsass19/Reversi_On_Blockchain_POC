@@ -6,6 +6,7 @@ import networkService from '@/service/network';
 import ControlHeader from './components/ControlHeader';
 import Proposals from './components/Proposals';
 import GameOver from './components/GameOver';
+import GameInfo from './components/GameInfo';
 
 const Container = styled.div`
     flex: 1;
@@ -17,10 +18,7 @@ const BoardArea = styled.div`
     flex-direction: column;
     padding: 20px 0px;
 `;
-const GameInfo = styled.div`
-    /* border: 1px solid red; */
-    flex: 1;
-`;
+
 const ControlArea = styled.div`
     /* border: 1px solid red; */
     flex: 1;
@@ -38,9 +36,7 @@ export default class Game extends React.Component {
                     <div>
                         <Board size={contract.currentSize} />
                     </div>
-                    <GameInfo>
-                        sdf
-                    </GameInfo>
+                    <GameInfo />
                 </BoardArea>
                 <ControlArea>
                     <ControlHeader />

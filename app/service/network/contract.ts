@@ -1,4 +1,6 @@
 import { observable, action, runInAction, computed } from 'mobx';
+import throttle from 'lodash/throttle';
+import maxBy from 'lodash/maxBy';
 import { ContractInterface, NetworkInterface, HandlerInterface } from './interface';
 
 interface ManifestInterface {
@@ -50,6 +52,8 @@ class Contract implements ContractInterface {
     @observable public currentTurn : string;
     @observable public gameRound : string;
     @observable public boardStatus : Array<string> = [];
+    @observable public black : string;
+    @observable public white : string;
 
     @observable public autoTurn : string;
     @observable public turnGap : number = 0;
@@ -60,6 +64,7 @@ class Contract implements ContractInterface {
     }> = [];
     @observable public proposalStatus : {
         [proposal : string] : {
+            turn : string,
             vote : string,
             time : string,
             x : string,
@@ -101,6 +106,36 @@ class Contract implements ContractInterface {
         return keys.map((key) => this.proposalStatus[key]);
     }
 
+    @computed public get flipForecast() {
+        let forecast : {
+            [id : string] : string
+        } = {};
+        if (Number(this.autoTurn) > Number(this.currentTurn)) {
+            const lastTurnProposals = this.proposalStatusArray.filter((it) => it.turn === this.currentTurn);
+            if (lastTurnProposals.length) {
+                const max = maxBy(lastTurnProposals, (p) => Number(p.vote));
+                const baseColor = this.getChessColorByTeam(this.currentTeam);
+                const oppositeColor = (baseColor === this.GRID_STATUS.BLACK) ? this.GRID_STATUS.WHITE : this.GRID_STATUS.BLACK;
+                const x = Number(max.x);
+                const y = Number(max.y);
+                forecast = {
+                    [`${x}${y}`]: baseColor,
+                    ...this.doFlip(x, y, 1, 1, baseColor, oppositeColor),
+                    ...this.doFlip(x, y, 1, 0, baseColor, oppositeColor),
+                    ...this.doFlip(x, y, 1, -1, baseColor, oppositeColor),
+                    ...this.doFlip(x, y, 0, -1, baseColor, oppositeColor),
+                    ...this.doFlip(x, y, -1, -1, baseColor, oppositeColor),
+                    ...this.doFlip(x, y, -1, 0, baseColor, oppositeColor),
+                    ...this.doFlip(x, y, -1, 1, baseColor, oppositeColor),
+                    ...this.doFlip(x, y, 0, 1, baseColor, oppositeColor),
+                };
+            }
+
+        }
+        console.log('forecast', forecast);
+        return forecast;
+    }
+
     private contractHandler : HandlerInterface;
     private walletHandler : HandlerInterface;
 
@@ -108,6 +143,97 @@ class Contract implements ContractInterface {
     private network : NetworkInterface;
 
     private looper;
+
+    private getContractState = throttle(async () => {
+        if (this.contractHandler) {
+            const [
+                currentSize,
+                fundRaisingPeriod,
+                turnPeriod,
+                currentSharePrice,
+                fundRaisingCountingDown,
+                countingStartedTime,
+                teamFundingStatus,
+                userStatus,
+                currentSharePerProposal,
+                currentTurn,
+            ] = await Promise.all([
+                this.contractHandler.methods.currentSize().call(),
+                this.contractHandler.methods.fundRaisingPeriod().call(),
+                this.contractHandler.methods.turnPeriod().call(),
+                this.contractHandler.methods.currentSharePrice().call(),
+                this.contractHandler.methods.fundRaisingCountingDown().call(),
+                this.contractHandler.methods.countingStartedTime().call(),
+                this.contractHandler.methods.getTeamFundingStatus().call(),
+                this.contractHandler.methods.getUserStatus(this.network.wallet).call(),
+                this.contractHandler.methods.currentSharePerProposal().call(),
+                this.contractHandler.methods.currentTurn().call(),
+            ]);
+            runInAction(() => {
+                this.currentSize = currentSize;
+                this.fundRaisingPeriod = fundRaisingPeriod;
+                this.turnPeriod = turnPeriod;
+                this.currentSharePrice = this.network.web3.utils.fromWei(currentSharePrice);
+                this.fundRaisingCountingDown = fundRaisingCountingDown;
+                this.countingStartedTime = countingStartedTime;
+                this.teamCatFunding = teamFundingStatus[0];
+                this.teamDogFunding = teamFundingStatus[1];
+                this.userStatus = {
+                    team: userStatus[1],
+                    catShare: userStatus[2],
+                    dogShare: userStatus[3],
+                };
+                this.currentSharePerProposal = currentSharePerProposal;
+                this.currentTurn = currentTurn;
+                this.autoTurn = currentTurn;
+            });
+            const [
+                currentTeam,
+                gameRound,
+                boardStatus,
+                black,
+                white,
+            ] = await Promise.all([
+                this.contractHandler.methods.currentTeam().call(),
+                this.contractHandler.methods.gameRound().call(),
+                this.contractHandler.methods.getBoardStatus().call(),
+                this.contractHandler.methods.black().call(),
+                this.contractHandler.methods.white().call()
+            ]);
+            const pastProposed : Array<any> = await this.contractHandler.getPastEvents<any>(
+                'proposed',
+                { filter: { round: gameRound }, fromBlock: 0, toBlock: 'latest' }
+            );
+            runInAction(() => {
+                this.boardStatus = boardStatus;
+                this.black = black;
+                this.white = white;
+                this.currentTeam = currentTeam;
+                this.gameRound = gameRound;
+                const turn = this.currentTurn;
+                this.proposed = pastProposed.map(({ returnValues }) => {
+                    this.contractHandler.methods.getProposalStatus(
+                        gameRound,
+                        turn,
+                        returnValues.proposer,
+                    ).call().then(({ time, vote, x, y }) => {
+                        if (time !== '0') {
+                            runInAction(() => {
+                                this.proposalStatus[this.getProposalId(turn, returnValues.proposer)] = {
+                                    turn,
+                                    time,
+                                    vote,
+                                    x,
+                                    y,
+                                };
+                            });
+                        }
+                    });
+                    return returnValues;
+                });
+            });
+        }
+    }, 200);
 
     constructor(network : NetworkInterface) {
         this.network = network;
@@ -117,6 +243,18 @@ class Contract implements ContractInterface {
     public getProposalId = (turn : string, addr : string) => `${turn}-${addr}`;
     public clearGame = () => this.writeWrapper('clearGame')([]);
     public startNewGame = () => this.writeWrapper('startNewGame')([]);
+    public getChessColorByTeam = (team : string) => {
+        switch(team) {
+            case `${this.TEAM.NONE}`:
+                return undefined;
+            case this.black:
+                return this.GRID_STATUS.BLACK;
+            case this.white:
+                return this.GRID_STATUS.WHITE;
+            default:
+                return undefined;
+        }
+    }
 
     public fund = async (team : number, shares : string) => {
         const [
@@ -188,91 +326,6 @@ class Contract implements ContractInterface {
         return infoOnNetwork ? infoOnNetwork.address : '';
     }
 
-    private async getContractState() {
-        if (this.contractHandler) {
-            const [
-                currentSize,
-                fundRaisingPeriod,
-                turnPeriod,
-                currentSharePrice,
-                fundRaisingCountingDown,
-                countingStartedTime,
-                teamFundingStatus,
-                userStatus,
-                currentSharePerProposal,
-                currentTurn,
-            ] = await Promise.all([
-                this.contractHandler.methods.currentSize().call(),
-                this.contractHandler.methods.fundRaisingPeriod().call(),
-                this.contractHandler.methods.turnPeriod().call(),
-                this.contractHandler.methods.currentSharePrice().call(),
-                this.contractHandler.methods.fundRaisingCountingDown().call(),
-                this.contractHandler.methods.countingStartedTime().call(),
-                this.contractHandler.methods.getTeamFundingStatus().call(),
-                this.contractHandler.methods.getUserStatus(this.network.wallet).call(),
-                this.contractHandler.methods.currentSharePerProposal().call(),
-                this.contractHandler.methods.currentTurn().call(),
-            ]);
-            runInAction(() => {
-                this.currentSize = currentSize;
-                this.fundRaisingPeriod = fundRaisingPeriod;
-                this.turnPeriod = turnPeriod;
-                this.currentSharePrice = this.network.web3.utils.fromWei(currentSharePrice);
-                this.fundRaisingCountingDown = fundRaisingCountingDown;
-                this.countingStartedTime = countingStartedTime;
-                this.teamCatFunding = teamFundingStatus[0];
-                this.teamDogFunding = teamFundingStatus[1];
-                this.userStatus = {
-                    team: userStatus[1],
-                    catShare: userStatus[2],
-                    dogShare: userStatus[3],
-                };
-                this.currentSharePerProposal = currentSharePerProposal;
-                this.currentTurn = currentTurn;
-                this.autoTurn = currentTurn;
-            });
-            const [
-                currentTeam,
-                gameRound,
-            ] = await Promise.all([
-                this.contractHandler.methods.currentTeam().call(),
-                this.contractHandler.methods.gameRound().call()
-            ]);
-            const pastProposed : Array<any> = await this.contractHandler.getPastEvents<any>(
-                'proposed',
-                { filter: { round: gameRound }, fromBlock: 0, toBlock: 'latest' }
-            );
-            runInAction(() => {
-                this.currentTeam = currentTeam;
-                this.gameRound = gameRound;
-                const turn = this.currentTurn;
-                this.proposed = pastProposed.map(({ returnValues }) => {
-                    this.contractHandler.methods.getProposalStatus(
-                        gameRound,
-                        turn,
-                        returnValues.proposer,
-                    ).call().then(({ time, vote, x, y }) => {
-                        if (time !== '0') {
-                            runInAction(() => {
-                                this.proposalStatus[this.getProposalId(turn, returnValues.proposer)] = {
-                                    time,
-                                    vote,
-                                    x,
-                                    y,
-                                };
-                            });
-                        }
-                    });
-                    return returnValues;
-                });
-            });
-            const boardStatus = await this.contractHandler.methods.getBoardStatus().call();
-            runInAction(() => {
-                this.boardStatus = boardStatus;
-            });
-        }
-    }
-
     private eventListener() {
         if (this.contractHandler) {
             this.contractHandler.events.NewGameStarted({}, (...arr) => {
@@ -288,10 +341,10 @@ class Contract implements ContractInterface {
                 console.log('start counting down!!!');
                 this.getContractState();
             });
-            this.contractHandler.events.turnStart({}, (...arr) => {
-                console.log('new turn start!', arr);
-                this.getContractState();
-            });
+            // this.contractHandler.events.turnStart({}, (...arr) => {
+            //     console.log('new turn start!', arr);
+            //     this.getContractState();
+            // });
             this.contractHandler.events.proposed({}, (t, { returnValues }) => {
                 const { round, turn, proposer } = returnValues;
                 this.getContractState();
@@ -306,12 +359,12 @@ class Contract implements ContractInterface {
                 console.log('someone voted!');
                 this.getContractState();
             });
-            this.contractHandler.events.proposalSelected({}, (t, { returnValues }) => {
-                // console.log('gsdf', returnValues);
-            });
-            this.contractHandler.events.flipEvent({}, (t, { returnValues }) => {
-                console.log('FLIP!', returnValues);
-            });
+            // this.contractHandler.events.proposalSelected({}, (t, { returnValues }) => {
+            //     // console.log('gsdf', returnValues);
+            // });
+            // this.contractHandler.events.flipEvent({}, (t, { returnValues }) => {
+            //     console.log('FLIP!', returnValues);
+            // });
         }
     }
 
@@ -319,7 +372,7 @@ class Contract implements ContractInterface {
         if (this.looper) {
             clearInterval(this.looper);
         }
-        this.looper = setInterval(() => this.loop(), 1000);
+        this.looper = setInterval(() => this.loop(), 500);
     }
 
     @action
@@ -354,6 +407,31 @@ class Contract implements ContractInterface {
             default:
                 return;
         }
+    }
+
+    private doFlip = (x, y, offsetX, offsetY, baseColor, oppositeColor) => {
+        const flip = {};
+        let currentX = x + offsetX;
+        let currentY = y + offsetY;
+        let shouldFlip = false;
+        const size = Number(this.currentSize);
+        while(
+            (currentX >= 0) &&
+            (currentY >= 0) &&
+            (currentX < size) &&
+            (currentY < size)
+        ) {
+            const status = this.boardStatus[(size * currentX) + currentY];
+            if (status === oppositeColor) {
+                flip[`${currentX}${currentY}`] = baseColor;
+                currentX += offsetX;
+                currentY += offsetY;
+            } else {
+                shouldFlip = (status === baseColor);
+                break;
+            }
+        }
+        return shouldFlip ? flip : {};
     }
 }
 

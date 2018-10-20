@@ -27,6 +27,7 @@ const Chess : any = styled.div`
     width: 80%;
     border-radius: 10%;
     ${(p : any) => p.isProposed ? 'border: 1px solid yellow' : ''};
+    ${(p : any) => p.isForecast ? 'border: 1px solid orange' : ''}
     background-color: ${(p) => p.color};
     display: flex;
     justify-content: center;
@@ -54,19 +55,26 @@ const getColor = (status : string) => {
 };
 const isProposed = (status : string) => {
     const { contract } = networkService;
-    return status === contract.GRID_STATUS.PROPOSED;
+    return (status === contract.GRID_STATUS.PROPOSED) &&
+    (contract.currentTurn === contract.autoTurn);
 };
 
-const Grid = ({ x, y, proposal, status }) => (
+const Grid = ({ x, y, proposal, status, forecast }) => (
     <Wrapper>
+        {(() => {
+            if (forecast) {
+                console.log('forecast', forecast);
+            }
+        })()}
         <InnerGrid>
             <Chess
-                color={getColor(status)}
+                color={getColor(forecast || status)}
                 isProposed={isProposed(status)}
                 onClick={() => {
                     const { contract } = networkService;
                     contract.propose(x, y);
                 }}
+                isForecast={forecast}
             >
                 {proposal && proposal.vote}
             </Chess>

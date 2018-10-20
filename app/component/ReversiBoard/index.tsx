@@ -41,17 +41,20 @@ class Board extends React.Component<{ size : string | number }> {
         const size = Number(this.props.size);
         const boardIterator = range(Number(size));
         const { contract } = networkService;
+        // console.log(contract.flipForecast);
         return (
             <BoardOutline>
                 <InnerBoard>
                     {boardIterator.map((iter, key) => {
-                        // console.log(contract.proposalStatusArray);
                         return (
                             <Row key={key}>
                                 {boardIterator.map((data, index) => {
-                                    const proposal = contract.proposalStatusArray.find((it) => {
-                                        return (Number(it.x) === key) && (Number(it.y) === index);
-                                    });
+                                    const proposal = contract.proposalStatusArray.find((it) => (
+                                        (Number(it.x) === key) &&
+                                        (Number(it.y) === index) &&
+                                        (it.turn === contract.autoTurn)
+                                    ));
+                                    const forecast = contract.flipForecast[`${key}${index}`];
                                     return (
                                         <Grid
                                             key={index}
@@ -63,6 +66,7 @@ class Board extends React.Component<{ size : string | number }> {
                                                 (contract.boardStatus[(size * key) + index])
                                             }
                                             proposal={proposal}
+                                            forecast={forecast}
                                         />
                                     );
                                 })}

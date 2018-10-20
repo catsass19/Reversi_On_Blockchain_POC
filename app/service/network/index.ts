@@ -68,8 +68,8 @@ class Network implements NetworkInterface {
         await this.connectWallet();
         this.blockchainHandler = new web3.default(this.getWebsocketProvider());
         runInAction(() => {
-            this.loaded = true;
             this.contract = new Contract(this);
+            this.loaded = true;
         });
     }
 

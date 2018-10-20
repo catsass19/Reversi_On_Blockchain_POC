@@ -40,6 +40,8 @@ interface ContractMethods {
     clearGame : () => Method;
     vote : () => Method;
     getBoardStatus : () => Variable<Array<string>>;
+    black : () => Variable<string>;
+    white : () => Variable<string>;
 }
 
 interface ContractEvents {
