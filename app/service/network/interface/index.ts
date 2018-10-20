@@ -51,6 +51,7 @@ interface ContractEvents {
     gameCleared : EventSubscriber<{ round : string, clearer : string }>;
     voted : EventSubscriber<any>;
     proposalSelected : EventSubscriber<any>;
+    flipEvent : EventSubscriber<any>;
 }
 
 export interface HandlerInterface {

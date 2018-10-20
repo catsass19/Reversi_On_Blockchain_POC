@@ -31,6 +31,7 @@ class Contract implements ContractInterface {
         WHITE: '2',
         AVAILABLE: '3',
         PROPOSED: '4',
+        FLIP: '5',
     };
 
     @observable public updatedTime : Date = new Date();
@@ -306,7 +307,10 @@ class Contract implements ContractInterface {
                 this.getContractState();
             });
             this.contractHandler.events.proposalSelected({}, (t, { returnValues }) => {
-                console.log('gsdf', returnValues);
+                // console.log('gsdf', returnValues);
+            });
+            this.contractHandler.events.flipEvent({}, (t, { returnValues }) => {
+                console.log('FLIP!', returnValues);
             });
         }
     }

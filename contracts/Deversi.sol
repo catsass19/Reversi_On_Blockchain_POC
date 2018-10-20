@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 contract Deversi {
 
     enum _TEAM { NONE, DOG, CAT }
-    enum _GRID_STATUS { EMPTY, BLACK, WHITE, AVAILABLE, PROPOSED }
+    enum _GRID_STATUS { EMPTY, BLACK, WHITE, AVAILABLE, PROPOSED, FLIP }
 
     struct Ledger {
         uint256 CAT;
@@ -18,6 +18,10 @@ contract Deversi {
         uint256 vote;
         uint256 time;
         bool isExist;
+        uint256 x;
+        uint256 y;
+    }
+    struct Flip {
         uint256 x;
         uint256 y;
     }
@@ -52,6 +56,9 @@ contract Deversi {
     mapping(uint256 => mapping(uint => bool)) public roundPropsedStatus;
     mapping(uint256 => mapping(uint256 => mapping(address => Proposal))) public proposals;
     mapping(uint256 => mapping(uint256 => address[])) public proposedAddress;
+    
+    mapping(uint256 => mapping(uint256 => mapping(uint256 => int[]))) private flipX;
+    mapping(uint256 => mapping(uint256 => mapping(uint256 => int[]))) private flipY;
 
     event funded();
     event NewGameStarted(uint256 round, uint time);
@@ -61,6 +68,7 @@ contract Deversi {
     event gameCleared(uint256, address clearer);
     event voted(uint round, uint turn, address proposer, address voter, uint256 shares);
     event proposalSelected(uint round, uint turn, address proposer, uint256 vote);
+    event flipEvent(uint turn, uint x, uint y);
 
     constructor() public {
         owner = msg.sender;
@@ -69,7 +77,7 @@ contract Deversi {
         configure(
             8, // size
             10, // funding period
-            120,  // turn period
+            30,  // turn period
             1000000000000000,
             5,
             10
@@ -183,7 +191,7 @@ contract Deversi {
         if (proposals[gameRound][currentTurn][msg.sender].isExist != true) {
             uint256 shares = msg.value / currentSharePrice;
             require(shares >= sharesPerProposal, "Not enough fund");
-            require(boardStatus[gameRound][x][y] == _GRID_STATUS.AVAILABLE, "Unavailable");
+            // require(boardStatus[gameRound][x][y] == _GRID_STATUS.AVAILABLE, "Unavailable");
             proposals[gameRound][currentTurn][msg.sender].vote = shares - sharesPerProposal;
             proposals[gameRound][currentTurn][msg.sender].isExist = true;
             proposals[gameRound][currentTurn][msg.sender].time = now;
@@ -240,10 +248,96 @@ contract Deversi {
                 highestAmount = _proposal.vote;
             }
         }
+        Proposal selected = proposals[gameRound][currentTurn][highestAddress];
+        if (black == currentTeam) {
+            boardStatus[gameRound][selected.x][selected.y] = _GRID_STATUS.BLACK;
+        } else if (white == currentTeam) {
+            boardStatus[gameRound][selected.x][selected.y] = _GRID_STATUS.WHITE;
+        }
+        // reverting calculation here...
+        flip(selected.x, selected.y);
         emit proposalSelected(gameRound, currentTurn, highestAddress, highestAmount);
         currentTurn += 1;
         currentTeam = (currentTeam == _TEAM.CAT) ? _TEAM.DOG : _TEAM.CAT;
         emit turnStart(gameRound, currentTurn, now);
+    }
+
+    function flip(uint256 x, uint256 y) {
+        _GRID_STATUS base = boardStatus[gameRound][x][y];
+        _GRID_STATUS opposite;
+        if (base == _GRID_STATUS.BLACK) {
+            opposite = _GRID_STATUS.WHITE;
+        } else if (base == _GRID_STATUS.WHITE) {
+            opposite = _GRID_STATUS.BLACK;
+        }
+        markFlip(x, y, 1, 1, base, opposite, 0);
+        markFlip(x, y, 1, 0, base, opposite, 1);
+        markFlip(x, y, 1, -1, base, opposite, 2);
+        markFlip(x, y, 0, -1, base, opposite, 3);
+        markFlip(x, y, -1, -1, base, opposite, 4);
+        markFlip(x, y, -1, 0, base, opposite, 5);
+        markFlip(x, y, 1, -1, base, opposite, 6);
+        markFlip(x, y, 0, 1, base, opposite, 7);
+        flipAll(base);
+    }
+    function flipAll(_GRID_STATUS base) {
+        for (uint i = 0; i < currentSize; i++) {
+            for(uint j = 0; j < currentSize; j++) {
+                if (boardStatus[gameRound][i][j] == _GRID_STATUS.FLIP) {
+                    boardStatus[gameRound][i][j] = base;
+                }
+            }
+        }
+    }
+    function markFlip(
+        uint256 x, uint256 y, int256 offsetX, int256 offsetY, 
+        _GRID_STATUS base, _GRID_STATUS opposite, uint256 direction
+    ) private {
+        int currentX = int(x) + offsetX;
+        int currentY = int(y) + offsetY;
+        bool shouldFlip = false;
+        uint index = 0;
+        while(
+            (currentX >= 0) &&
+            (currentY >= 0) &&
+            (currentX < int(currentSize)) &&
+            (currentY < int(currentSize))
+        ) {
+            _GRID_STATUS status = boardStatus[gameRound][uint(currentX)][uint(currentY)];
+            if (status == _GRID_STATUS.FLIP) {
+                currentX += offsetX;
+                currentY += offsetY;
+                continue;
+            } else if (status == opposite)  {
+                flipX[gameRound][currentTurn][direction].push(currentX);
+                flipY[gameRound][currentTurn][direction].push(currentY);
+      
+                emit flipEvent(currentTurn, uint(currentX), uint(currentY));
+                emit flipEvent(currentTurn, uint(flipX[gameRound][currentTurn][direction][index]), uint(flipY[gameRound][currentTurn][direction][index]));
+
+                index++;
+                currentX += offsetX;
+                currentY += offsetY;
+                continue;
+            } else {
+                if (status == base) {
+                    shouldFlip = true;
+                    break;
+                } else {
+                    shouldFlip = false;
+                    break;
+                }
+       
+            }
+        }
+        
+        if (shouldFlip) {
+            for (uint i = 0; i < index; i++) {
+                emit flipEvent(currentTurn, uint(flipX[gameRound][currentTurn][direction][i]), uint(flipY[gameRound][currentTurn][direction][i]));
+                boardStatus[gameRound][uint(flipX[gameRound][currentTurn][direction][i])][uint(flipY[gameRound][currentTurn][direction][i])] = _GRID_STATUS.FLIP;
+            }
+        }
+        
     }
 
     function clearGame() public onlyInGame {

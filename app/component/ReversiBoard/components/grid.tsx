@@ -42,9 +42,11 @@ const getColor = (status : string) => {
             return 'rgba(0, 0, 0, 1)';
         case contract.GRID_STATUS.WHITE:
             return 'rgba(255, 255, 255, 1)';
+        case contract.GRID_STATUS.FLIP:
+            return 'purple';
         case contract.GRID_STATUS.AVAILABLE:
         case contract.GRID_STATUS.PROPOSED:
-            return 'rgba(0, 0, 0, 0.2)';
+            // return 'rgba(0, 0, 0, 0.2)';
         case contract.GRID_STATUS.EMPTY:
         default:
             return '';
