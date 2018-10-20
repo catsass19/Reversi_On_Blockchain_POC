@@ -112,6 +112,7 @@ contract Deversi {
 
         boardStatus[gameRound][(currentSize / 2) - 1][(currentSize / 2) + 1] = _GRID_STATUS.AVAILABLE;
         boardStatus[gameRound][(currentSize / 2) - 2][(currentSize / 2)] = _GRID_STATUS.AVAILABLE;
+
         emit NewGameStarted(gameRound, now);
     }
 
@@ -276,7 +277,7 @@ contract Deversi {
         markFlip(x, y, 0, -1, base, opposite, 3);
         markFlip(x, y, -1, -1, base, opposite, 4);
         markFlip(x, y, -1, 0, base, opposite, 5);
-        markFlip(x, y, 1, -1, base, opposite, 6);
+        markFlip(x, y, -1, 1, base, opposite, 6);
         markFlip(x, y, 0, 1, base, opposite, 7);
         flipAll(base);
     }
@@ -311,9 +312,6 @@ contract Deversi {
             } else if (status == opposite)  {
                 flipX[gameRound][currentTurn][direction].push(currentX);
                 flipY[gameRound][currentTurn][direction].push(currentY);
-      
-                emit flipEvent(currentTurn, uint(currentX), uint(currentY));
-                emit flipEvent(currentTurn, uint(flipX[gameRound][currentTurn][direction][index]), uint(flipY[gameRound][currentTurn][direction][index]));
 
                 index++;
                 currentX += offsetX;
@@ -333,7 +331,6 @@ contract Deversi {
         
         if (shouldFlip) {
             for (uint i = 0; i < index; i++) {
-                emit flipEvent(currentTurn, uint(flipX[gameRound][currentTurn][direction][i]), uint(flipY[gameRound][currentTurn][direction][i]));
                 boardStatus[gameRound][uint(flipX[gameRound][currentTurn][direction][i])][uint(flipY[gameRound][currentTurn][direction][i])] = _GRID_STATUS.FLIP;
             }
         }
