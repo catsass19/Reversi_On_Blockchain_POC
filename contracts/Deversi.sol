@@ -76,8 +76,8 @@ contract Deversi {
         inGame = false;
         configure(
             8, // size
-            30, // funding period
-            60,  // turn period
+            10, // funding period
+            30,  // turn period
             1000000000000000,
             5,
             10
@@ -192,7 +192,7 @@ contract Deversi {
         if (proposals[gameRound][currentTurn][msg.sender].isExist != true) {
             uint256 shares = msg.value / currentSharePrice;
             require(shares >= sharesPerProposal, "Not enough fund");
-            // require(boardStatus[gameRound][x][y] == _GRID_STATUS.AVAILABLE, "Unavailable");
+            require(boardStatus[gameRound][x][y] == _GRID_STATUS.AVAILABLE, "Unavailable");
             proposals[gameRound][currentTurn][msg.sender].vote = shares - sharesPerProposal;
             proposals[gameRound][currentTurn][msg.sender].isExist = true;
             proposals[gameRound][currentTurn][msg.sender].time = now;
@@ -278,12 +278,15 @@ contract Deversi {
         for (int x = 0; x < int(currentSize); x++) {
             for (int y = 0; y < int(currentSize); y++) {
                 _GRID_STATUS status = boardStatus[gameRound][uint(x)][uint(y)];
-                if (status == _GRID_STATUS.AVAILABLE) {
+                if (
+                    (status != _GRID_STATUS.BLACK) &&
+                    (status != _GRID_STATUS.WHITE)
+                ) {
                     boardStatus[gameRound][uint(x)][uint(y)] = _GRID_STATUS.EMPTY;
-                }
-                if (markAvailable(x, y, base, opposite)) {
-                    boardStatus[gameRound][uint(x)][uint(y)] = _GRID_STATUS.AVAILABLE;
-                    available = true;
+                    if (markAvailable(x, y, base, opposite)) {
+                        boardStatus[gameRound][uint(x)][uint(y)] = _GRID_STATUS.AVAILABLE;
+                        available = true;
+                    }
                 }
             }
         }

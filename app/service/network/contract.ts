@@ -129,6 +129,7 @@ class Contract implements ContractInterface {
                     ...this.doFlip(x, y, -1, 1, baseColor, oppositeColor),
                     ...this.doFlip(x, y, 0, 1, baseColor, oppositeColor),
                 };
+                forecast = this.markAvailable(forecast);
             }
 
         }
@@ -407,6 +408,19 @@ class Contract implements ContractInterface {
             default:
                 return;
         }
+    }
+
+    private markAvailable(forecast) {
+        const size = Number(this.currentSize);
+        for (let x = 0; x < size; x++) {
+            for (let y = 0; y < size; y++) {
+                const status = this.boardStatus[(size * x) + y];
+                if (status === this.GRID_STATUS.AVAILABLE) {
+                    forecast[`${x}${y}`] = this.GRID_STATUS.EMPTY;
+                }
+            }
+        }
+        return forecast;
     }
 
     private doFlip = (x, y, offsetX, offsetY, baseColor, oppositeColor) => {

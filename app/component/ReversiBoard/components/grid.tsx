@@ -46,7 +46,6 @@ const getColor = (status : string) => {
         case contract.GRID_STATUS.FLIP:
             return 'purple';
         case contract.GRID_STATUS.AVAILABLE:
-        // case contract.GRID_STATUS.PROPOSED:
             return 'rgba(0, 0, 0, 0.2)';
         case contract.GRID_STATUS.EMPTY:
         default:
@@ -61,11 +60,6 @@ const isProposed = (status : string) => {
 
 const Grid = ({ x, y, proposal, status, forecast }) => (
     <Wrapper>
-        {(() => {
-            if (forecast) {
-                console.log('forecast', forecast);
-            }
-        })()}
         <InnerGrid>
             <Chess
                 color={getColor(forecast || status)}
@@ -74,7 +68,10 @@ const Grid = ({ x, y, proposal, status, forecast }) => (
                     const { contract } = networkService;
                     contract.propose(x, y);
                 }}
-                isForecast={forecast}
+                isForecast={
+                    forecast &&
+                    (forecast !== networkService.contract.GRID_STATUS.EMPTY)
+                }
             >
                 {proposal && proposal.vote}
             </Chess>
