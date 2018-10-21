@@ -27,7 +27,7 @@ const Chess : any = styled.div`
     width: 80%;
     border-radius: 10%;
     ${(p : any) => p.isProposed ? 'border: 1px solid yellow' : ''};
-    ${(p : any) => p.isForecast ? 'border: 1px solid orange' : ''}
+    ${(p : any) => p.isForecast ? 'border: 3px solid orange' : ''};
     background-color: ${(p) => p.color};
     display: flex;
     justify-content: center;
@@ -46,8 +46,8 @@ const getColor = (status : string) => {
         case contract.GRID_STATUS.FLIP:
             return 'purple';
         case contract.GRID_STATUS.AVAILABLE:
-        case contract.GRID_STATUS.PROPOSED:
-            // return 'rgba(0, 0, 0, 0.2)';
+        // case contract.GRID_STATUS.PROPOSED:
+            return 'rgba(0, 0, 0, 0.2)';
         case contract.GRID_STATUS.EMPTY:
         default:
             return '';

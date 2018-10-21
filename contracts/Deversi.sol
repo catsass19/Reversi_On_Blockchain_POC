@@ -258,9 +258,80 @@ contract Deversi {
         // reverting calculation here...
         flip(selected.x, selected.y);
         // emit proposalSelected(gameRound, currentTurn, highestAddress, highestAmount);
-        currentTurn += 1;
+        currentTurn += 1;    
+        _GRID_STATUS base;
+        _GRID_STATUS opposite;
+        if (currentTeam == black) {
+            base = _GRID_STATUS.WHITE;
+            opposite = _GRID_STATUS.BLACK;
+        } else if (currentTeam == white) {
+            base = _GRID_STATUS.BLACK;
+            opposite = _GRID_STATUS.WHITE;
+        }
+        checkAvailable(base, opposite);
         currentTeam = (currentTeam == _TEAM.CAT) ? _TEAM.DOG : _TEAM.CAT;
         // emit turnStart(gameRound, currentTurn, now);
+    }
+
+    function checkAvailable(_GRID_STATUS base, _GRID_STATUS opposite) returns(bool) {
+        bool available = false;
+        for (int x = 0; x < int(currentSize); x++) {
+            for (int y = 0; y < int(currentSize); y++) {
+                _GRID_STATUS status = boardStatus[gameRound][uint(x)][uint(y)];
+                if (status == _GRID_STATUS.AVAILABLE) {
+                    boardStatus[gameRound][uint(x)][uint(y)] = _GRID_STATUS.EMPTY;
+                }
+                if (markAvailable(x, y, base, opposite)) {
+                    boardStatus[gameRound][uint(x)][uint(y)] = _GRID_STATUS.AVAILABLE;
+                    available = true;
+                }
+            }
+        }
+        return available;
+    }
+
+    function markAvailable(int x, int y, _GRID_STATUS base, _GRID_STATUS opposite) returns(bool) {
+        bool dir1 = isAvailable(x, y, 1, 1, base, opposite);
+        bool dir2 = isAvailable(x, y, 1, 0, base, opposite);
+        bool dir3 = isAvailable(x, y, 1, -1, base, opposite);
+        bool dir4 = isAvailable(x, y, 0, -1, base, opposite);
+        bool dir5 = isAvailable(x, y, -1, -1, base, opposite);
+        bool dir6 = isAvailable(x, y, -1, 0, base, opposite);
+        bool dir7 = isAvailable(x, y, -1, 1, base, opposite);
+        bool dir8 = isAvailable(x, y, 0, 1, base, opposite);
+        return (
+            dir1 || dir2 || dir3 || dir4 || dir5 || dir6 || dir7 || dir8
+        );
+    }
+    function isAvailable(
+        int x, int y, int offsetX, int offsetY, 
+        _GRID_STATUS base, _GRID_STATUS opposite
+    ) returns (bool) {
+        int currentX = x + offsetX;
+        int currentY = y + offsetY;
+        int flipCount = 0;
+        bool shouldFlip = false;
+        while(
+            (currentX >= 0) &&
+            (currentY >= 0) &&
+            (currentX < int(currentSize)) &&
+            (currentY < int(currentSize))
+        ) {
+            _GRID_STATUS status = boardStatus[gameRound][uint(currentX)][uint(currentY)];
+            if (status == opposite) {
+                flipCount += 1;
+                currentX += offsetX;
+                currentY += offsetY;
+                continue;
+            } else if (status == base) {
+                shouldFlip = true;
+                break;
+            } else {
+                shouldFlip = false;
+                break;
+            }
+        }
+        return ((flipCount > 0) && shouldFlip);
     }
 
     function flip(uint256 x, uint256 y) {
