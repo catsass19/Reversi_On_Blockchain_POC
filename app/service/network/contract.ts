@@ -129,7 +129,7 @@ class Contract implements ContractInterface {
                     ...this.doFlip(x, y, -1, 1, baseColor, oppositeColor),
                     ...this.doFlip(x, y, 0, 1, baseColor, oppositeColor),
                 };
-                forecast = this.markAvailable(forecast);
+                forecast = this.markAvailable(forecast, oppositeColor, baseColor);
             }
 
         }
@@ -410,7 +410,7 @@ class Contract implements ContractInterface {
         }
     }
 
-    private markAvailable(forecast) {
+    private markAvailable(forecast, base, opposite) {
         const size = Number(this.currentSize);
         for (let x = 0; x < size; x++) {
             for (let y = 0; y < size; y++) {
@@ -418,9 +418,61 @@ class Contract implements ContractInterface {
                 if (status === this.GRID_STATUS.AVAILABLE) {
                     forecast[`${x}${y}`] = this.GRID_STATUS.EMPTY;
                 }
+                const forecastStatus = this.getForecastStatus(x, y, forecast, size);
+                if (forecastStatus === this.GRID_STATUS.EMPTY) {
+                    if (this.markAvailble(x, y, forecast, base, opposite)) {
+                        forecast[`${x}${y}`] = this.GRID_STATUS.AVAILABLE;
+                    }
+                }
             }
         }
         return forecast;
+    }
+
+    private markAvailble(x, y, forecast, base, opposite) {
+        return (
+            this.isAvailable(x, y, 1, 1, forecast, base, opposite) ||
+            this.isAvailable(x, y, 1, 0, forecast, base, opposite) ||
+            this.isAvailable(x, y, 1, -1, forecast, base, opposite) ||
+            this.isAvailable(x, y, 0, -1, forecast, base, opposite) ||
+            this.isAvailable(x, y, -1, -1, forecast, base, opposite) ||
+            this.isAvailable(x, y, -1, 0, forecast, base, opposite) ||
+            this.isAvailable(x, y, -1, 1, forecast, base, opposite) ||
+            this.isAvailable(x, y, 0, 1, forecast, base, opposite)
+        );
+    }
+    private isAvailable(x, y, offsetX, offsetY, forecast, base, opposite) {
+        let currentX = x + offsetX;
+        let currentY = y + offsetY;
+        let flipCount = 0;
+        let shouldFlip = false;
+        const size = Number(this.currentSize);
+
+        while(
+            (currentX >= 0) &&
+            (currentY >= 0) &&
+            (currentX < size) &&
+            (currentY < size)
+        ) {
+            const status = this.getForecastStatus(currentX, currentY, forecast, size);
+            if (status === opposite) {
+                flipCount += 1;
+                currentX += offsetX;
+                currentY += offsetY;
+                continue;
+            } else if (status === base) {
+                shouldFlip = true;
+                break;
+            } else {
+                shouldFlip = false;
+                break;
+            }
+        }
+        return ((flipCount > 0) && shouldFlip);
+    }
+
+    private getForecastStatus(x, y, forecast, size) {
+        return forecast[`${x}${y}`] || this.boardStatus[(size * x) + y];
     }
 
     private doFlip = (x, y, offsetX, offsetY, baseColor, oppositeColor) => {
