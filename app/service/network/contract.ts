@@ -78,6 +78,23 @@ class Contract implements ContractInterface {
     @computed public get currentTeamName() {
         return this.getTeamName(this.currentTeam);
     }
+    @computed public get forecastCurrentTeam() {
+        let team;
+        if (this.autoTurn === this.currentTurn) {
+            team = this.currentTeam;
+        } else if (Number(this.autoTurn) > Number(this.currentTurn)) {
+            if (this.currentTurn === '0') {
+                team = (Number(this.teamCatFunding) > Number(this.teamDogFunding))
+                    ? this.TEAM.CAT
+                    : this.TEAM.DOG;
+            } else {
+                team =  (Number(this.currentTeam) === this.TEAM.CAT)
+                    ? this.TEAM.DOG
+                    : this.TEAM.CAT;
+            }
+        }
+        return this.getTeamName(team);
+    }
     @computed public get autoTurnEndTime() {
         if (Number(this.autoTurn) > 0) {
             const endTime =
@@ -133,7 +150,6 @@ class Contract implements ContractInterface {
             }
 
         }
-        console.log('forecast', forecast);
         return forecast;
     }
 

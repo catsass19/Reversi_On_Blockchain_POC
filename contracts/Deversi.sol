@@ -56,7 +56,7 @@ contract Deversi {
     mapping(uint256 => mapping(uint => bool)) public roundPropsedStatus;
     mapping(uint256 => mapping(uint256 => mapping(address => Proposal))) public proposals;
     mapping(uint256 => mapping(uint256 => address[])) public proposedAddress;
-    
+
     mapping(uint256 => mapping(uint256 => mapping(uint256 => int[]))) private flipX;
     mapping(uint256 => mapping(uint256 => mapping(uint256 => int[]))) private flipY;
 
@@ -77,7 +77,7 @@ contract Deversi {
         configure(
             8, // size
             10, // funding period
-            30,  // turn period
+            90,  // turn period
             1000000000000000,
             5,
             10
@@ -258,7 +258,7 @@ contract Deversi {
         // reverting calculation here...
         flip(selected.x, selected.y);
         // emit proposalSelected(gameRound, currentTurn, highestAddress, highestAmount);
-        currentTurn += 1;    
+        currentTurn += 1;
         _GRID_STATUS base;
         _GRID_STATUS opposite;
         if (currentTeam == black) {
@@ -273,7 +273,7 @@ contract Deversi {
         // emit turnStart(gameRound, currentTurn, now);
     }
 
-    function checkAvailable(_GRID_STATUS base, _GRID_STATUS opposite) returns(bool) {
+    function checkAvailable(_GRID_STATUS base, _GRID_STATUS opposite) private returns(bool) {
         bool available = false;
         for (int x = 0; x < int(currentSize); x++) {
             for (int y = 0; y < int(currentSize); y++) {
@@ -293,7 +293,7 @@ contract Deversi {
         return available;
     }
 
-    function markAvailable(int x, int y, _GRID_STATUS base, _GRID_STATUS opposite) returns(bool) {
+    function markAvailable(int x, int y, _GRID_STATUS base, _GRID_STATUS opposite) private returns(bool) {
         bool dir1 = isAvailable(x, y, 1, 1, base, opposite);
         bool dir2 = isAvailable(x, y, 1, 0, base, opposite);
         bool dir3 = isAvailable(x, y, 1, -1, base, opposite);
@@ -307,9 +307,9 @@ contract Deversi {
         );
     }
     function isAvailable(
-        int x, int y, int offsetX, int offsetY, 
+        int x, int y, int offsetX, int offsetY,
         _GRID_STATUS base, _GRID_STATUS opposite
-    ) returns (bool) {
+    ) private returns (bool) {
         int currentX = x + offsetX;
         int currentY = y + offsetY;
         int flipCount = 0;
@@ -365,7 +365,7 @@ contract Deversi {
         }
     }
     function markFlip(
-        uint256 x, uint256 y, int256 offsetX, int256 offsetY, 
+        uint256 x, uint256 y, int256 offsetX, int256 offsetY,
         _GRID_STATUS base, _GRID_STATUS opposite, uint256 direction
     ) private {
         int currentX = int(x) + offsetX;
@@ -399,16 +399,16 @@ contract Deversi {
                     shouldFlip = false;
                     break;
                 }
-       
+
             }
         }
-        
+
         if (shouldFlip) {
             for (uint i = 0; i < index; i++) {
                 boardStatus[gameRound][uint(flipX[gameRound][currentTurn][direction][i])][uint(flipY[gameRound][currentTurn][direction][i])] = _GRID_STATUS.FLIP;
             }
         }
-        
+
     }
 
     function clearGame() public onlyInGame {

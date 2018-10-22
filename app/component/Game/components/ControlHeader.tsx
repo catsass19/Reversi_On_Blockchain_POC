@@ -10,7 +10,7 @@ const Container = styled.div`
 `;
 const DescrptionText = styled.span``;
 const VariableText = styled.span`
-    margin: 15px;
+
     color: white;
 `;
 const Item = styled.div`
@@ -30,8 +30,8 @@ export default class ControlHeader extends React.Component {
                     {!contract.gameResolvedAuto && (
                         <>
                           <Item>
-                              <DescrptionText>Turn</DescrptionText>
-                              <VariableText>{contract.autoTurn}</VariableText>
+                                <VariableText>{contract.forecastCurrentTeam}</VariableText>
+                                <DescrptionText>'s turn</DescrptionText>
                           </Item>
                           <Padding />
                           {contract.autoTurnEndTime && (
@@ -39,7 +39,6 @@ export default class ControlHeader extends React.Component {
                                 <VariableText>
                                     <CountDown time={contract.autoTurnEndTime} />
                                 </VariableText>
-                                <DescrptionText>Sec</DescrptionText>
                             </Item>
                           )}
                         </>

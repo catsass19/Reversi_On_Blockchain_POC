@@ -27,7 +27,7 @@ const Chess : any = styled.div`
     width: 80%;
     border-radius: 10%;
     ${(p : any) => p.isProposed ? 'border: 1px solid yellow' : ''};
-    ${(p : any) => p.isForecast ? 'border: 3px solid rgba(255, 255, 0, 0.2)' : ''};
+    /* ${(p : any) => p.isForecast ? 'border: 3px solid rgba(255, 255, 0, 0.2)' : ''}; */
     background-color: ${(p) => p.color};
     display: flex;
     justify-content: center;
