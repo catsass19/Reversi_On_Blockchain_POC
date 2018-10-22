@@ -69,6 +69,7 @@ contract Deversi {
     event voted(uint round, uint turn, address proposer, address voter, uint256 shares);
     event proposalSelected(uint round, uint turn, address proposer, uint256 vote);
     event flipEvent(uint turn, uint x, uint y);
+    event messagePost(string msg, address sender, uint round, uint time);
 
     constructor() public {
         owner = msg.sender;
@@ -147,6 +148,10 @@ contract Deversi {
                 emit fundRaisingCountdown(gameRound, now);
             }
         }
+    }
+
+    function postMessage(string message) public onlyInGame {
+        emit messagePost(message, msg.sender, gameRound, now);
     }
 
     function propose(uint256 x, uint256 y) public payable onlyInGame {

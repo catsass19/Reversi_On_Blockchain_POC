@@ -54,6 +54,12 @@ class Contract implements ContractInterface {
     @observable public boardStatus : Array<string> = [];
     @observable public black : string;
     @observable public white : string;
+    @observable public messages : Array<{
+        msg : string;
+        round : string;
+        sender : string;
+        time : string;
+     }> = [];
 
     @observable public autoTurn : string;
     @observable public turnGap : number = 0;
@@ -160,6 +166,7 @@ class Contract implements ContractInterface {
     private network : NetworkInterface;
 
     private looper;
+    private getPastMessage : boolean = false;
 
     private getContractState = throttle(async () => {
         if (this.contractHandler) {
@@ -249,6 +256,17 @@ class Contract implements ContractInterface {
                     return returnValues;
                 });
             });
+            if (!this.getPastMessage && this.gameRound) {
+                const pastMessages : Array<any> = await this.contractHandler.getPastEvents<any>(
+                    'messagePost',
+                    { filter: { round: gameRound }, fromBlock: 0, toBlock: 'latest' }
+                );
+                runInAction(() => {
+                    pastMessages.map(({ returnValues}) => {
+                        this.handleMessage(returnValues);
+                    });
+                });
+            }
         }
     }, 200);
 
@@ -257,6 +275,7 @@ class Contract implements ContractInterface {
         this.init();
     }
 
+    public postMessage = (message : string) => this.writeWrapper('postMessage')([message]);
     public getProposalId = (turn : string, addr : string) => `${turn}-${addr}`;
     public clearGame = () => this.writeWrapper('clearGame')([]);
     public startNewGame = () => this.writeWrapper('startNewGame')([]);
@@ -382,7 +401,18 @@ class Contract implements ContractInterface {
             // this.contractHandler.events.flipEvent({}, (t, { returnValues }) => {
             //     console.log('FLIP!', returnValues);
             // });
+            this.contractHandler.events.messagePost({}, (t, { returnValues }) => {
+                this.handleMessage(returnValues);
+            });
         }
+    }
+
+    private handleMessage(returnValues) {
+        const { msg, round, sender, time } = returnValues;
+        const date = new Date(Number(time) * 1000);
+        runInAction(() => {
+            this.messages.push({ msg, round, sender, time: date.toLocaleString('zh-TW', { timeZone: 'UTC' }) });
+        });
     }
 
     private startLoop() {

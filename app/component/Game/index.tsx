@@ -7,11 +7,12 @@ import ControlHeader from './components/ControlHeader';
 import Proposals from './components/Proposals';
 import GameOver from './components/GameOver';
 import GameInfo from './components/GameInfo';
+import Messages from './components/Messages';
 
 const Container = styled.div`
     flex: 1;
     display: flex;
-    padding: 0px 28px;
+    padding: 0px 10px;
 `;
 const BoardArea = styled.div`
     display: flex;
@@ -26,8 +27,52 @@ const ControlArea = styled.div`
     display: flex;
     flex-direction: column;
 `;
+
+const ChatArea = styled.div`
+    /* border-left: 1px solid rgba(255, 255, 255, 0.5); */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+`;
+const Title = styled.div`
+    padding: 15px;
+    font-size: xx-large;
+    text-align: right;
+`;
+const StyledInput = styled.input`
+    flex: 1;
+    outline: none;
+    height: 40px;
+    color: #13BF99;
+    border: none;
+    border-bottom: 1px solid #13BF99;
+    background-color: black;
+    font-size: larger;
+`;
+const StyledButton = styled.button`
+    margin-left: 15px;
+    outline: none;
+    height: 40px;
+    padding: 0px 20px;
+    border: 1px solid #13BF99;
+    color: #13BF99;
+    font-size: 20px;
+    background-color: black;
+`;
+const InputArea = styled.div`
+    display: flex;
+    align-items: center;
+    padding-top: 10px;
+`;
+
 @observer
 export default class Game extends React.Component {
+
+    public state = {
+        input: '',
+    };
+
     public render() {
         const { contract } = networkService;
         return (
@@ -40,11 +85,35 @@ export default class Game extends React.Component {
                 </BoardArea>
                 <ControlArea>
                     <ControlHeader />
-                    <Proposals />
                     {!contract.gameResolvedAuto && (<Proposals />)}
                     {contract.gameResolvedAuto && (<GameOver />)}
                 </ControlArea>
+                <ChatArea>
+                    <Title>Discussion</Title>
+                    <Messages />
+                    <InputArea>
+                        <StyledInput
+                            value={this.state.input}
+                            onChange={this.inputOnChanged}
+                        />
+                        <StyledButton
+                            onClick={this.sendMessage}
+                        >
+                            Send
+                        </StyledButton>
+                    </InputArea>
+                </ChatArea>
             </Container>
         );
+    }
+
+    private inputOnChanged = (e) => {
+        this.setState({ input: e.target.value });
+    }
+    private sendMessage = () => {
+        const { contract } = networkService;
+        const { input } = this.state;
+        contract.postMessage(input);
+        this.setState({ input: '' });
     }
 }

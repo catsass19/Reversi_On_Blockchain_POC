@@ -42,6 +42,7 @@ interface ContractMethods {
     getBoardStatus : () => Variable<Array<string>>;
     black : () => Variable<string>;
     white : () => Variable<string>;
+    postMessage : (message : string) => Method;
 }
 
 interface ContractEvents {
@@ -54,6 +55,7 @@ interface ContractEvents {
     voted : EventSubscriber<any>;
     proposalSelected : EventSubscriber<any>;
     flipEvent : EventSubscriber<any>;
+    messagePost : EventSubscriber<any>;
 }
 
 export interface HandlerInterface {
