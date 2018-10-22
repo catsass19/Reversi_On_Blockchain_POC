@@ -366,6 +366,7 @@ class Contract implements ContractInterface {
         if (this.contractHandler) {
             this.contractHandler.events.NewGameStarted({}, (...arr) => {
                 console.log('NewGameStarted');
+                this.proposalStatus = {};
                 this.getContractState();
                 this.startLoop();
             });

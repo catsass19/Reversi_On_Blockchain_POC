@@ -59,6 +59,10 @@ const StyledButton = styled.button`
     color: #13BF99;
     font-size: 20px;
     background-color: black;
+    cursor: pointer;
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
 `;
 const InputArea = styled.div`
     display: flex;

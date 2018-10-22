@@ -44,15 +44,18 @@ export default class Messages extends React.Component {
 
     private ref;
 
-    public componentDidUpdate() {
+    public componentDidMount() {
+        this.scrollToBottom();
+    }
 
+    public componentDidUpdate() {
+        this.scrollToBottom();
     }
 
     public render() {
         const { contract } = networkService;
         return (
             <div
-                ref={(ref) => this.ref}
                 style={{
                   flex: 1,
                   display: 'flex',
@@ -75,7 +78,14 @@ export default class Messages extends React.Component {
                       </MessageInfo>
                     </Message>
                 ))}
+                <div
+                  ref={(ref) => this.ref = ref}
+                />
             </div>
         );
     }
+
+    private scrollToBottom = () => {
+      this.ref.scrollIntoView({ behavior: 'smooth' });
+  }
 }
