@@ -36,6 +36,7 @@ class Contract implements ContractInterface {
         FLIP: '5',
     };
 
+    @observable public availableCount : number;
     @observable public updatedTime : Date = new Date();
     @observable public address : string;
     @observable public currentSize : string;
@@ -111,7 +112,16 @@ class Contract implements ContractInterface {
         }
     }
     @computed public get gameResolvedAuto() {
-        return this.fundRaisingCountingDown && (this.turnGap >= 2);
+        return (
+            this.fundRaisingCountingDown &&
+            (
+                (this.turnGap >= 2) ||
+                (
+                    (Number(this.autoTurn) > 1) &&
+                    (this.availableCount === 0)
+                )
+            )
+        );
     }
 
     @computed public get currentTurnEndTime() {
@@ -130,8 +140,8 @@ class Contract implements ContractInterface {
     }
 
     @computed public get flipForecast() {
-        let forecast : {
-            [id : string] : string
+        let forecastT : {
+            [id : string] : string,
         } = {};
         if (Number(this.autoTurn) > Number(this.currentTurn)) {
             const lastTurnProposals = this.proposalStatusArray.filter((it) => it.turn === this.currentTurn);
@@ -141,7 +151,7 @@ class Contract implements ContractInterface {
                 const oppositeColor = (baseColor === this.GRID_STATUS.BLACK) ? this.GRID_STATUS.WHITE : this.GRID_STATUS.BLACK;
                 const x = Number(max.x);
                 const y = Number(max.y);
-                forecast = {
+                forecastT = {
                     [`${x}${y}`]: baseColor,
                     ...this.doFlip(x, y, 1, 1, baseColor, oppositeColor),
                     ...this.doFlip(x, y, 1, 0, baseColor, oppositeColor),
@@ -152,11 +162,17 @@ class Contract implements ContractInterface {
                     ...this.doFlip(x, y, -1, 1, baseColor, oppositeColor),
                     ...this.doFlip(x, y, 0, 1, baseColor, oppositeColor),
                 };
-                forecast = this.markAvailable(forecast, oppositeColor, baseColor);
+                const { forecast, count } = this.markAvailable(forecastT, oppositeColor, baseColor);
+                forecastT = forecast;
+                setTimeout(() => {
+                    runInAction(() => {
+                        this.availableCount = count;
+                    });
+                }, 0);
             }
 
         }
-        return forecast;
+        return forecastT;
     }
 
     private contractHandler : HandlerInterface;
@@ -317,6 +333,10 @@ class Contract implements ContractInterface {
         this.writeWrapper('propose')([x, y], total.toString());
     }
 
+    public updateGame = async () => {
+        this.writeWrapper('updateGame')([]);
+    }
+
     public vote = async (round : string, turn : string, proposer : string, shares : string) => {
         const [
             sharePrice,
@@ -366,9 +386,11 @@ class Contract implements ContractInterface {
         if (this.contractHandler) {
             this.contractHandler.events.NewGameStarted({}, (...arr) => {
                 console.log('NewGameStarted');
-                this.proposalStatus = {};
-                this.getContractState();
-                this.startLoop();
+                runInAction(() => {
+                    this.proposalStatus = {};
+                    this.getContractState();
+                    this.startLoop();
+                });
             });
             this.contractHandler.events.funded({}, (...arr) => {
                 console.log('a team gets funded');
@@ -458,6 +480,7 @@ class Contract implements ContractInterface {
     }
 
     private markAvailable(forecast, base, opposite) {
+        let count = 0;
         const size = Number(this.currentSize);
         for (let x = 0; x < size; x++) {
             for (let y = 0; y < size; y++) {
@@ -468,12 +491,13 @@ class Contract implements ContractInterface {
                 const forecastStatus = this.getForecastStatus(x, y, forecast, size);
                 if (forecastStatus === this.GRID_STATUS.EMPTY) {
                     if (this.markAvailble(x, y, forecast, base, opposite)) {
+                        count ++;
                         forecast[`${x}${y}`] = this.GRID_STATUS.AVAILABLE;
                     }
                 }
             }
         }
-        return forecast;
+        return { forecast, count};
     }
 
     private markAvailble(x, y, forecast, base, opposite) {

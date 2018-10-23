@@ -43,6 +43,7 @@ interface ContractMethods {
     black : () => Variable<string>;
     white : () => Variable<string>;
     postMessage : (message : string) => Method;
+    updateGame : () => Method;
 }
 
 interface ContractEvents {

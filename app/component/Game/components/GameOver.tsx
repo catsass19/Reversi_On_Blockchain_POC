@@ -18,6 +18,11 @@ export default class ControlHeader extends React.Component {
                 Game Over. Prize will be distributed to all winners based on share amounts.
                 If you are one of the losers you may still get something back by clicking the 'clear game' button
                 <button
+                    onClick={() => contract.updateGame()}
+                >
+                    updateGame
+                </button>
+                <button
                     onClick={() => contract.clearGame()}
                 >
                     Clear Game

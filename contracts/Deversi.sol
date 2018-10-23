@@ -76,9 +76,9 @@ contract Deversi {
         gameRound = 0;
         inGame = false;
         configure(
-            8, // size
+            4, // size
             10, // funding period
-            90,  // turn period
+            30,  // turn period
             1000000000000000,
             5,
             10
@@ -242,7 +242,7 @@ contract Deversi {
         }
     }
 
-    function updateGame() private {
+    function updateGame() public {
         uint256 proposedLength = proposedAddress[gameRound][currentTurn].length;
         address highestAddress = proposedAddress[gameRound][currentTurn][0];
         uint256 highestAmount = proposals[gameRound][currentTurn][highestAddress].vote;
@@ -264,22 +264,13 @@ contract Deversi {
         flip(selected.x, selected.y);
         // emit proposalSelected(gameRound, currentTurn, highestAddress, highestAmount);
         currentTurn += 1;
-        _GRID_STATUS base;
-        _GRID_STATUS opposite;
-        if (currentTeam == black) {
-            base = _GRID_STATUS.WHITE;
-            opposite = _GRID_STATUS.BLACK;
-        } else if (currentTeam == white) {
-            base = _GRID_STATUS.BLACK;
-            opposite = _GRID_STATUS.WHITE;
-        }
-        checkAvailable(base, opposite);
-        currentTeam = (currentTeam == _TEAM.CAT) ? _TEAM.DOG : _TEAM.CAT;
+        checkGameEnd();
+
         // emit turnStart(gameRound, currentTurn, now);
     }
 
-    function checkAvailable(_GRID_STATUS base, _GRID_STATUS opposite) private returns(bool) {
-        bool available = false;
+    function checkAvailable(_GRID_STATUS base, _GRID_STATUS opposite) private returns(uint) {
+        uint available = 0;
         for (int x = 0; x < int(currentSize); x++) {
             for (int y = 0; y < int(currentSize); y++) {
                 _GRID_STATUS status = boardStatus[gameRound][uint(x)][uint(y)];
@@ -290,7 +281,7 @@ contract Deversi {
                     boardStatus[gameRound][uint(x)][uint(y)] = _GRID_STATUS.EMPTY;
                     if (markAvailable(x, y, base, opposite)) {
                         boardStatus[gameRound][uint(x)][uint(y)] = _GRID_STATUS.AVAILABLE;
-                        available = true;
+                        available += 1;
                     }
                 }
             }
@@ -342,7 +333,7 @@ contract Deversi {
         return ((flipCount > 0) && shouldFlip);
     }
 
-    function flip(uint256 x, uint256 y) {
+    function flip(uint256 x, uint256 y) private {
         _GRID_STATUS base = boardStatus[gameRound][x][y];
         _GRID_STATUS opposite;
         if (base == _GRID_STATUS.BLACK) {
@@ -360,7 +351,7 @@ contract Deversi {
         markFlip(x, y, 0, 1, base, opposite, 7);
         flipAll(base);
     }
-    function flipAll(_GRID_STATUS base) {
+    function flipAll(_GRID_STATUS base) private {
         for (uint i = 0; i < currentSize; i++) {
             for(uint j = 0; j < currentSize; j++) {
                 if (boardStatus[gameRound][i][j] == _GRID_STATUS.FLIP) {
@@ -414,6 +405,24 @@ contract Deversi {
             }
         }
 
+    }
+
+    function checkGameEnd() public onlyInGame {
+        _GRID_STATUS base;
+        _GRID_STATUS opposite;
+        if (currentTeam == black) {
+            base = _GRID_STATUS.WHITE;
+            opposite = _GRID_STATUS.BLACK;
+        } else if (currentTeam == white) {
+            base = _GRID_STATUS.BLACK;
+            opposite = _GRID_STATUS.WHITE;
+        }
+        uint available = checkAvailable(base, opposite);
+        if (available == 0) {
+            clearGame();
+        } else {
+            currentTeam = (currentTeam == _TEAM.CAT) ? _TEAM.DOG : _TEAM.CAT;
+        }
     }
 
     function clearGame() public onlyInGame {
