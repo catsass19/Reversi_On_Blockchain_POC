@@ -48,6 +48,13 @@ class Network implements NetworkInterface {
     public getContractHandler = (abi : Array<any>, addr : string) => this.getHandler('blockchainHandler')(abi, addr);
     public getWalletHandler = (abi : Array<any>, addr : string) => this.getHandler('walletHandler')(abi, addr);
 
+    public getBalanceOfAddress = async (address : string) => {
+        if (this.blockchainHandler) {
+            const balance = await this.blockchainHandler.eth.getBalance(address);
+            return balance;
+        }
+    }
+
     private getHandler = (target : string) => {
         return (abi : Array<any>, addr : string) => {
             if (this[target] && abi.length && addr) {

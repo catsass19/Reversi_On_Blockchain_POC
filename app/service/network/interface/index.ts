@@ -85,4 +85,5 @@ export interface NetworkInterface {
     netId : number;
     getContractHandler : (abi : Array<any>, addr : string) => any;
     getWalletHandler : (abi : Array<any>, addr : string) => any;
+    getBalanceOfAddress : (address : string) => Promise<string>;
 }

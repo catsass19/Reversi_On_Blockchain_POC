@@ -41,13 +41,17 @@ export default class Header extends React.Component {
                     amount={contract.currentSharePrice}
                     unit={'DEX'}
                 />
+                <DisplayItem
+                    title='Jackpot'
+                    amount={contract.totalBalance}
+                    unit={'DEX'}
+                />
                 {contract.myTeam && (
                     <DisplayItem
                         title='My Team'
                         amount={contract.myTeam}
                     />
                 )}
-
             </Container>
         );
     }
