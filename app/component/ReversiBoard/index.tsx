@@ -49,12 +49,14 @@ class Board extends React.Component<{ size : string | number }> {
                         return (
                             <Row key={key}>
                                 {boardIterator.map((data, index) => {
+                                    const { x, y } = contract.hoverProposal || { x: undefined, y: undefined };
                                     const proposal = contract.proposalStatusArray.find((it) => (
                                         (Number(it.x) === key) &&
                                         (Number(it.y) === index) &&
                                         (it.turn === contract.autoTurn)
                                     ));
                                     const forecast = contract.flipForecast[`${key}${index}`];
+                                    const hover = (x === key) && (y === index);
                                     return (
                                         <Grid
                                             key={index}
@@ -67,6 +69,7 @@ class Board extends React.Component<{ size : string | number }> {
                                             }
                                             proposal={proposal}
                                             forecast={forecast}
+                                            hover={hover}
                                         />
                                     );
                                 })}

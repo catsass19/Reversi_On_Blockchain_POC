@@ -27,6 +27,7 @@ const Chess : any = styled.div`
     width: 80%;
     border-radius: 10%;
     ${(p : any) => p.isProposed ? 'border: 1px solid yellow' : ''};
+    ${(p : any) => p.hover ? 'border: 3px solid orange' : ''};
     /* ${(p : any) => p.isForecast ? 'border: 3px solid rgba(255, 255, 0, 0.2)' : ''}; */
     background-color: ${(p) => p.color};
     display: flex;
@@ -58,7 +59,7 @@ const isProposed = (status : string) => {
     (contract.currentTurn === contract.autoTurn);
 };
 
-const Grid = ({ x, y, proposal, status, forecast }) => (
+const Grid = ({ x, y, proposal, status, forecast, hover }) => (
     <Wrapper>
         <InnerGrid>
             <Chess
@@ -72,6 +73,7 @@ const Grid = ({ x, y, proposal, status, forecast }) => (
                     forecast &&
                     (forecast !== networkService.contract.GRID_STATUS.EMPTY)
                 }
+                hover={hover}
             >
                 {proposal && proposal.vote}
             </Chess>

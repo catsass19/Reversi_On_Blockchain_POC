@@ -2,6 +2,7 @@ import { observable, action, runInAction, computed } from 'mobx';
 import throttle from 'lodash/throttle';
 import maxBy from 'lodash/maxBy';
 import { ContractInterface, NetworkInterface, HandlerInterface } from './interface';
+import { number } from 'prop-types';
 
 interface ManifestInterface {
     abi : Array<any>;
@@ -63,12 +64,18 @@ class Contract implements ContractInterface {
         time : string;
      }> = [];
 
+    @observable public hoverProposal : {
+        x? : number;
+        y? : number;
+    } = {};
     @observable public autoTurn : string;
     @observable public turnGap : number = 0;
     @observable public proposed : Array<{
         round : string,
         turn : string,
         proposer : string,
+        x : string,
+        y : string,
     }> = [];
     @observable public proposalStatus : {
         [proposal : string] : {
@@ -101,7 +108,10 @@ class Contract implements ContractInterface {
                     : this.TEAM.CAT;
             }
         }
-        return this.getTeamName(team);
+        return team;
+    }
+    @computed public get forecastCurrentTeamColor() {
+        return ((Number(this.autoTurn) % 2) === 1) ? 'black' : 'white';
     }
     @computed public get autoTurnEndTime() {
         if (Number(this.autoTurn) > 0) {
@@ -296,6 +306,17 @@ class Contract implements ContractInterface {
         this.init();
     }
 
+    @action
+    public setHoverProposal(x, y) {
+        this.hoverProposal = {
+            x: Number(x),
+            y: Number(y),
+        };
+    }
+    @action
+    public clearHoverProposal() {
+        this.hoverProposal = {};
+    }
     public postMessage = (message : string) => this.writeWrapper('postMessage')([message]);
     public getProposalId = (turn : string, addr : string) => `${turn}-${addr}`;
     public clearGame = () => this.writeWrapper('clearGame')([]);
@@ -352,6 +373,17 @@ class Contract implements ContractInterface {
         const SharesBig = new this.network.web3.utils.BN(shares);
         const wei = sharePriceBig.mul(SharesBig);
         this.writeWrapper('vote')([round, turn, proposer], wei);
+    }
+
+    public getTeamName(team) {
+        switch(Number(team)) {
+            case this.TEAM.CAT:
+                return 'Cat Kōgekitai';
+            case this.TEAM.DOG:
+                return 'Dog Guerrilla';
+            default:
+                return;
+        }
     }
 
     private loadManifest = () => import('#/Deversi.json');
@@ -470,18 +502,10 @@ class Contract implements ContractInterface {
             }
             this.turnGap = turnGap;
         }
-        this.autoTurn = `${turn}`;
-    }
-
-    private getTeamName(team) {
-        switch(Number(team)) {
-            case this.TEAM.CAT:
-                return 'Cat Kōgekitai';
-            case this.TEAM.DOG:
-                return 'Dog Guerrilla';
-            default:
-                return;
+        if (turn > Number(this.autoTurn)) {
+            this.clearHoverProposal();
         }
+        this.autoTurn = `${turn}`;
     }
 
     private markAvailable(forecast, base, opposite) {

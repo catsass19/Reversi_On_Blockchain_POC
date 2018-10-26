@@ -79,8 +79,8 @@ contract Deversi {
             4, // size
             10, // funding period
             30,  // turn period
-            1000000000000000,
-            5,
+            100000000000000000,
+            100000000000000000,
             10
         );
         startNewGame();
@@ -193,7 +193,6 @@ contract Deversi {
     function doPropose(uint256 x, uint256 y) private {
         User userTeam = userStatus[gameRound][msg.sender];
         require(userTeam.team == currentTeam, "You are not on this team");
-        roundPropsedStatus[gameRound][currentTurn] = true;
         if (proposals[gameRound][currentTurn][msg.sender].isExist != true) {
             uint256 shares = msg.value / currentSharePrice;
             require(shares >= sharesPerProposal, "Not enough fund");
@@ -212,6 +211,10 @@ contract Deversi {
             proposals[gameRound][currentTurn][msg.sender].y = y;
             boardStatus[gameRound][x][y] = _GRID_STATUS.PROPOSED;
             proposedAddress[gameRound][currentTurn].push(msg.sender);
+            if (roundPropsedStatus[gameRound][currentTurn] == false) {
+                currentSharePrice += currentShareGrowthRate;
+                roundPropsedStatus[gameRound][currentTurn] = true;
+            }
             emit proposed(gameRound, currentTurn, msg.sender, x, y);
         } else {
             revert("You've already propsed in this turn");

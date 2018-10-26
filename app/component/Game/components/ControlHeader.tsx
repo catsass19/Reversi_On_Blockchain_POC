@@ -20,27 +20,37 @@ const Item = styled.div`
 const Padding = styled.div`
     flex: 1;
 `;
+const Color = styled.div`
+    background-color: ${(p) => p.color};
+    height: 40px;
+    width: 40px;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    margin-right: 10px;
+`;
 @observer
 export default class ControlHeader extends React.Component {
     public render() {
         const { contract } = networkService;
+        const forecastTeam = contract.forecastCurrentTeam;
         return (
             <>
                 <Container>
                     {!contract.gameResolvedAuto && (
                         <>
-                          <Item>
-                                <VariableText>{contract.forecastCurrentTeam}</VariableText>
-                                <DescrptionText>'s turn</DescrptionText>
-                          </Item>
-                          <Padding />
-                          {contract.autoTurnEndTime && (
+                            <Color color={contract.forecastCurrentTeamColor} />
                             <Item>
-                                <VariableText>
-                                    <CountDown time={contract.autoTurnEndTime} />
-                                </VariableText>
+                                    <VariableText>{contract.getTeamName(forecastTeam)}</VariableText>
+                                    <DescrptionText>'s turn</DescrptionText>
                             </Item>
-                          )}
+                            <Padding />
+                            {contract.autoTurnEndTime && (
+                                <Item>
+                                    <VariableText>
+                                        <CountDown time={contract.autoTurnEndTime} />
+                                    </VariableText>
+                                </Item>
+                            )}
                         </>
                     )}
 

@@ -37,12 +37,12 @@ export default class Header extends React.Component {
                 </Title>
                 <Padding />
                 <DisplayItem
-                    title='Share Price'
+                    title='Price Per Share'
                     amount={contract.currentSharePrice}
                     unit={'DEX'}
                 />
                 <DisplayItem
-                    title='Jackpot'
+                    title='Total Funds'
                     amount={contract.totalBalance}
                     unit={'DEX'}
                 />

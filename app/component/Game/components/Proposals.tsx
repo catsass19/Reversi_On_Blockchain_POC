@@ -42,10 +42,15 @@ export default class Proposals extends React.Component {
                     <div>{contract.proposed.length} Proposals</div>
                 )}
                 {proposals.map((it) => {
+                    console.log(it);
                     const id = contract.getProposalId(it.turn, it.proposer);
                     const status = contract.proposalStatus[id];
                     return (
-                        <Proposal key={id}>
+                        <Proposal
+                            key={id}
+                            onMouseEnter={() => contract.setHoverProposal(it.x, it.y)}
+                            onMouseLeave={() => contract.clearHoverProposal()}
+                        >
                             turn: {it.turn}
                             {status && (
                                 <div>Received: {status.vote} Shares</div>
