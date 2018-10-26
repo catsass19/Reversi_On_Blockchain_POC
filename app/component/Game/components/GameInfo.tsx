@@ -15,13 +15,8 @@ export default class GameInfo extends React.Component {
         const { contract } = networkService;
         return (
             <Container>
-                current team: {contract.currentTeam}
-                <br />
-                forecast team:
-                <br />
-                black team: {contract.black}
-                <br/>
-                White team: {contract.white}
+                <div>cat team total share: {contract.teamCatFunding}</div>
+                <div>dog team total share: {contract.teamDogFunding}</div>
             </Container>
         );
     }
