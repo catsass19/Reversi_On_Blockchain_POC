@@ -46,6 +46,7 @@ contract Deversi {
     Ledger public currentFundingStatus;
     bool public fundRaisingCountingDown;
     uint256 public countingStartedTime;
+
     _TEAM public currentTeam;
     _TEAM public black;
     _TEAM public white;
@@ -53,12 +54,14 @@ contract Deversi {
     // mapping(uint256 => _GRID_STATUS[][]) public boardStatus;
     mapping(uint256 => mapping(uint256 => mapping(uint256 => _GRID_STATUS))) public boardStatus;
     mapping(uint256 => mapping(address => User)) public userStatus;
+    mapping(uint256 => address[]) public userList;
     mapping(uint256 => mapping(uint => bool)) public roundPropsedStatus;
     mapping(uint256 => mapping(uint256 => mapping(address => Proposal))) public proposals;
     mapping(uint256 => mapping(uint256 => address[])) public proposedAddress;
 
     mapping(uint256 => mapping(uint256 => mapping(uint256 => int[]))) private flipX;
     mapping(uint256 => mapping(uint256 => mapping(uint256 => int[]))) private flipY;
+
 
     event funded();
     event NewGameStarted(uint256 round, uint time);
@@ -70,6 +73,7 @@ contract Deversi {
     event proposalSelected(uint round, uint turn, address proposer, uint256 vote);
     event flipEvent(uint turn, uint x, uint y);
     event messagePost(string msg, address sender, uint round, uint time);
+    event prizeTransfer(uint256 round, uint256 amount, address receiver);
 
     constructor() public {
         owner = msg.sender;
@@ -138,6 +142,7 @@ contract Deversi {
         userStatus[gameRound][msg.sender].team = teamChoosen;
         userStatus[gameRound][msg.sender].isExist = true;
         emit funded();
+        userList[gameRound].push(msg.sender);
         if (fundRaisingCountingDown == false) {
             if (
                 (currentFundingStatus.CAT > 0) &&
@@ -181,7 +186,7 @@ contract Deversi {
                 if (now > nextRoundEndTime) {
                     revert("Game over");
                 } else {
-                    updateGame();
+                    updateGame(false);
                     doPropose(x, y);
                 }
             }
@@ -239,13 +244,17 @@ contract Deversi {
                 userStatus[gameRound][msg.sender].ledger.DOG += sharesToVote;
                 currentFundingStatus.DOG += sharesToVote;
             }
+            if (userStatus[gameRound][msg.sender].isExist != true) {
+                userList[gameRound].push(msg.sender);
+                userStatus[gameRound][msg.sender].isExist = true;
+            }
             emit voted(gameRound, currentTurn, proposer, msg.sender, sharesToVote);
         } else {
             revert("proposal not exist");
         }
     }
 
-    function updateGame() public {
+    function updateGame(bool doNotCheck) public {
         uint256 proposedLength = proposedAddress[gameRound][currentTurn].length;
         address highestAddress = proposedAddress[gameRound][currentTurn][0];
         uint256 highestAmount = proposals[gameRound][currentTurn][highestAddress].vote;
@@ -267,8 +276,9 @@ contract Deversi {
         flip(selected.x, selected.y);
         // emit proposalSelected(gameRound, currentTurn, highestAddress, highestAmount);
         currentTurn += 1;
-        checkGameEnd();
-
+        if (doNotCheck != true) {
+            checkGameEnd();
+        }
         // emit turnStart(gameRound, currentTurn, now);
     }
 
@@ -429,9 +439,50 @@ contract Deversi {
     }
 
     function clearGame() public onlyInGame {
-        // revert("game over!");
         inGame = false;
-        // distribute money
+        updateGame(true);
+        uint blackCount = 0;
+        uint whiteCount = 0;
+        _TEAM winner = _TEAM.NONE;
+        uint256 winnerShare;
+        uint256 totalFund = address(this).balance;
+        for (uint i = 0; i < currentSize; i++) {
+            for (uint j = 0; j < currentSize; j++) {
+                // ret[(i * currentSize) + j] = boardStatus[gameRound][i][j];
+                if (boardStatus[gameRound][i][j] == _GRID_STATUS.BLACK) {
+                    blackCount += 1;
+                } else if (boardStatus[gameRound][i][j] == _GRID_STATUS.WHITE) {
+                    whiteCount += 1;
+                }
+            }
+        }
+        if (blackCount > whiteCount) {
+            winner = black;
+        } else {
+            winner = white;
+        }
+        if (winner == _TEAM.CAT) {
+            winnerShare = currentFundingStatus.CAT;
+        } else if (winner == _TEAM.DOG) {
+            winnerShare = currentFundingStatus.DOG;
+        }
+        for (uint index = 0; index < userList[gameRound].length; index++) {
+            address userAddress = userList[gameRound][index];
+            User user = userStatus[gameRound][userAddress];
+            if (user.isExist) {
+                uint256 userShare;
+                if (winner == _TEAM.DOG) {
+                    userShare = user.ledger.DOG;
+                } else if (winner == _TEAM.CAT) {
+                    userShare = user.ledger.CAT;
+                }
+                if (userShare > 0) {
+                    uint256 prizeAmount = (userShare / winnerShare) * totalFund;
+                    userAddress.transfer(prizeAmount);
+                    emit prizeTransfer(gameRound, prizeAmount, userAddress);
+                }
+            }
+        }
         emit gameCleared(gameRound, msg.sender);
 
     }

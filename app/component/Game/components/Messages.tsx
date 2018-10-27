@@ -65,8 +65,7 @@ export default class Messages extends React.Component {
                 }}
             >
                 <InitMessage>
-                    You can't post message if you are not able to make proposal.
-                    Whatever you say stays on blockchain forever so please mind your manner.
+                    Whatever you say stays on blockchain forever so please mind your manner ☺
                 </InitMessage>
                 {contract.messages.map((it) => (
                     <Message key={`${it.time}`}>

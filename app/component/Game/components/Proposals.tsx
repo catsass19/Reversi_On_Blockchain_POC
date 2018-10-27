@@ -42,7 +42,7 @@ export default class Proposals extends React.Component {
                     <div>{contract.proposed.length} Proposals</div>
                 )}
                 {proposals.map((it) => {
-                    console.log(it);
+                    // console.log(it);
                     const id = contract.getProposalId(it.turn, it.proposer);
                     const status = contract.proposalStatus[id];
                     return (

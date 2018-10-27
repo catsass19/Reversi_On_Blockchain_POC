@@ -1,7 +1,7 @@
 {
-  "name": "My Web App Boilerplate",
-  "short_name": "MyWAB",
-  "description": "Web App Boilerplate based on TypeScript/React/Webpack4",
+  "name": "Deversi",
+  "short_name": "Deversi",
+  "description": "Deversi - Decentrailized Reversi",
   "background_color": "#ffffff",
   "crossorigin": "use-credentials",
   "ios": true

@@ -464,6 +464,9 @@ class Contract implements ContractInterface {
             this.contractHandler.events.messagePost({}, (t, { returnValues }) => {
                 this.handleMessage(returnValues);
             });
+            this.contractHandler.events.prizeTransfer({}, (t, { returnValues }) => {
+                console.log('Prize Received', returnValues);
+            });
         }
     }
 

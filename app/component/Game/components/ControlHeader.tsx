@@ -40,8 +40,8 @@ export default class ControlHeader extends React.Component {
                         <>
                             <Color color={contract.forecastCurrentTeamColor} />
                             <Item>
-                                    <VariableText>{contract.getTeamName(forecastTeam)}</VariableText>
-                                    <DescrptionText>'s turn</DescrptionText>
+                                <VariableText>{contract.getTeamName(forecastTeam)}</VariableText>
+                                <DescrptionText>'s turn</DescrptionText>
                             </Item>
                             <Padding />
                             {contract.autoTurnEndTime && (
@@ -56,9 +56,9 @@ export default class ControlHeader extends React.Component {
 
                     {contract.gameResolvedAuto && (
                         <Item>
-                            <DescrptionText>Game</DescrptionText>
-                            <VariableText>{contract.gameRound}</VariableText>
-                            <DescrptionText>is Ended</DescrptionText>
+                            <DescrptionText>Game Over</DescrptionText>
+                            {/* <VariableText>{contract.gameRound}</VariableText>
+                            <DescrptionText>is Ended</DescrptionText> */}
                         </Item>
                     )}
                   </Container>

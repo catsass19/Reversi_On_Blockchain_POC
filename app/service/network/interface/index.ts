@@ -57,6 +57,7 @@ interface ContractEvents {
     proposalSelected : EventSubscriber<any>;
     flipEvent : EventSubscriber<any>;
     messagePost : EventSubscriber<any>;
+    prizeTransfer : EventSubscriber<any>;
 }
 
 export interface HandlerInterface {
