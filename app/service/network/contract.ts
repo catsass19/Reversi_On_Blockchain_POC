@@ -1,8 +1,9 @@
 import { observable, action, runInAction, computed } from 'mobx';
 import throttle from 'lodash/throttle';
 import maxBy from 'lodash/maxBy';
+import { toast } from 'react-toastify';
+import range from 'lodash/range';
 import { ContractInterface, NetworkInterface, HandlerInterface } from './interface';
-import { number } from 'prop-types';
 
 interface ManifestInterface {
     abi : Array<any>;
@@ -386,6 +387,35 @@ class Contract implements ContractInterface {
         }
     }
 
+    @computed public get getBoardCount() {
+        const size = Number(this.currentSize);
+        const boardIterator = range(Number(size));
+        let blackCount = 0;
+        let whiteCount = 0;
+        boardIterator.forEach((it, x) => {
+            boardIterator.forEach((item, y) => {
+                const boardStatus = this.boardStatus[(size * x) + y];
+                const forecast = this.flipForecast[`${x}${y}`];
+                // console.log(boardStatus, forecast);
+                let currentStatus = boardStatus;
+                if (forecast) {
+                    currentStatus = forecast;
+                }
+                switch(currentStatus) {
+                    case this.GRID_STATUS.BLACK:
+                        blackCount += 1;
+                        return;
+                    case this.GRID_STATUS.WHITE:
+                        whiteCount += 1;
+                        return;
+                    default:
+                        return;
+                }
+            });
+        });
+        return { blackCount, whiteCount };
+    };
+
     private loadManifest = () => import('#/Deversi.json');
 
     private writeWrapper = (method : string) => {
@@ -423,6 +453,7 @@ class Contract implements ContractInterface {
         if (this.contractHandler) {
             this.contractHandler.events.NewGameStarted({}, (...arr) => {
                 console.log('NewGameStarted');
+                toast('New Game Started!');
                 runInAction(() => {
                     this.proposalStatus = {};
                     this.getContractState();
@@ -430,7 +461,7 @@ class Contract implements ContractInterface {
                 });
             });
             this.contractHandler.events.funded({}, (...arr) => {
-                console.log('a team gets funded');
+                console.log('a team gets funded', arr);
                 this.getContractState();
             });
             this.contractHandler.events.fundRaisingCountdown({}, (...arr) => {
@@ -445,14 +476,15 @@ class Contract implements ContractInterface {
                 const { round, turn, proposer } = returnValues;
                 this.getContractState();
                 console.log('someonehad proposed', round, turn, proposer);
+                toast('New proposal has been made');
             });
             this.contractHandler.events.gameCleared({}, (t, { returnValues }) => {
                 const { round, clearer } = returnValues;
                 this.getContractState();
-                console.log('game is cleared by', clearer);
+                toast('Game is cleared');
             });
             this.contractHandler.events.voted({}, () => {
-                console.log('someone voted!');
+                toast('Someone voted', { type: toast.TYPE.INFO });
                 this.getContractState();
             });
             // this.contractHandler.events.proposalSelected({}, (t, { returnValues }) => {
@@ -462,10 +494,11 @@ class Contract implements ContractInterface {
             //     console.log('FLIP!', returnValues);
             // });
             this.contractHandler.events.messagePost({}, (t, { returnValues }) => {
+                toast('New message arrived',  { type: toast.TYPE.INFO });
                 this.handleMessage(returnValues);
             });
             this.contractHandler.events.prizeTransfer({}, (t, { returnValues }) => {
-                console.log('Prize Received', returnValues);
+                toast('Received Prize!');
             });
         }
     }

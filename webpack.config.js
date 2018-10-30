@@ -113,6 +113,10 @@ module.exports = (env, options) => {
         module: {
             rules: [
                 {
+                    test: /\.css$/,
+                    use: [ 'style-loader', 'css-loader' ]
+                },
+                {
                     test: /\.tsx?$/,
                     exclude: /node_modules/,
                     use: [
