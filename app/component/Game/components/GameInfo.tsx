@@ -27,7 +27,7 @@ const ChessCount = styled.div`
 const Chess = styled.div`
     height: 40px;
     width: 40px;
-    background-color: ${p => p.color};
+    background-color: ${(p) => p.color};
     border: 1px solid white;
     border-radius: 5px;
     margin-right: 20px;

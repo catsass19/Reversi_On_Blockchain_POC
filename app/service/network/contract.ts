@@ -414,7 +414,7 @@ class Contract implements ContractInterface {
             });
         });
         return { blackCount, whiteCount };
-    };
+    }
 
     private loadManifest = () => import('#/Deversi.json');
 

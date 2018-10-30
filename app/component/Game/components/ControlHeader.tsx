@@ -25,7 +25,7 @@ const Color = styled.div`
     height: 40px;
     width: 40px;
     border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    border: 1px solid white;
     margin-right: 10px;
 `;
 @observer
@@ -54,13 +54,11 @@ export default class ControlHeader extends React.Component {
                         </>
                     )}
 
-                    {contract.gameResolvedAuto && (
+                    {/* {contract.gameResolvedAuto && (
                         <Item>
                             <DescrptionText>Game Over</DescrptionText>
-                            {/* <VariableText>{contract.gameRound}</VariableText>
-                            <DescrptionText>is Ended</DescrptionText> */}
                         </Item>
-                    )}
+                    )} */}
                   </Container>
                   {/* <Container>
                       <Item>
