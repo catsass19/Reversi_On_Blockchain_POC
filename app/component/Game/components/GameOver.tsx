@@ -91,6 +91,6 @@ export default class ControlHeader extends React.Component {
     private winnerName() {
         const { contract } = networkService;
         const { blackCount, whiteCount } = contract.getBoardCount;
-        return ( blackCount > whiteCount) ? contract.black : contract.white;
+        return (blackCount > whiteCount) ? contract.black : contract.white;
     }
 }
