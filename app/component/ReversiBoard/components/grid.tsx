@@ -26,15 +26,17 @@ const Chess : any = styled.div`
     height: 80%;
     width: 80%;
     border-radius: 10%;
+    color: yellow;
     ${(p : any) => p.isProposed ? 'border: 1px solid yellow' : ''};
-    ${(p : any) => p.hover ? 'border: 3px solid orange' : ''};
+    ${(p : any) => p.hover ? 'border: 3px solid violet' : ''};
+    ${(p : any) => p.hover ? 'color: violet' : ''};
     /* ${(p : any) => p.isForecast ? 'border: 3px solid rgba(255, 255, 0, 0.2)' : ''}; */
     background-color: ${(p) => p.color};
     display: flex;
     justify-content: center;
     align-items: center;
     font-weight: bold;
-    color: yellow;
+
 `;
 
 const getColor = (status : string) => {

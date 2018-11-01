@@ -2,19 +2,24 @@ import * as React from 'react';
 import { observer } from 'mobx-react';
 import styled from 'styled-components';
 import networkService from '@/service/network';
-
+import appService from '@/service/app';
+import VoteModal from './VoteModal';
 const Container = styled.div`
-    border-bottom: 1px solid red;
     flex: 1;
+    overflow-y: auto;
 `;
 
 const Proposal = styled.div`
     display: flex;
-    padding: 20px 10px;
+    padding: 20px;
     align-items: center;
     background-color: rgba(255, 255, 255, 0.1);
     font-size: larger;
-    margin-bottom: 10px;
+    margin-top: 10px;
+    cursor: pointer;
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
 `;
 
 const Padding = styled.div`
@@ -22,11 +27,15 @@ const Padding = styled.div`
 `;
 
 const Vote = styled.div`
-    padding: 0px 20px;
     cursor: pointer;
     &:hover {
         font-weight: bold;
     }
+`;
+
+const Line = styled.hr`
+    margin: 20px 0px;
+    border: 1px solid rgba(255 ,255, 255, 0.2);
 `;
 
 @observer
@@ -37,9 +46,9 @@ export default class Proposals extends React.Component {
         // const proposals = contract.proposed;
         return (
             <Container>
-
+                <Line />
                 {(proposals.length > 0) && (
-                    <div>{contract.proposed.length} Proposals</div>
+                    <div>{proposals.length} Proposals:</div>
                 )}
                 {proposals.map((it) => {
                     // console.log(it);
@@ -51,20 +60,23 @@ export default class Proposals extends React.Component {
                             onMouseEnter={() => contract.setHoverProposal(it.x, it.y)}
                             onMouseLeave={() => contract.clearHoverProposal()}
                         >
-                            turn: {it.turn}
+                            {/* turn: {it.turn} */}
                             {status && (
-                                <div>Received: {status.vote} Shares</div>
+                                <div>{status.vote} Shares</div>
                             )}
                             {(it.proposer === networkService.wallet) && (
-                                <div>This is my proposal!</div>
+                                <div style={{ margin: '0px 20px' }} >(Your proposal)</div>
                             )}
                             <Padding />
                             <Vote
                                 onClick={() => {
-                                    const value = prompt('How many shares do you want to vote?');
-                                    if (value) {
-                                        contract.vote(it.round, it.turn, it.proposer, value);
-                                    }
+                                    appService.openModal(
+                                        <VoteModal
+                                            round={it.round}
+                                            turn={it.turn}
+                                            proposer={it.proposer}
+                                        />
+                                    );
                                 }}
                             >
                                 Vote

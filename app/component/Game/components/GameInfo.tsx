@@ -38,6 +38,11 @@ const Score = styled.span`
 const Padding = styled.div`
     flex: 1;
 `;
+
+const round = (num) => {
+    return Math.floor(Number(num) * 100) / 100;
+}
+
 @observer
 export default class GameInfo extends React.Component {
     public render() {
@@ -102,9 +107,9 @@ export default class GameInfo extends React.Component {
         );
     }
     private getPercentage(a, b) {
-        return `${(Number(a) / Number(b)) * 100}%`;
+        return `${round((Number(a) / Number(b)) * 100)}%`;
     }
     private getPrize(a, b, c) {
-        return Number(c) * (Number(a) / Number(b));
+        return round(Number(c) * (Number(a) / Number(b)));
     }
 }
