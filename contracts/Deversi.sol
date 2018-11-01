@@ -431,43 +431,35 @@ contract Deversi {
             opposite = _GRID_STATUS.WHITE;
         }
         uint available = checkAvailable(base, opposite);
+        currentTeam = (currentTeam == _TEAM.CAT) ? _TEAM.DOG : _TEAM.CAT;
         if (available == 0) {
             clearGame();
-        } else {
-            currentTeam = (currentTeam == _TEAM.CAT) ? _TEAM.DOG : _TEAM.CAT;
         }
     }
 
     function clearGame() public onlyInGame {
         inGame = false;
         updateGame(true);
-        uint blackCount = 0;
-        uint whiteCount = 0;
         _TEAM winner = _TEAM.NONE;
         uint256 winnerShare;
         uint256 totalFund = address(this).balance;
-        for (uint i = 0; i < currentSize; i++) {
-            for (uint j = 0; j < currentSize; j++) {
-                // ret[(i * currentSize) + j] = boardStatus[gameRound][i][j];
-                if (boardStatus[gameRound][i][j] == _GRID_STATUS.BLACK) {
-                    blackCount += 1;
-                } else if (boardStatus[gameRound][i][j] == _GRID_STATUS.WHITE) {
-                    whiteCount += 1;
+        // uint256 gameStartTime = countingStartedTime + fundRaisingPeriod;
+        if (roundPropsedStatus[gameRound][currentTurn - 1] != true) {
+            /* if last turn wasn't played, current */
+            winner = currentTeam;
+        } else {
+            uint blackCount = 0;
+            uint whiteCount = 0;
+            for (uint i = 0; i < currentSize; i++) {
+                for (uint j = 0; j < currentSize; j++) {
+                    // ret[(i * currentSize) + j] = boardStatus[gameRound][i][j];
+                    if (boardStatus[gameRound][i][j] == _GRID_STATUS.BLACK) {
+                        blackCount += 1;
+                    } else if (boardStatus[gameRound][i][j] == _GRID_STATUS.WHITE) {
+                        whiteCount += 1;
+                    }
                 }
             }
-        }
-        uint256 gameStartTime = countingStartedTime + fundRaisingPeriod;
-        uint256 currentRoundEndTime = gameStartTime + (currentTurn * turnPeriod);
-        if (
-            (now > currentRoundEndTime) &&
-            (roundPropsedStatus[gameRound][currentTurn] != true)
-        ) {
-            if (currentTeam == _TEAM.DOG) {
-                winner = _TEAM.CAT;
-            } else if (currentTeam == _TEAM.CAT) {
-                winner = _TEAM.DOG;
-            }
-        } else {
             if (blackCount > whiteCount) {
                 winner = black;
             } else {
@@ -499,6 +491,10 @@ contract Deversi {
         }
         emit gameCleared(gameRound, msg.sender);
 
+    }
+
+    function getProposedStatus(uint256 turn) public view returns(bool isProposed) {
+        return roundPropsedStatus[gameRound][turn];
     }
 
     function getBoardStatus() public view returns (

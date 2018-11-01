@@ -180,6 +180,7 @@ class Contract implements ContractInterface {
                 forecastT = forecast;
                 setTimeout(() => {
                     runInAction(() => {
+                        console.log('available step forecast:', count);
                         this.availableCount = count;
                     });
                 }, 0);
@@ -486,7 +487,7 @@ class Contract implements ContractInterface {
             this.contractHandler.events.gameCleared({}, (t, { returnValues }) => {
                 const { round, clearer } = returnValues;
                 this.getContractState();
-                toast(`Game ${round} is cleared`);
+                toast(`Game is cleared`);
             });
             this.contractHandler.events.voted({}, () => {
                 toast('Someone voted', { type: toast.TYPE.INFO });
@@ -524,7 +525,7 @@ class Contract implements ContractInterface {
     }
 
     @action
-    private loop() {
+    private async loop() {
         let turn = 0;
         const contractTurn = Number(this.currentTurn);
         if (this.fundRaisingCountingDown) {
@@ -538,12 +539,9 @@ class Contract implements ContractInterface {
         if (turn > contractTurn) {
             const turnGap = turn - Number(contractTurn);
             if (turnGap >= 2) {
-                // console.log('game is exptected to be ended!!');
+                console.log('game is exptected to be ended!!');
                 clearInterval(this.looper);
-                const proposalsLastTurn = this.proposed.filter((it) => `${it.turn}` === `${turnGap - 1}`);
-                // console.log(proposalsLastTurn);
-                if (proposalsLastTurn.length === 0) {
-                    /* there's no proposal in turn (n - 1), contract status remains in (n - 2) */
+                if (this.availableCount > 0) {
                     this.forceWinner = this.currentTeam;
                 }
             }

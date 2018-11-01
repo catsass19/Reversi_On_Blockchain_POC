@@ -45,6 +45,7 @@ interface ContractMethods {
     postMessage : (message : string) => Method;
     updateGame : () => Method;
     inGame : () => Variable<boolean>;
+    getProposedStatus : () => Variable<boolean>;
 }
 
 interface ContractEvents {
