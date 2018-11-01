@@ -82,7 +82,7 @@ contract Deversi {
         configure(
             4, // size
             10, // funding period
-            300,  // turn period
+            30,  // turn period
             100000000000000000,
             100000000000000000,
             10

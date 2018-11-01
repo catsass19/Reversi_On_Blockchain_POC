@@ -40,6 +40,20 @@ const VariableText = styled.span`
 const ClearSection = styled.div`
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     margin-top: 20px;
+    padding: 30px 0px;
+`;
+
+const StyledButton = styled.button`
+    width: 100%;
+    padding: 10px 0px;
+    border: 1px solid #13BF99;
+    background-color: black;
+    color: #13BF99;
+    cursor: pointer;
+    font-size: large;
+    &: hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
 `;
 @observer
 export default class ControlHeader extends React.Component {
@@ -67,11 +81,20 @@ export default class ControlHeader extends React.Component {
                     {whiteCount}
                 </ResultRow>
                 <ClearSection>
-                    <button
-                        onClick={() => contract.clearGame()}
-                    >
-                        Clear Game
-                    </button>
+                    {contract.inGame && (
+                        <StyledButton
+                            onClick={() => contract.clearGame()}
+                        >
+                            Claim Your Prize!
+                        </StyledButton>
+                    )}
+                    {!contract.inGame && (
+                        <StyledButton
+                            onClick={() => contract.startNewGame()}
+                        >
+                            Start New Game
+                        </StyledButton>
+                    )}
                 </ClearSection>
                 {/* <button
                     onClick={() => contract.updateGame()}

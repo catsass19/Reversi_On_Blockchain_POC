@@ -44,6 +44,7 @@ interface ContractMethods {
     white : () => Variable<string>;
     postMessage : (message : string) => Method;
     updateGame : () => Method;
+    inGame : () => Variable<boolean>;
 }
 
 interface ContractEvents {

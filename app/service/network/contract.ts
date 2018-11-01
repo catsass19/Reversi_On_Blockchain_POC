@@ -48,6 +48,7 @@ class Contract implements ContractInterface {
     @observable public currentSharePerProposal : string;
     @observable public currentTeam : string;
     @observable public fundRaisingCountingDown : boolean;
+    @observable public inGame : boolean;
     @observable public countingStartedTime : string;
     @observable public teamCatFunding : string;
     @observable public teamDogFunding : string;
@@ -243,6 +244,7 @@ class Contract implements ContractInterface {
                 white,
                 currentTurn,
                 totalBalance,
+                inGame,
             ] = await Promise.all([
                 this.contractHandler.methods.currentTeam().call(),
                 this.contractHandler.methods.gameRound().call(),
@@ -251,12 +253,14 @@ class Contract implements ContractInterface {
                 this.contractHandler.methods.white().call(),
                 this.contractHandler.methods.currentTurn().call(),
                 this.network.getBalanceOfAddress(this.address),
+                this.contractHandler.methods.inGame().call(),
             ]);
             const pastProposed : Array<any> = await this.contractHandler.getPastEvents<any>(
                 'proposed',
                 { filter: { round: gameRound }, fromBlock: 0, toBlock: 'latest' }
             );
             runInAction(() => {
+                this.inGame = inGame;
                 this.totalBalance = this.network.web3.utils.fromWei(totalBalance);
                 this.boardStatus = boardStatus;
                 this.black = black;

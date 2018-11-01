@@ -41,7 +41,7 @@ const Padding = styled.div`
 
 const round = (num) => {
     return Math.floor(Number(num) * 100) / 100;
-}
+};
 
 @observer
 export default class GameInfo extends React.Component {
