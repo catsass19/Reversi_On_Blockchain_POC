@@ -5,6 +5,8 @@ import networkService from '@/service/network';
 import cat from '@/assets/cat.svg';
 import dog from '@/assets/dog.svg';
 import CountDown from '@/component/CountDown';
+import appService from '@/service/app';
+import FundingModal from './FundingModal';
 
 const Container = styled.div`
     flex: 1;
@@ -52,14 +54,15 @@ const TeamArea = styled.div`
     align-items: center;
     margin-top: 120px;
 `;
-const Check = styled.span`
-    margin: 0px 10px;
-    font-size: 50px;
-`;
 const CountDownText = styled.div`
     font-size: 50px;
     display: flex;
 `;
+const Check = styled.span`
+    margin: 0px 10px;
+    font-size: 50px;
+`;
+
 @observer
 export default class Funding extends React.Component {
     public render() {
@@ -108,9 +111,16 @@ export default class Funding extends React.Component {
     }
 
     private fund(teamName : string, teamEnum : number) {
-        const shares = prompt(`How much Shares do you want to invest in ${teamName}?`);
-        if (shares && networkService.contract) {
-          networkService.contract.fund(teamEnum, shares);
-      }
+        appService.openModal(
+            <FundingModal
+                teamName={teamName}
+                teamEnum={teamEnum}
+            />
+        );
+
+        // const shares = prompt(`How much Shares do you want to invest in ${teamName}?`);
+        // if (shares && networkService.contract) {
+        //   networkService.contract.fund(teamEnum, shares);
+        // }
     }
 }

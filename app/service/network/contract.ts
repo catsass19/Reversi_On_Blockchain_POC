@@ -461,11 +461,11 @@ class Contract implements ContractInterface {
                 });
             });
             this.contractHandler.events.funded({}, (...arr) => {
-                console.log('a team gets funded', arr);
+                toast('Someone funded!');
                 this.getContractState();
             });
             this.contractHandler.events.fundRaisingCountdown({}, (...arr) => {
-                console.log('start counting down!!!');
+                toast('Both team are funded, start counting down!');
                 this.getContractState();
             });
             // this.contractHandler.events.turnStart({}, (...arr) => {
