@@ -23,7 +23,7 @@ const StyledInput = styled.input`
 const StyledButton = styled.button`
     border: none;
     margin-top: 60px;
-    padding: 20px;
+    padding: 10px;
     background-color: #13BF99;
     color: white;
     font-size: xx-large;

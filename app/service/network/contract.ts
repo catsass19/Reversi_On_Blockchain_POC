@@ -59,6 +59,7 @@ class Contract implements ContractInterface {
     @observable public black : string;
     @observable public white : string;
     @observable public totalBalance : string;
+    @observable public forceWinner : string;
     @observable public messages : Array<{
         msg : string;
         round : string;
@@ -485,7 +486,7 @@ class Contract implements ContractInterface {
             this.contractHandler.events.gameCleared({}, (t, { returnValues }) => {
                 const { round, clearer } = returnValues;
                 this.getContractState();
-                toast('Game is cleared');
+                toast(`Game ${round} is cleared`);
             });
             this.contractHandler.events.voted({}, () => {
                 toast('Someone voted', { type: toast.TYPE.INFO });
@@ -537,8 +538,14 @@ class Contract implements ContractInterface {
         if (turn > contractTurn) {
             const turnGap = turn - Number(contractTurn);
             if (turnGap >= 2) {
-                console.log('game is exptected to be ended!!');
+                // console.log('game is exptected to be ended!!');
                 clearInterval(this.looper);
+                const proposalsLastTurn = this.proposed.filter((it) => `${it.turn}` === `${turnGap - 1}`);
+                // console.log(proposalsLastTurn);
+                if (proposalsLastTurn.length === 0) {
+                    /* there's no proposal in turn (n - 1), contract status remains in (n - 2) */
+                    this.forceWinner = this.currentTeam;
+                }
             }
             this.turnGap = turnGap;
         }

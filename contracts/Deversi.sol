@@ -456,11 +456,25 @@ contract Deversi {
                 }
             }
         }
-        if (blackCount > whiteCount) {
-            winner = black;
+        uint256 gameStartTime = countingStartedTime + fundRaisingPeriod;
+        uint256 currentRoundEndTime = gameStartTime + (currentTurn * turnPeriod);
+        if (
+            (now > currentRoundEndTime) &&
+            (roundPropsedStatus[gameRound][currentTurn] != true)
+        ) {
+            if (currentTeam == _TEAM.DOG) {
+                winner = _TEAM.CAT;
+            } else if (currentTeam == _TEAM.CAT) {
+                winner = _TEAM.DOG;
+            }
         } else {
-            winner = white;
+            if (blackCount > whiteCount) {
+                winner = black;
+            } else {
+                winner = white;
+            }
         }
+
         if (winner == _TEAM.CAT) {
             winnerShare = currentFundingStatus.CAT;
         } else if (winner == _TEAM.DOG) {

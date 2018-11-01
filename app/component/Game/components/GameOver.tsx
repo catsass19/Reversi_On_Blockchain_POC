@@ -55,6 +55,12 @@ const StyledButton = styled.button`
         background-color: rgba(255, 255, 255, 0.1);
     }
 `;
+
+const Hint = styled.div`
+    font-size: medium;
+    padding: 10px;
+`;
+
 @observer
 export default class ControlHeader extends React.Component {
     public render() {
@@ -64,9 +70,19 @@ export default class ControlHeader extends React.Component {
             <Container>
                 <WinnerArea>
                     <VariableText>
-                        {contract.getTeamName(this.winnerName())}
+                        {!contract.forceWinner && (
+                            contract.getTeamName(this.winnerName())
+                        )}
+                        {contract.forceWinner && (
+                            contract.getTeamName(contract.forceWinner)
+                        )}
                     </VariableText>
                     Wins!
+                    {contract.forceWinner && (
+                        <Hint>
+                            because opponent didn't make any proposal at last turn
+                        </Hint>
+                    )}
                 </WinnerArea>
                 <ResultRow>
                     <Chess color={'black'} />

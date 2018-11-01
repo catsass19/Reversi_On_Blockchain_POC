@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 import styled from 'styled-components';
 import networkService from '@/service/network';
 import range from 'lodash/range';
+import { isNumber } from 'lodash-es';
 
 const Container = styled.div`
     flex: 1;
@@ -40,7 +41,10 @@ const Padding = styled.div`
 `;
 
 const round = (num) => {
-    return Math.floor(Number(num) * 100) / 100;
+    const t = Number(num);
+    if (!isNaN(t)) {
+        return Math.floor(t * 100) / 100;
+    }
 };
 
 @observer
