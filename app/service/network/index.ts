@@ -116,7 +116,7 @@ class Network implements NetworkInterface {
                 return 'wss://rinkeby.infura.io/ws';
             case 5777:
             default:
-                return 'ws://localhost:8545';
+                return `ws://${window.location.hostname}:8545`;
         }
     }
 }

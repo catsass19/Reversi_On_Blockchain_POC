@@ -74,13 +74,14 @@ contract Deversi {
     event flipEvent(uint turn, uint x, uint y);
     event messagePost(string msg, address sender, uint round, uint time);
     event prizeTransfer(uint256 round, uint256 amount, address receiver);
+    event winnerAnnounce(uint256 round, string winner);
 
     constructor() public {
         owner = msg.sender;
         gameRound = 0;
         inGame = false;
         configure(
-            4, // size
+            8, // size
             10, // funding period
             30,  // turn period
             100000000000000000,
@@ -432,22 +433,41 @@ contract Deversi {
         }
         uint available = checkAvailable(base, opposite);
         currentTeam = (currentTeam == _TEAM.CAT) ? _TEAM.DOG : _TEAM.CAT;
-        if (available == 0) {
-            clearGame();
+        // if (available == 0) {
+        //     clearGame();
+        // }
+    }
+
+     /* workaround functino */
+    function getAvailable() private onlyInGame returns(uint256) {
+        _GRID_STATUS base;
+        _GRID_STATUS opposite;
+        if (currentTeam == black) {
+            base = _GRID_STATUS.WHITE;
+            opposite = _GRID_STATUS.BLACK;
+        } else if (currentTeam == white) {
+            base = _GRID_STATUS.BLACK;
+            opposite = _GRID_STATUS.WHITE;
         }
+        uint available = checkAvailable(base, opposite);
+        return available;
     }
 
     function clearGame() public onlyInGame {
-        inGame = false;
         updateGame(true);
+        uint256 available = getAvailable();
         _TEAM winner = _TEAM.NONE;
         uint256 winnerShare;
         uint256 totalFund = address(this).balance;
         // uint256 gameStartTime = countingStartedTime + fundRaisingPeriod;
-        if (roundPropsedStatus[gameRound][currentTurn - 1] != true) {
-            /* if last turn wasn't played, current */
+        if (
+            (available > 0) &&
+            (roundPropsedStatus[gameRound][currentTurn] != true)
+        ) {
+            /* last turn wasn't played */
             winner = currentTeam;
         } else {
+            emit messagePost("???", msg.sender, gameRound, now);
             uint blackCount = 0;
             uint whiteCount = 0;
             for (uint i = 0; i < currentSize; i++) {
@@ -489,8 +509,10 @@ contract Deversi {
                 }
             }
         }
+        string memory winnerName = (winner == _TEAM.DOG) ? "DOG" : "CAT";
+        emit winnerAnnounce(gameRound, winnerName);
         emit gameCleared(gameRound, msg.sender);
-
+        inGame = false;
     }
 
     function getProposedStatus(uint256 turn) public view returns(bool isProposed) {

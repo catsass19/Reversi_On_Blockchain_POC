@@ -452,13 +452,14 @@ class Contract implements ContractInterface {
     private getContractAddress() : string {
         const netId = this.network.netId;
         const infoOnNetwork = this.contractManifest.networks[`${netId}`];
+        // console.log(toChecksumAddress(infoOnNetwork.address));
         return infoOnNetwork ? infoOnNetwork.address : '';
     }
 
     private eventListener() {
         if (this.contractHandler) {
             this.contractHandler.events.NewGameStarted({}, (...arr) => {
-                console.log('NewGameStarted');
+                // console.log('NewGameStarted');
                 toast('New Game Started!');
                 runInAction(() => {
                     this.proposalStatus = {};
@@ -481,7 +482,7 @@ class Contract implements ContractInterface {
             this.contractHandler.events.proposed({}, (t, { returnValues }) => {
                 const { round, turn, proposer } = returnValues;
                 this.getContractState();
-                console.log('someonehad proposed', round, turn, proposer);
+                // console.log('someonehad proposed', round, turn, proposer);
                 toast('New proposal has been made');
             });
             this.contractHandler.events.gameCleared({}, (t, { returnValues }) => {
@@ -505,6 +506,10 @@ class Contract implements ContractInterface {
             });
             this.contractHandler.events.prizeTransfer({}, (t, { returnValues }) => {
                 toast('Received Prize!');
+            });
+            this.contractHandler.events.winnerAnnounce({}, (t, { returnValues }) => {
+                console.log('winnerAnnounce', returnValues);
+                // toast('Received Prize!');
             });
         }
     }
@@ -549,6 +554,7 @@ class Contract implements ContractInterface {
         }
         if (turn > Number(this.autoTurn)) {
             this.clearHoverProposal();
+            toast(`Turn ${turn} starts!`);
         }
         this.autoTurn = `${turn}`;
     }
