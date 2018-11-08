@@ -536,7 +536,7 @@ class Contract implements ContractInterface {
 
     private handleMessage(returnValues) {
         const { msg, round, sender, time } = returnValues;
-        const date = new Date(Number(time) * 1000);
+        const date = new Date(Number(time));
         runInAction(() => {
             this.messages.push({ msg, round, sender, time: date.toLocaleString('zh-TW', { timeZone: 'UTC' }) });
         });

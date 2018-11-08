@@ -157,7 +157,7 @@ contract Deversi {
         }
     }
 
-    function postMessage(string message) public onlyInGame {
+    function postMessage(string message) public {
         emit messagePost(message, msg.sender, gameRound, now);
     }
 

@@ -6,6 +6,7 @@ declare global {
     interface Window {
         ethereum : any;
         web3 : any;
+        dexon : any;
     }
 }
 
@@ -15,6 +16,7 @@ class Network implements NetworkInterface {
         MAIN_NET: 'Ethereum Mainnet',
         RINKEBY: 'Ethereum Rinkeby',
         GANACHE: 'Ganache@local',
+        DEXON_TESTNET: 'Dexon Testnet',
         UNKNOWN: '',
     };
 
@@ -38,6 +40,8 @@ class Network implements NetworkInterface {
                 return this.NETWORK.MAIN_NET;
             case 4:
                 return this.NETWORK.RINKEBY;
+            case 237:
+                return this.NETWORK.DEXON_TESTNET;
             case 5777:
                 return this.NETWORK.GANACHE;
             default:
@@ -66,7 +70,10 @@ class Network implements NetworkInterface {
     private init = async () => {
         const web3 = await  import(/* webpackChunkName: "web3" */'web3');
         this.web3 = web3;
-        if (window.ethereum) {
+        if (window.dexon) {
+            this.walletHandler = new web3.default(window.dexon);
+            await window.dexon.enable();
+        } else if (window.ethereum) {
             this.walletHandler = new web3.default(window.ethereum);
             await window.ethereum.enable();
         } else if (window.web3) {
