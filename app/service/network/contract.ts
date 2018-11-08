@@ -224,11 +224,11 @@ class Contract implements ContractInterface {
             ]);
             runInAction(() => {
                 this.currentSize = currentSize;
-                this.fundRaisingPeriod = fundRaisingPeriod;
-                this.turnPeriod = turnPeriod;
+                this.fundRaisingPeriod = this.handleTimestamp(fundRaisingPeriod);
+                this.turnPeriod = this.handleTimestamp(turnPeriod);
                 this.currentSharePrice = this.network.web3.utils.fromWei(currentSharePrice);
                 this.fundRaisingCountingDown = fundRaisingCountingDown;
-                this.countingStartedTime = countingStartedTime;
+                this.countingStartedTime = this.handleTimestamp(countingStartedTime);
                 this.teamCatFunding = teamFundingStatus[0];
                 this.teamDogFunding = teamFundingStatus[1];
                 this.userStatus = {
@@ -238,6 +238,7 @@ class Contract implements ContractInterface {
                 };
                 this.currentSharePerProposal = currentSharePerProposal;
             });
+            // console.log(this.countingStartedTime);
             const [
                 currentTeam,
                 gameRound,
@@ -420,6 +421,13 @@ class Contract implements ContractInterface {
             });
         });
         return { blackCount, whiteCount };
+    }
+
+    private handleTimestamp = (timestamp : string) : string => {
+        if (this.network.netId === 237) {
+            return `${Math.ceil(Number(timestamp) / 1000)}`;
+        }
+        return timestamp;
     }
 
     private loadManifest = () => import('#/Deversi.json');

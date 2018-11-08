@@ -108,12 +108,14 @@ class Network implements NetworkInterface {
     }
     private getNetId = () : Promise<number> => this.walletHandler.eth.net.getId();
     private getWebsocketProvider() {
-        console.log(this.netId);
+        console.log('network id', this.netId);
         switch(this.netId) {
             case 1:
                 return 'wss://mainnet.infura.io/_ws';
             case 4:
                 return 'wss://rinkeby.infura.io/ws';
+            case 237:
+                return 'ws://testnet.dexon.org:8546';
             case 5777:
             default:
                 return `ws://${window.location.hostname}:8545`;

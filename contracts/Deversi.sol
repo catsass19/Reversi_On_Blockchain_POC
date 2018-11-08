@@ -83,8 +83,8 @@ contract Deversi {
         inGame = false;
         configure(
             8, // size
-            10, // funding period
-            30,  // turn period
+            60000, // funding period
+            90000,  // turn period
             100000000000000000,
             100000000000000000,
             10
@@ -92,7 +92,7 @@ contract Deversi {
         startNewGame();
     }
 
-    function startNewGame() public {
+    function startNewGame() public onlyOwner {
         require(inGame == false, "game is going on");
         gameRound = gameRound + 1;
         currentSize = size;

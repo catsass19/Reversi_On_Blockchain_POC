@@ -17,6 +17,7 @@
     "build-contract": "truffle compile",
     "migrate-contract-dev": "truffle migrate --network development --reset",
     "migrate-contract-rinkeby": "truffle migrate --network rinkeby --reset",
+    "migrate-contract-dexonTestnet": "truffle migrate --network dexonTestnet --reset",
     "test-contract": "truffle test"
   },
   "jest": {
