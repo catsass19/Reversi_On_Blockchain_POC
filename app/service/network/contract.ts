@@ -515,10 +515,10 @@ class Contract implements ContractInterface {
             });
             this.contractHandler.events.prizeTransfer({}, (t, { returnValues }) => {
                 const { receiver, amount } = returnValues;
-                // console.log('prizeTransfer', this.network.web3.utils.fromWei(amount), receiver);
+                console.log('prizeTransfer', this.network.web3.utils.fromWei(amount), receiver);
             });
             this.contractHandler.events.winnerAnnounce({}, (t, { returnValues }) => {
-                // console.log('winnerAnnounce', returnValues);
+                console.log('winner', returnValues.winner);
                 // toast('Received Prize!');
             });
             this.contractHandler.events.prizeParam({}, (t, { returnValues }) => {

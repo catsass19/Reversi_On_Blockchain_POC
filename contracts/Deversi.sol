@@ -82,9 +82,9 @@ contract Deversi {
         gameRound = 0;
         inGame = false;
         configure(
-            8, // size
-            60000, // funding period
-            90000,  // turn period
+            4, // size
+            10, // funding period
+            30,  // turn period
             100000000000000000,
             100000000000000000,
             10

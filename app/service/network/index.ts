@@ -122,7 +122,8 @@ class Network implements NetworkInterface {
             case 4:
                 return 'wss://rinkeby.infura.io/ws';
             case 237:
-                return 'ws://testnet.dexon.org:8546';
+                // return 'ws://testnet.dexon.org:8546';
+                return 'wss://ws-proxy.dexon.org';
             case 5777:
             default:
                 return `ws://${window.location.hostname}:8545`;
