@@ -5,11 +5,11 @@
   "main": "index.js",
   "husky": {
     "hooks": {
-      "pre-push": "npm run test"
+      "pre-push": ""
     }
   },
   "scripts": {
-    "test": "npm run test-contract && jest --coverage",
+    "test": "jest --coverage",
     "dev": "npm run build-contract && npm run migrate-contract-dev && webpack-dev-server --mode development --host 0.0.0.0",
     "build": "npm run test && webpack --mode production --progress",
     "electron": "npm run test && export BASE_URL=./ && webpack --mode production --target electron-renderer && electron ./electron.js",
