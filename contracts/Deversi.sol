@@ -75,6 +75,7 @@ contract Deversi {
     event messagePost(string msg, address sender, uint round, uint time);
     event prizeTransfer(uint256 round, uint256 amount, address receiver);
     event winnerAnnounce(uint256 round, string winner);
+    event prizeParam(uint256 userShare, uint256 winnerShare, uint256 totalFund);
 
     constructor() public {
         owner = msg.sender;
@@ -131,6 +132,8 @@ contract Deversi {
         require(userStatus[gameRound][msg.sender].isExist != true, "Already funded!");
 
         uint shareAmount = msg.value / currentSharePrice;
+        userStatus[gameRound][msg.sender].team = teamChoosen;
+        userStatus[gameRound][msg.sender].isExist = true;
         if (teamChoosen == _TEAM.CAT) {
             userStatus[gameRound][msg.sender].ledger.CAT = shareAmount;
             currentFundingStatus.CAT += shareAmount;
@@ -140,8 +143,6 @@ contract Deversi {
         } else {
             revert("Invalid team");
         }
-        userStatus[gameRound][msg.sender].team = teamChoosen;
-        userStatus[gameRound][msg.sender].isExist = true;
         emit funded();
         userList[gameRound].push(msg.sender);
         if (fundRaisingCountingDown == false) {
@@ -238,16 +239,16 @@ contract Deversi {
         if (proposals[round][turn][proposer].isExist) {
             uint256 sharesToVote = msg.value / currentSharePrice;
             proposals[round][turn][proposer].vote += sharesToVote;
+            if (userStatus[gameRound][msg.sender].isExist != true) {
+                userList[gameRound].push(msg.sender);
+                userStatus[gameRound][msg.sender].isExist = true;
+            }
             if (currentTeam == _TEAM.CAT) {
                 userStatus[gameRound][msg.sender].ledger.CAT += sharesToVote;
                 currentFundingStatus.CAT += sharesToVote;
             } else if (currentTeam == _TEAM.DOG) {
                 userStatus[gameRound][msg.sender].ledger.DOG += sharesToVote;
                 currentFundingStatus.DOG += sharesToVote;
-            }
-            if (userStatus[gameRound][msg.sender].isExist != true) {
-                userList[gameRound].push(msg.sender);
-                userStatus[gameRound][msg.sender].isExist = true;
             }
             emit voted(gameRound, currentTurn, proposer, msg.sender, sharesToVote);
         } else {
@@ -455,19 +456,19 @@ contract Deversi {
 
     function clearGame() public onlyInGame {
         updateGame(true);
-        uint256 available = getAvailable();
+        // uint256 available = getAvailable();
         _TEAM winner = _TEAM.NONE;
         uint256 winnerShare;
         uint256 totalFund = address(this).balance;
         // uint256 gameStartTime = countingStartedTime + fundRaisingPeriod;
         if (
-            (available > 0) &&
+            // (available > 0) &&
             (roundPropsedStatus[gameRound][currentTurn] != true)
         ) {
             /* last turn wasn't played */
             winner = currentTeam;
         } else {
-            emit messagePost("???", msg.sender, gameRound, now);
+            // emit messagePost("???", msg.sender, gameRound, now);
             uint blackCount = 0;
             uint whiteCount = 0;
             for (uint i = 0; i < currentSize; i++) {
@@ -503,7 +504,9 @@ contract Deversi {
                     userShare = user.ledger.CAT;
                 }
                 if (userShare > 0) {
-                    uint256 prizeAmount = (userShare / winnerShare) * totalFund;
+                    emit prizeParam(userShare, winnerShare, totalFund);
+                    uint256 ratio = (userShare * 100) / winnerShare;
+                    uint256 prizeAmount = (totalFund * ratio) / 100;
                     userAddress.transfer(prizeAmount);
                     emit prizeTransfer(gameRound, prizeAmount, userAddress);
                 }
@@ -512,6 +515,8 @@ contract Deversi {
         string memory winnerName = (winner == _TEAM.DOG) ? "DOG" : "CAT";
         emit winnerAnnounce(gameRound, winnerName);
         emit gameCleared(gameRound, msg.sender);
+        uint256 remainingFund = address(this).balance;
+        owner.transfer(remainingFund);
         inGame = false;
     }
 

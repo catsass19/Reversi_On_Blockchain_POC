@@ -61,6 +61,7 @@ interface ContractEvents {
     messagePost : EventSubscriber<any>;
     prizeTransfer : EventSubscriber<any>;
     winnerAnnounce : EventSubscriber<any>;
+    prizeParam : EventSubscriber<any>;
 }
 
 export interface HandlerInterface {

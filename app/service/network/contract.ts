@@ -180,7 +180,7 @@ class Contract implements ContractInterface {
                 forecastT = forecast;
                 setTimeout(() => {
                     runInAction(() => {
-                        console.log('available step forecast:', count);
+                        // console.log('available step forecast:', count);
                         this.availableCount = count;
                     });
                 }, 0);
@@ -490,8 +490,9 @@ class Contract implements ContractInterface {
                 this.getContractState();
                 toast(`Game is cleared`);
             });
-            this.contractHandler.events.voted({}, () => {
-                toast('Someone voted', { type: toast.TYPE.INFO });
+            this.contractHandler.events.voted({}, (t, { returnValues }) => {
+                // console.log('voted', returnValues.shares);
+                // toast('Someone voted', { type: toast.TYPE.INFO });
                 this.getContractState();
             });
             // this.contractHandler.events.proposalSelected({}, (t, { returnValues }) => {
@@ -505,10 +506,21 @@ class Contract implements ContractInterface {
                 this.handleMessage(returnValues);
             });
             this.contractHandler.events.prizeTransfer({}, (t, { returnValues }) => {
-                toast('Received Prize!');
+                const { receiver, amount } = returnValues;
+                // console.log('prizeTransfer', this.network.web3.utils.fromWei(amount), receiver);
             });
             this.contractHandler.events.winnerAnnounce({}, (t, { returnValues }) => {
-                console.log('winnerAnnounce', returnValues);
+                // console.log('winnerAnnounce', returnValues);
+                // toast('Received Prize!');
+            });
+            this.contractHandler.events.prizeParam({}, (t, { returnValues }) => {
+                const { totalFund, userShare, winnerShare } = returnValues;
+                // console.log(
+                //     'prizeParam',
+                //     this.network.web3.utils.fromWei(totalFund),
+                //     userShare,
+                //     winnerShare
+                // );
                 // toast('Received Prize!');
             });
         }
@@ -554,7 +566,7 @@ class Contract implements ContractInterface {
         }
         if (turn > Number(this.autoTurn)) {
             this.clearHoverProposal();
-            toast(`Turn ${turn} starts!`);
+            // toast(`Turn ${turn} starts!`);
         }
         this.autoTurn = `${turn}`;
     }
