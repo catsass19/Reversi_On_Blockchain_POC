@@ -71,6 +71,13 @@ const Highlight = styled.span`
 
 const DekuSanLink = 'https://chrome.google.com/webstore/detail/dekusan/anlicggbddjeebblaidciapponbpegoj';
 
+const Warning = styled.div`
+    color: white;
+    background-color: red;
+    text-align: center;
+    padding: 10px;
+`;
+
 @observer
 class Home extends React.Component<{}, { dev : boolean }> {
 
@@ -112,6 +119,11 @@ class Home extends React.Component<{}, { dev : boolean }> {
                                         <Highlight>DekuSan Wallet</Highlight>
                                         to participant
                                     </InstallWallet>
+                                )}
+                                {!networkService.wsConnecting && (
+                                    <Warning>
+                                        WebSocket disconnected. Please refresh your browser.
+                                    </Warning>
                                 )}
                             </>
                         )}

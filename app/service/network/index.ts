@@ -25,9 +25,9 @@ class Network implements NetworkInterface {
     @observable public wallet : string;
     @observable public netId : number;
     @observable public contract : Contract;
-
+    @observable public hasWallet : boolean;
+    @observable public wsConnecting : boolean = true;
     public web3 : any;
-    public hasWallet : boolean;
 
     private blockchainHandler;
     private walletHandler;
@@ -92,8 +92,9 @@ class Network implements NetworkInterface {
             });
             await this.connectWallet();
             this.blockchainHandler = new web3.default(this.getWebsocketProvider());
-            this.blockchainHandler.on('error', this.wsErrorHandler);
-            this.blockchainHandler.on('end', this.wsErrorHandler);
+            // this.blockchainHandler.on('error', () => {
+            //     console.log('error on ws');
+            // });
         }
         runInAction(() => {
             this.contract = new Contract(this);
@@ -131,6 +132,17 @@ class Network implements NetworkInterface {
 
     private walletDetector = async () => {
         const wallet = await this.getWalletAddress();
+        try {
+            const isListening = await this.blockchainHandler.eth.net.isListening();
+            runInAction(() => {
+                this.wsConnecting = isListening;
+            });
+        } catch(e) {
+            runInAction(() => {
+                this.wsConnecting = false;
+            });
+        }
+
         if (this.wallet !== wallet) {
             location.reload();
         } else {
