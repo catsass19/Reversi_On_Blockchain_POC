@@ -73,9 +73,9 @@ const DekuSanLink = 'https://chrome.google.com/webstore/detail/dekusan/anlicggbd
 
 const Warning = styled.div`
     color: white;
-    background-color: red;
+    background-color: #FF4136;
     text-align: center;
-    padding: 10px;
+    padding: 3px;
 `;
 
 @observer
