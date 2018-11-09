@@ -84,6 +84,7 @@ export default class FundingModal extends React.PureComponent<Props, { shares : 
                     <StyledInput
                         type='number'
                         min='1'
+                        step='1'
                         value={this.state.shares}
                         onChange={this.inputOnchange}
                     />
@@ -108,7 +109,12 @@ export default class FundingModal extends React.PureComponent<Props, { shares : 
       }
     }
     private inputOnchange = (e) => {
-        this.setState({ shares: e.target.value });
+        let shares = e.target.value || 1;
+        if (shares < 1) {
+            shares = 1;
+        }
+        shares = Math.floor(shares);
+        this.setState({ shares });
     }
 
 }

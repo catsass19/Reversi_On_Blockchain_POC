@@ -69,7 +69,10 @@ const Grid = ({ x, y, proposal, status, forecast, hover }) => (
                 isProposed={isProposed(status)}
                 onClick={() => {
                     const { contract } = networkService;
-                    contract.propose(x, y);
+                    const state = forecast || status;
+                    if (state === contract.GRID_STATUS.AVAILABLE) {
+                        contract.propose(x, y);
+                    }
                 }}
                 isForecast={
                     forecast &&
