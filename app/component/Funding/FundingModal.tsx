@@ -54,6 +54,13 @@ interface Props {
     teamEnum : number;
 }
 
+const round = (num) => {
+    const t = Number(num);
+    if (!isNaN(t)) {
+        return Math.floor(t * 100) / 100;
+    }
+};
+
 export default class FundingModal extends React.PureComponent<Props, { shares : number }> {
 
     public state = {
@@ -82,7 +89,7 @@ export default class FundingModal extends React.PureComponent<Props, { shares : 
                     />
                     Shares
                     (total cost: <VariableText style={{ margin: '0px 5px' }}>
-                        {` ${shares *  Number(networkService.contract.currentSharePrice)} `}
+                        {` ${round(shares *  Number(networkService.contract.currentSharePrice))} `}
                     </VariableText> DEX)
 
                 </InputRow>

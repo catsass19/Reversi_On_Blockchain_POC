@@ -55,6 +55,13 @@ interface Props {
     proposer : string;
 }
 
+const getRound = (num) => {
+    const t = Number(num);
+    if (!isNaN(t)) {
+        return Math.floor(t * 100) / 100;
+    }
+};
+
 export default class VoteModal extends React.PureComponent<Props, { shares : number }> {
 
     public state = {
@@ -82,7 +89,7 @@ export default class VoteModal extends React.PureComponent<Props, { shares : num
                     />
                     Shares
                     (total cost: <VariableText style={{ margin: '0px 5px' }}>
-                        {` ${shares *  Number(networkService.contract.currentSharePrice)} `}
+                        {` ${getRound(shares *  Number(networkService.contract.currentSharePrice))} `}
                     </VariableText> DEX)
 
                 </InputRow>

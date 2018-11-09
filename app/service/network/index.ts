@@ -70,12 +70,10 @@ class Network implements NetworkInterface {
     private init = async () => {
         const web3 = await  import(/* webpackChunkName: "web3" */'web3');
         this.web3 = web3;
-        if (window.dexon) {
-            this.walletHandler = new web3.default(window.dexon);
-            await window.dexon.enable();
-        } else if (window.ethereum) {
-            this.walletHandler = new web3.default(window.ethereum);
-            await window.ethereum.enable();
+        const injectedProvider = window.dexon || window.ethereum;
+        if (injectedProvider) {
+            this.walletHandler = new web3.default(injectedProvider);
+            await injectedProvider.enable();
         } else if (window.web3) {
             this.walletHandler = new web3.default(window.web3.currentProvider);
         }
@@ -121,9 +119,11 @@ class Network implements NetworkInterface {
                 return 'wss://mainnet.infura.io/_ws';
             case 4:
                 return 'wss://rinkeby.infura.io/ws';
-            case 237:
-                // return 'ws://testnet.dexon.org:8546';
-                return 'wss://ws-proxy.dexon.org';
+            case 237: {
+                return (window.location.hostname === 'localhost')
+                    ? 'ws://testnet.dexon.org:8546'
+                    : 'wss://ws-proxy.dexon.org';
+            }
             case 5777:
             default:
                 return `ws://${window.location.hostname}:8545`;

@@ -200,112 +200,116 @@ class Contract implements ContractInterface {
     private getPastMessage : boolean = false;
 
     private getContractState = throttle(async () => {
-        if (this.contractHandler) {
-            const [
-                currentSize,
-                fundRaisingPeriod,
-                turnPeriod,
-                currentSharePrice,
-                fundRaisingCountingDown,
-                countingStartedTime,
-                teamFundingStatus,
-                userStatus,
-                currentSharePerProposal,
-            ] = await Promise.all([
-                this.contractHandler.methods.currentSize().call(),
-                this.contractHandler.methods.fundRaisingPeriod().call(),
-                this.contractHandler.methods.turnPeriod().call(),
-                this.contractHandler.methods.currentSharePrice().call(),
-                this.contractHandler.methods.fundRaisingCountingDown().call(),
-                this.contractHandler.methods.countingStartedTime().call(),
-                this.contractHandler.methods.getTeamFundingStatus().call(),
-                this.contractHandler.methods.getUserStatus(this.network.wallet).call(),
-                this.contractHandler.methods.currentSharePerProposal().call(),
-            ]);
-            runInAction(() => {
-                this.currentSize = currentSize;
-                this.fundRaisingPeriod = this.handleTimestamp(fundRaisingPeriod);
-                this.turnPeriod = this.handleTimestamp(turnPeriod);
-                this.currentSharePrice = this.network.web3.utils.fromWei(currentSharePrice);
-                this.fundRaisingCountingDown = fundRaisingCountingDown;
-                this.countingStartedTime = this.handleTimestamp(countingStartedTime);
-                this.teamCatFunding = teamFundingStatus[0];
-                this.teamDogFunding = teamFundingStatus[1];
-                this.userStatus = {
-                    team: userStatus[1],
-                    catShare: userStatus[2],
-                    dogShare: userStatus[3],
-                };
-                this.currentSharePerProposal = currentSharePerProposal;
-            });
-            // console.log(this.countingStartedTime);
-            const [
-                currentTeam,
-                gameRound,
-                boardStatus,
-                black,
-                white,
-                currentTurn,
-                totalBalance,
-                inGame,
-            ] = await Promise.all([
-                this.contractHandler.methods.currentTeam().call(),
-                this.contractHandler.methods.gameRound().call(),
-                this.contractHandler.methods.getBoardStatus().call(),
-                this.contractHandler.methods.black().call(),
-                this.contractHandler.methods.white().call(),
-                this.contractHandler.methods.currentTurn().call(),
-                this.network.getBalanceOfAddress(this.address),
-                this.contractHandler.methods.inGame().call(),
-            ]);
-            const pastProposed : Array<any> = await this.contractHandler.getPastEvents<any>(
-                'proposed',
-                { filter: { round: gameRound }, fromBlock: 0, toBlock: 'latest' }
-            );
-            runInAction(() => {
-                this.inGame = inGame;
-                this.totalBalance = this.network.web3.utils.fromWei(totalBalance);
-                this.boardStatus = boardStatus;
-                this.black = black;
-                this.white = white;
-                this.currentTeam = currentTeam;
-                this.gameRound = gameRound;
-                this.currentTurn = currentTurn;
-                this.autoTurn = currentTurn;
-                const turn = this.currentTurn;
-                this.proposed = pastProposed.map(({ returnValues }) => {
-                    this.contractHandler.methods.getProposalStatus(
-                        gameRound,
-                        turn,
-                        returnValues.proposer,
-                    ).call().then(({ time, vote, x, y }) => {
-                        if (time !== '0') {
-                            runInAction(() => {
-                                this.proposalStatus[this.getProposalId(turn, returnValues.proposer)] = {
-                                    turn,
-                                    time,
-                                    vote,
-                                    x,
-                                    y,
-                                };
-                            });
-                        }
-                    });
-                    return returnValues;
+        try {
+            if (this.contractHandler) {
+                const [
+                    currentSize,
+                    fundRaisingPeriod,
+                    turnPeriod,
+                    currentSharePrice,
+                    fundRaisingCountingDown,
+                    countingStartedTime,
+                    teamFundingStatus,
+                    userStatus,
+                    currentSharePerProposal,
+                ] = await Promise.all([
+                    this.contractHandler.methods.currentSize().call(),
+                    this.contractHandler.methods.fundRaisingPeriod().call(),
+                    this.contractHandler.methods.turnPeriod().call(),
+                    this.contractHandler.methods.currentSharePrice().call(),
+                    this.contractHandler.methods.fundRaisingCountingDown().call(),
+                    this.contractHandler.methods.countingStartedTime().call(),
+                    this.contractHandler.methods.getTeamFundingStatus().call(),
+                    this.contractHandler.methods.getUserStatus(this.network.wallet).call(),
+                    this.contractHandler.methods.currentSharePerProposal().call(),
+                ]);
+                runInAction(() => {
+                    this.currentSize = currentSize;
+                    this.fundRaisingPeriod = this.handleTimestamp(fundRaisingPeriod);
+                    this.turnPeriod = this.handleTimestamp(turnPeriod);
+                    this.currentSharePrice = this.network.web3.utils.fromWei(currentSharePrice);
+                    this.fundRaisingCountingDown = fundRaisingCountingDown;
+                    this.countingStartedTime = this.handleTimestamp(countingStartedTime);
+                    this.teamCatFunding = teamFundingStatus[0];
+                    this.teamDogFunding = teamFundingStatus[1];
+                    this.userStatus = {
+                        team: userStatus[1],
+                        catShare: userStatus[2],
+                        dogShare: userStatus[3],
+                    };
+                    this.currentSharePerProposal = currentSharePerProposal;
                 });
-            });
-            if (!this.getPastMessage && this.gameRound) {
-                const pastMessages : Array<any> = await this.contractHandler.getPastEvents<any>(
-                    'messagePost',
+                // console.log(this.countingStartedTime);
+                const [
+                    currentTeam,
+                    gameRound,
+                    boardStatus,
+                    black,
+                    white,
+                    currentTurn,
+                    totalBalance,
+                    inGame,
+                ] = await Promise.all([
+                    this.contractHandler.methods.currentTeam().call(),
+                    this.contractHandler.methods.gameRound().call(),
+                    this.contractHandler.methods.getBoardStatus().call(),
+                    this.contractHandler.methods.black().call(),
+                    this.contractHandler.methods.white().call(),
+                    this.contractHandler.methods.currentTurn().call(),
+                    this.network.getBalanceOfAddress(this.address),
+                    this.contractHandler.methods.inGame().call(),
+                ]);
+                const pastProposed : Array<any> = await this.contractHandler.getPastEvents<any>(
+                    'proposed',
                     { filter: { round: gameRound }, fromBlock: 0, toBlock: 'latest' }
                 );
                 runInAction(() => {
-                    pastMessages.map(({ returnValues}) => {
-                        this.handleMessage(returnValues);
+                    this.inGame = inGame;
+                    this.totalBalance = this.network.web3.utils.fromWei(totalBalance);
+                    this.boardStatus = boardStatus;
+                    this.black = black;
+                    this.white = white;
+                    this.currentTeam = currentTeam;
+                    this.gameRound = gameRound;
+                    this.currentTurn = currentTurn;
+                    this.autoTurn = currentTurn;
+                    const turn = this.currentTurn;
+                    this.proposed = pastProposed.map(({ returnValues }) => {
+                        this.contractHandler.methods.getProposalStatus(
+                            gameRound,
+                            turn,
+                            returnValues.proposer,
+                        ).call().then(({ time, vote, x, y }) => {
+                            if (time !== '0') {
+                                runInAction(() => {
+                                    this.proposalStatus[this.getProposalId(turn, returnValues.proposer)] = {
+                                        turn,
+                                        time,
+                                        vote,
+                                        x,
+                                        y,
+                                    };
+                                });
+                            }
+                        });
+                        return returnValues;
                     });
-                    this.getPastMessage = true;
                 });
+                if (!this.getPastMessage && this.gameRound) {
+                    const pastMessages : Array<any> = await this.contractHandler.getPastEvents<any>(
+                        'messagePost',
+                        { filter: { round: gameRound }, fromBlock: 0, toBlock: 'latest' }
+                    );
+                    runInAction(() => {
+                        pastMessages.map(({ returnValues}) => {
+                            this.handleMessage(returnValues);
+                        });
+                        this.getPastMessage = true;
+                    });
+                }
             }
+        } catch(e) {
+            alert('Unable to read from contract');
         }
     }, 200);
 
@@ -452,6 +456,7 @@ class Contract implements ContractInterface {
         const address = await this.getContractAddress();
         runInAction(() => this.address = address);
         this.contractHandler = this.network.getContractHandler(this.contractManifest.abi, this.address);
+
         this.walletHandler = this.network.getWalletHandler(this.contractManifest.abi, this.address);
         this.getContractState();
         this.eventListener();

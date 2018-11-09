@@ -82,17 +82,17 @@ contract Deversi {
         gameRound = 0;
         inGame = false;
         configure(
-            4, // size
-            30000, // funding period
-            90000,  // turn period
+            8, // size
+            10, // funding period
+            20,  // turn period
             100000000000000000,
             100000000000000000,
-            5
+            10
         );
         startNewGame();
     }
 
-    function startNewGame() public onlyOwner {
+    function startNewGame() public {
         require(inGame == false, "game is going on");
         gameRound = gameRound + 1;
         currentSize = size;
@@ -455,39 +455,50 @@ contract Deversi {
     }
 
     function clearGame() public onlyInGame {
-        updateGame(true);
         // uint256 available = getAvailable();
         _TEAM winner = _TEAM.NONE;
         uint256 winnerShare;
         uint256 totalFund = address(this).balance;
-        // uint256 gameStartTime = countingStartedTime + fundRaisingPeriod;
-        if (
-            // (available > 0) &&
-            (roundPropsedStatus[gameRound][currentTurn] != true)
-        ) {
-            /* last turn wasn't played */
-            winner = currentTeam;
-        } else {
-            // emit messagePost("???", msg.sender, gameRound, now);
-            uint blackCount = 0;
-            uint whiteCount = 0;
-            for (uint i = 0; i < currentSize; i++) {
-                for (uint j = 0; j < currentSize; j++) {
-                    // ret[(i * currentSize) + j] = boardStatus[gameRound][i][j];
-                    if (boardStatus[gameRound][i][j] == _GRID_STATUS.BLACK) {
-                        blackCount += 1;
-                    } else if (boardStatus[gameRound][i][j] == _GRID_STATUS.WHITE) {
-                        whiteCount += 1;
+        if (currentTurn > 0) {
+            updateGame(true);
+            if (
+                // (available > 0) &&
+                (roundPropsedStatus[gameRound][currentTurn] != true)
+            ) {
+                /* last turn wasn't played */
+                winner = currentTeam;
+            } else {
+                // emit messagePost("???", msg.sender, gameRound, now);
+                uint blackCount = 0;
+                uint whiteCount = 0;
+                for (uint i = 0; i < currentSize; i++) {
+                    for (uint j = 0; j < currentSize; j++) {
+                        // ret[(i * currentSize) + j] = boardStatus[gameRound][i][j];
+                        if (boardStatus[gameRound][i][j] == _GRID_STATUS.BLACK) {
+                            blackCount += 1;
+                        } else if (boardStatus[gameRound][i][j] == _GRID_STATUS.WHITE) {
+                            whiteCount += 1;
+                        }
                     }
                 }
+                if (blackCount > whiteCount) {
+                    winner = black;
+                } else {
+                    winner = white;
+                }
             }
-            if (blackCount > whiteCount) {
-                winner = black;
+        } else {
+            if (currentFundingStatus.CAT >= currentFundingStatus.DOG) {
+                currentTeam = _TEAM.CAT;
+                black = _TEAM.CAT;
+                white = _TEAM.DOG;
             } else {
-                winner = white;
+                currentTeam = _TEAM.DOG;
+                black = _TEAM.DOG;
+                white = _TEAM.CAT;
             }
+            winner = white;
         }
-
         if (winner == _TEAM.CAT) {
             winnerShare = currentFundingStatus.CAT;
         } else if (winner == _TEAM.DOG) {
