@@ -18,6 +18,7 @@ class AppService {
 
     @action
     public openModal(modalComponent) {
+        this.closeModal();
         this.isModalOpen = true;
         this.mountedModal = modalComponent;
     }

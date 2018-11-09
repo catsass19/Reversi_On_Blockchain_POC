@@ -1,5 +1,6 @@
 import { observable, computed, runInAction } from 'mobx';
 import { NetworkInterface } from './interface';
+import appService from '@/service/app';
 import Contract from './contract';
 
 declare global {
@@ -26,6 +27,7 @@ class Network implements NetworkInterface {
     @observable public contract : Contract;
 
     public web3 : any;
+    public hasWallet : boolean;
 
     private blockchainHandler;
     private walletHandler;
@@ -73,16 +75,29 @@ class Network implements NetworkInterface {
         const injectedProvider = window.dexon || window.ethereum;
         if (injectedProvider) {
             this.walletHandler = new web3.default(injectedProvider);
-            await injectedProvider.enable();
+            appService.openModal('Please login to your wallet and allow Deversi to connect to your account');
+            try {
+                await injectedProvider.enable();
+            } catch(e) {
+                appService.openModal('You rejected the Connect Request. Pleasse refresh browser to proceed again');
+                throw new Error();
+            }
         } else if (window.web3) {
             this.walletHandler = new web3.default(window.web3.currentProvider);
         }
-        await this.connectWallet();
-        this.blockchainHandler = new web3.default(this.getWebsocketProvider());
+
+        if (this.walletHandler) {
+            runInAction(() => {
+                this.hasWallet = true;
+            });
+            await this.connectWallet();
+            this.blockchainHandler = new web3.default(this.getWebsocketProvider());
+        }
         runInAction(() => {
             this.contract = new Contract(this);
             this.loaded = true;
         });
+
     }
 
     private connectWallet = async () => {
@@ -104,7 +119,17 @@ class Network implements NetworkInterface {
         runInAction(() => {
             this.wallet = wallet;
             this.netId = netId;
+            this.walletDetector();
         });
+    }
+
+    private walletDetector = async () => {
+        const wallet = await this.getWalletAddress();
+        if (this.wallet !== wallet) {
+            location.reload();
+        } else {
+            setTimeout(this.walletDetector, 1000);
+        }
     }
 
     private getWalletAddress = async () : Promise<string> => {

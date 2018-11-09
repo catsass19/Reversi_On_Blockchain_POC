@@ -9,6 +9,7 @@ import Funding from '@/component/Funding';
 import Game from '@/component/Game';
 import 'react-toastify/dist/ReactToastify.min.css';
 import appService from '@/service/app';
+import dekusan from '@/assets/dekusan.svg';
 
 const Container = styled.div`
     display: flex;
@@ -46,6 +47,30 @@ const ModalInner = styled.div`
     background-color: black;
 `;
 
+const InstallWallet = styled.div`
+    text-align: center;
+    padding: 20px;
+    margin: 20px 0px;
+    font-size: xx-large;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+`;
+const Dekusan = styled.img`
+    height: 50px;
+    margin: 20px;
+`;
+const Highlight = styled.span`
+    color: white;
+    margin-right: 20px;
+`;
+
+const DekuSanLink = 'https://chrome.google.com/webstore/detail/dekusan/anlicggbddjeebblaidciapponbpegoj';
+
 @observer
 class Home extends React.Component<{}, { dev : boolean }> {
 
@@ -76,6 +101,18 @@ class Home extends React.Component<{}, { dev : boolean }> {
                                 <Header />
                                 {(contract.autoTurn === '0') && <Funding />}
                                 {(Number(contract.autoTurn) > 0) && <Game />}
+                                {!networkService.hasWallet && (
+                                    <InstallWallet
+                                        onClick={() => {
+                                            window.open(DekuSanLink, '_blank');
+                                        }}
+                                    >
+                                        Please install
+                                        <Dekusan src={dekusan} />
+                                        <Highlight>DekuSan wallet</Highlight>
+                                        to participant
+                                    </InstallWallet>
+                                )}
                             </>
                         )}
                     </>
