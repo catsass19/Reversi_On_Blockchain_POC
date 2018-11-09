@@ -92,12 +92,18 @@ class Network implements NetworkInterface {
             });
             await this.connectWallet();
             this.blockchainHandler = new web3.default(this.getWebsocketProvider());
+            this.blockchainHandler.on('error', this.wsErrorHandler);
+            this.blockchainHandler.on('end', this.wsErrorHandler);
         }
         runInAction(() => {
             this.contract = new Contract(this);
             this.loaded = true;
         });
 
+    }
+
+    private wsErrorHandler = () => {
+        console.error('ws error!!');
     }
 
     private connectWallet = async () => {

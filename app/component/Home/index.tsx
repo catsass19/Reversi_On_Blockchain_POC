@@ -109,7 +109,7 @@ class Home extends React.Component<{}, { dev : boolean }> {
                                     >
                                         Please install
                                         <Dekusan src={dekusan} />
-                                        <Highlight>DekuSan wallet</Highlight>
+                                        <Highlight>DekuSan Wallet</Highlight>
                                         to participant
                                     </InstallWallet>
                                 )}
