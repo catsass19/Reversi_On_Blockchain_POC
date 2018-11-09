@@ -1,7 +1,8 @@
 import * as React from 'react';
+import moment from 'moment';
 
 interface State {
-  now : Date;
+  now : any;
   interval : any;
 }
 
@@ -14,10 +15,10 @@ class Countdown extends React.Component<Props, State> {
     constructor(props) {
       super(props);
       const interval = setInterval(() => {
-          this.setState({ now: new Date() });
+          this.setState({ now: moment() });
       }, 1000);
       this.state = {
-          now: new Date(),
+          now: moment(),
           interval,
       };
     }
@@ -29,10 +30,12 @@ class Countdown extends React.Component<Props, State> {
     public render() {
         const { time } = this.props;
         const { now } = this.state;
-        const countDown = Math.floor(time - (now.getTime() / 1000));
+        const timeMoment = moment(time * 1000);
+        const diff = timeMoment.diff(now, 'seconds');
         return (
             <span>
-                {countDown < 0 ? 0 : countDown}
+                {(diff > 60) && now.to(timeMoment)}
+                {(diff <= 60) && diff}
             </span>
         );
     }

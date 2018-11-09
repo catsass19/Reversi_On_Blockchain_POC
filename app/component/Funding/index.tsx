@@ -96,13 +96,12 @@ export default class Funding extends React.Component {
                 </TeamArea>
                 <Section>
                     {(contract.fundRaisingCountingDown) && (
-                        <CountDownText>Game Starts In
+                        <CountDownText>Game Starts
                             <CountDownStyle>
                                 <CountDown
                                     time={Number(contract.countingStartedTime) + Number(contract.fundRaisingPeriod)}
                                 />
                             </CountDownStyle>
-                            Seconds
                         </CountDownText>
                     )}
                 </Section>

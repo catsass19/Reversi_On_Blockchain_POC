@@ -6,7 +6,8 @@ import CountDown from '@/component/CountDown';
 
 const Container = styled.div`
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
 `;
 const DescrptionText = styled.span``;
 const VariableText = styled.span`
@@ -16,9 +17,14 @@ const VariableText = styled.span`
 const Item = styled.div`
     padding: 10px 0px;
     font-size: xx-large;
+    display: flex;
 `;
 const Padding = styled.div`
     flex: 1;
+`;
+const Time = styled.div`
+    font-size: large;
+    color: gray;
 `;
 const Color = styled.div`
     background-color: ${(p) => p.color};
@@ -38,17 +44,18 @@ export default class ControlHeader extends React.Component {
                 <Container>
                     {!contract.gameResolvedAuto && (
                         <>
-                            <Color color={contract.forecastCurrentTeamColor} />
                             <Item>
+                                <Color color={contract.forecastCurrentTeamColor} />
                                 <VariableText>{contract.getTeamName(forecastTeam)}</VariableText>
                                 <DescrptionText>'s turn</DescrptionText>
                             </Item>
                             <Padding />
                             {contract.autoTurnEndTime && (
                                 <Item>
-                                    <VariableText>
+                                    <Padding />
+                                    <Time>
                                         <CountDown time={contract.autoTurnEndTime} />
-                                    </VariableText>
+                                    </Time>
                                 </Item>
                             )}
                         </>
