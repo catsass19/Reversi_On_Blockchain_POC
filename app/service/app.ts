@@ -13,7 +13,7 @@ class AppService {
     public mountedModal;
 
     constructor() {
-        window.addEventListener(
+        (window as any).addEventListener(
             'resize',
             debounce(
                 () => runInAction(() => (this.width = window.innerWidth)),
