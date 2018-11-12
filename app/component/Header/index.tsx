@@ -90,24 +90,26 @@ const Highlight = styled.span`
 export default class Header extends React.Component {
 
     public componentDidMount() {
-        appService.openModal(
-            <Requirement>
-                <PopupTitle>
-                    Deversi is running on <Highlight>Dexon</Highlight> blocklattice<br />
-                    Get <Highlight>DekuSan</Highlight> wallet today and explore the power of Dexon
-                </PopupTitle>
-                <LogoArea>
-                    <Dexon onClick={() => openPage('https://dexon.org')}>
-                        <PromoteLogo src={dexon} />
-                    </Dexon>
-                    <DekuSan onClick={() => openPage(DekuSanLink)}>
-                        <PromoteLogo src={dekusan} height={115}/>
-                        <div style={{ flex: 1 }} />
-                        <DekuSanTitle>DekuSan Wallet</DekuSanTitle>
-                    </DekuSan>
-                </LogoArea>
-            </Requirement>
-        );
+        if (!appService.isMobile) {
+            appService.openModal(
+                <Requirement>
+                    <PopupTitle>
+                        Deversi is running on <Highlight>Dexon</Highlight> blocklattice<br />
+                        Get <Highlight>DekuSan</Highlight> wallet today and explore the power of Dexon
+                    </PopupTitle>
+                    <LogoArea>
+                        <Dexon onClick={() => openPage('https://dexon.org')}>
+                            <PromoteLogo src={dexon} />
+                        </Dexon>
+                        <DekuSan onClick={() => openPage(DekuSanLink)}>
+                            <PromoteLogo src={dekusan} height={115}/>
+                            <div style={{ flex: 1 }} />
+                            <DekuSanTitle>DekuSan Wallet</DekuSanTitle>
+                        </DekuSan>
+                    </LogoArea>
+                </Requirement>
+            );
+        }
     }
 
     public render() {

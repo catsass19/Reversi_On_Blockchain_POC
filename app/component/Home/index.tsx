@@ -7,9 +7,15 @@ import Dev from '@/component/Dev';
 import Header from '@/component/Header';
 import Funding from '@/component/Funding';
 import Game from '@/component/Game';
+import deversi from '@/assets/deversi.svg';
 import 'react-toastify/dist/ReactToastify.min.css';
 import appService from '@/service/app';
 import dekusan from '@/assets/dekusan.svg';
+
+const Logo = styled.img`
+    width: 50px;
+    height: 50px;
+`;
 
 const Container = styled.div`
     display: flex;
@@ -17,6 +23,7 @@ const Container = styled.div`
     height: 100vh;
     background-color: black;
     color: #13BF99;
+    justify-content: center;
 `;
 
 const ModalBackground = styled.div`
@@ -43,7 +50,7 @@ const ModalEffect = keyframes`
 const ModalInner = styled.div`
     padding: 20px;
     border: 1px solid #13BF99;
-    animation: ${ModalEffect} 0.3s ease-in;
+    animation: ${ModalEffect} 0.5s ease-in;
     background-color: black;
 `;
 
@@ -77,6 +84,10 @@ const Warning = styled.div`
     text-align: center;
     padding: 3px;
 `;
+const LoadingArea = styled.div`
+    justify-content: center;
+    display: flex;
+`;
 
 @observer
 class Home extends React.Component<{}, { dev : boolean }> {
@@ -98,7 +109,9 @@ class Home extends React.Component<{}, { dev : boolean }> {
             <Container>
                 <ToastContainer />
                 {!networkService.loaded && (
-                    'LOADING.....'
+                    <LoadingArea>
+                        <Logo src={deversi} />
+                    </LoadingArea>
                 )}
                 {networkService.loaded && (
                     <>

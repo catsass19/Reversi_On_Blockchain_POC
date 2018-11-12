@@ -1,6 +1,7 @@
 import * as ReactDOM from 'react-dom';
 import { configure } from 'mobx';
 import AppMain from '@/component/Home/';
+import Mobile from '@/component/Mobile';
 import appService from '@/service/app';
 
 configure({
@@ -18,5 +19,8 @@ configure({
         }
     }
 
-    ReactDOM.render(AppMain, document.getElementById('content'));
+    ReactDOM.render(
+      appService.isMobile ? Mobile() : AppMain,
+      document.getElementById('content')
+    );
 })();
