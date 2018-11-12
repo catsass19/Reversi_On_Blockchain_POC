@@ -123,7 +123,7 @@ class Network implements NetworkInterface {
             wallet = walletAddr;
             netId = id;
         } else {
-            netId = 4; // If we dont get net id from wallet, use Rinkeby
+            netId = 238; // If we dont get net id from wallet, use Dexon Testnet
         }
         runInAction(() => {
             this.wallet = wallet;
@@ -164,15 +164,16 @@ class Network implements NetworkInterface {
                 return 'wss://mainnet.infura.io/_ws';
             case 4:
                 return 'wss://rinkeby.infura.io/ws';
+            case 5777:
+                return `ws://${window.location.hostname}:8545`;
             case 238:
-            case 237: {
+            case 237:
+            default: {
                 return (window.location.hostname === 'localhost')
                     ? 'ws://testnet.dexon.org:8546'
                     : 'wss://ws-proxy.dexon.org';
             }
-            case 5777:
-            default:
-                return `ws://${window.location.hostname}:8545`;
+                
         }
     }
 }
