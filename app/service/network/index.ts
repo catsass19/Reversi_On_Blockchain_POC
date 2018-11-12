@@ -173,7 +173,6 @@ class Network implements NetworkInterface {
                     ? 'ws://testnet.dexon.org:8546'
                     : 'wss://ws-proxy.dexon.org';
             }
-                
         }
     }
 }
