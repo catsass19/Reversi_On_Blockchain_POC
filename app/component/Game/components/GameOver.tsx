@@ -101,7 +101,7 @@ export default class ControlHeader extends React.Component {
                         <StyledButton
                             onClick={() => contract.clearGame()}
                         >
-                            Claim Your Prize!
+                            Calculate and claim the prize
                         </StyledButton>
                     )}
                     {!contract.inGame && (

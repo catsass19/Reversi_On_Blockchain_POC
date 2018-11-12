@@ -88,7 +88,7 @@ const Mobile = () => (
       </Row>
       <Row>
           <Description>
-              <Variable>Deversi</Variable> is a Reversi game running on <Highlight>Dexon</Highlight> blocklattice
+              <Variable>Deversi</Variable> is a Reversi game running on <Highlight>DEXON</Highlight> blocklattice
           </Description>
       </Row>
       <Hint>
@@ -104,7 +104,7 @@ const Mobile = () => (
           Powered by <Variable>Smart Contract</Variable> with <Variable>Trust</Variable> and <Variable>Transparency</Variable>
       </List>
       <List>
-          The <Variable>Earlier</Variable> you get invole the more <Variable>Prize</Variable> might go to you
+          The <Variable>Earlier</Variable> you get invole the more <Variable>Prize</Variable> you might earn
       </List>
       <List>
           Each round is like a <Variable>Marathon</Variable> and the result is <Variable>Unpredictable</Variable>

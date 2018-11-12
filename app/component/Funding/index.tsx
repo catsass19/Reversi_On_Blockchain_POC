@@ -108,7 +108,7 @@ export default class Funding extends React.Component {
                 </TeamArea>
                 <Section>
                     <Description>
-                        Welcome to <White>Deversi</White> - Decentrailized Reversi based on <Purple>Dexon</Purple> blocklattice<br/>
+                        Welcome to <White>Deversi</White> - Decentrailized Reversi based on <Purple>DEXON</Purple> blocklattice<br/>
                         {((contract.userStatus.team !== `${contract.TEAM.DOG}`) &&
                         (contract.userStatus.team !== `${contract.TEAM.CAT}`)) && (
                             <span>
