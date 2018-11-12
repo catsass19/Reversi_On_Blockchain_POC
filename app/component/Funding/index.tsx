@@ -66,6 +66,7 @@ const Check = styled.span`
 const Description = styled.div`
     font-size: 20px;
     text-align: center;
+    margin-top: 60px;
 `;
 const White = styled.span`
     color: white;

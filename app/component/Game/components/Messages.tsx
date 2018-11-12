@@ -14,29 +14,35 @@ const Message = styled.div`
 `;
 const Text = styled.div`
     font-size: larger;
+    word-break: break-all;
 `;
 const MessageInfo = styled.div`
     display: flex;
     align-items: center;
+    font-size: small;
 `;
 const Sender = styled.div`
-    font-size: 5px;
     display: flex;
     align-items: center;
 `;
 const Address = styled.span`
     overflow: hidden;
-    font-size: 5px;
     width: 100px;
     color: rgba(255 ,255, 255, 0.5);
     margin-left: 5px;
 `;
 const Time = styled.div`
-    font-size: 5px;
     color: #888;
 `;
 const Padding = styled.div`
     flex: 1;
+`;
+const Container = styled.div`
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border-left: rgba(255, 255, 255, 0.3);
+    overflow-y: auto;
 `;
 
 @observer
@@ -55,15 +61,7 @@ export default class Messages extends React.Component {
     public render() {
         const { contract } = networkService;
         return (
-            <div
-                style={{
-                  flex: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  borderLeft: '1px solid rgba(255, 255, 255, 0.3)',
-                  overflowY: 'auto',
-                }}
-            >
+            <Container>
                 <InitMessage>
                     Whatever you say stays on blockchain forever so please mind your manner ☺
                 </InitMessage>
@@ -80,7 +78,7 @@ export default class Messages extends React.Component {
                 <div
                   ref={(ref) => this.ref = ref}
                 />
-            </div>
+            </Container>
         );
     }
 

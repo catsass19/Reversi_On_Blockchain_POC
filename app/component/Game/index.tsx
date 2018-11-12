@@ -11,9 +11,10 @@ import GameInfo from './components/GameInfo';
 import Messages from './components/Messages';
 
 const Container = styled.div`
-    flex: 1;
     display: flex;
+    flex: 1;
     padding: 0px 10px;
+    min-height: 0px;
 `;
 const BoardArea = styled.div`
     display: flex;
@@ -31,6 +32,7 @@ const ControlArea = styled.div`
 
 const ChatArea = styled.div`
     /* border-left: 1px solid rgba(255, 255, 255, 0.5); */
+    min-height: 0px;
     flex: 1;
     display: flex;
     flex-direction: column;
