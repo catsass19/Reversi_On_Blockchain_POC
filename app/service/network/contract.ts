@@ -428,7 +428,10 @@ class Contract implements ContractInterface {
     }
 
     private handleTimestamp = (timestamp : string) : string => {
-        if (this.network.netId === 237) {
+        if (
+            (this.network.netId === 237) ||
+            (this.network.netId === 238)
+        ) {
             return `${Math.ceil(Number(timestamp) / 1000)}`;
         }
         return timestamp;

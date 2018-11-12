@@ -83,7 +83,7 @@ export default class FundingModal extends React.PureComponent<Props, { shares : 
                     I'd like to buy
                     <StyledInput
                         type='number'
-                        // min='0'
+                        min='0'
                         step='1'
                         value={this.state.shares}
                         onChange={this.inputOnchange}
