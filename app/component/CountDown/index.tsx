@@ -34,8 +34,8 @@ class Countdown extends React.Component<Props, State> {
         const diff = timeMoment.diff(now, 'seconds');
         return (
             <span>
-                {(diff > 60) && now.to(timeMoment)}
-                {(diff <= 60) && diff}
+                {(diff > 99) && now.to(timeMoment)}
+                {((diff <= 99) && (diff > 0)) && `${diff} seconds`}
             </span>
         );
     }

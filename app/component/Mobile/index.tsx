@@ -11,6 +11,7 @@ const Board = styled.img`
 const Dexon = styled.img`
     margin-top: 20px;
     width: 150px;
+    cursor: pointer;
 `;
 
 const Container = styled.div`

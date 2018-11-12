@@ -42,10 +42,12 @@ class Network implements NetworkInterface {
                 return this.NETWORK.MAIN_NET;
             case 4:
                 return this.NETWORK.RINKEBY;
-            case 237:
-                return this.NETWORK.DEXON_TESTNET;
             case 5777:
                 return this.NETWORK.GANACHE;
+            case 237:
+            case 238:
+                return this.NETWORK.DEXON_TESTNET;
+
             default:
                 return this.NETWORK.UNKNOWN;
         }
@@ -162,6 +164,7 @@ class Network implements NetworkInterface {
                 return 'wss://mainnet.infura.io/_ws';
             case 4:
                 return 'wss://rinkeby.infura.io/ws';
+            case 238:
             case 237: {
                 return (window.location.hostname === 'localhost')
                     ? 'ws://testnet.dexon.org:8546'

@@ -23,7 +23,7 @@ class AppService {
     }
 
     @computed get isMobile() : boolean {
-        return this.width <= 1200;
+        return this.width <= 1000;
     }
 
     @action
