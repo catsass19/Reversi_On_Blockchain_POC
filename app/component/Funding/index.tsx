@@ -55,12 +55,23 @@ const TeamArea = styled.div`
     margin-top: 120px;
 `;
 const CountDownText = styled.div`
-    font-size: 50px;
+    font-size: 40px;
     display: flex;
 `;
 const Check = styled.span`
     margin: 0px 10px;
     font-size: 50px;
+`;
+
+const Description = styled.div`
+    font-size: 20px;
+    text-align: center;
+`;
+const White = styled.span`
+    color: white;
+`;
+const Purple = styled.span`
+    color: orchid;
 `;
 
 @observer
@@ -94,6 +105,26 @@ export default class Funding extends React.Component {
                         <TeamFund>received {contract.teamDogFunding} shares</TeamFund>
                     </Profile>
                 </TeamArea>
+                <Section>
+                    <Description>
+                        Welcome to <White>Deversi</White> - Decentrailized Reversi based on <Purple>Dexon</Purple> blocklattice<br/>
+                        {((contract.userStatus.team !== `${contract.TEAM.DOG}`) &&
+                        (contract.userStatus.team !== `${contract.TEAM.CAT}`)) && (
+                            <span>
+                                Join a team now by funding a team. Team members are eligible to make proposal of the next step.<br/>
+                                Price per share will go higher as game goes on so don't hestitate to fund a team now<br/>
+                                You can only fund once so be sure to put as much fund as possible :)
+                            </span>
+                        )}
+                        {((contract.userStatus.team === `${contract.TEAM.DOG}`) ||
+                        (contract.userStatus.team === `${contract.TEAM.CAT}`)) && (
+                            <span>
+                                You already funded a team! Please wait for the game to start<br />
+                                We will start counting down when both team are funded
+                            </span>
+                        )}
+                    </Description>
+                </Section>
                 <Section>
                     {(contract.fundRaisingCountingDown) && (
                         <CountDownText>Game Starts

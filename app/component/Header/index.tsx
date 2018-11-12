@@ -86,6 +86,18 @@ const Highlight = styled.span`
     font-weight: bold;
 `;
 
+const Button = styled.div`
+    border: 1px solid #13BF99;
+    font-size: x-large;
+    text-align: center;
+    padding: 10px;
+    margin-top: 20px;
+    cursor: pointer;
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+`;
+
 @observer
 export default class Header extends React.Component {
 
@@ -94,7 +106,7 @@ export default class Header extends React.Component {
             appService.openModal(
                 <Requirement>
                     <PopupTitle>
-                        Deversi is running on <Highlight>Dexon</Highlight> blocklattice<br />
+                        Deversi is running on <Highlight>DEXON</Highlight> blocklattice<br />
                         Get <Highlight>DekuSan</Highlight> wallet today and explore the power of Dexon
                     </PopupTitle>
                     <LogoArea>
@@ -107,6 +119,11 @@ export default class Header extends React.Component {
                             <DekuSanTitle>DekuSan Wallet</DekuSanTitle>
                         </DekuSan>
                     </LogoArea>
+                    <Button
+                        onClick={() => appService.closeModal()}
+                    >
+                        Got it
+                    </Button>
                 </Requirement>
             );
         }
