@@ -302,9 +302,7 @@ class Contract implements ContractInterface {
                     );
                     runInAction(() => {
                         pastMessages.map(({ returnValues }) => {
-                            if (this.gameRound === returnValues.round) {
-                                this.handleMessage(returnValues);
-                            }
+                            this.handleMessage(returnValues);
                         });
                         this.getPastMessage = true;
                     });
