@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 import styled from 'styled-components';
 import Board from '@/component/ReversiBoard';
 import networkService from '@/service/network';
+import appService from '@/service/app';
 import ControlHeader from './components/ControlHeader';
 import Proposals from './components/Proposals';
 import GameOver from './components/GameOver';
@@ -70,6 +71,12 @@ const InputArea = styled.div`
     padding-top: 10px;
 `;
 
+const ChatLogo = styled.div`
+    border: 1px solid red;
+    display: flex;
+    flex-direction: column;
+`;
+
 @observer
 export default class Game extends React.Component {
 
@@ -92,24 +99,34 @@ export default class Game extends React.Component {
                     {!contract.gameResolvedAuto && (<Proposals />)}
                     {contract.gameResolvedAuto && (<GameOver />)}
                 </ControlArea>
-                <ChatArea>
-                    <Title>Discussion</Title>
-                    <Messages />
-                    <InputArea>
-                        <StyledInput
-                            value={this.state.input}
-                            onChange={this.inputOnChanged}
-                        />
-                        <StyledButton
-                            onClick={this.sendMessage}
-                        >
-                            Send
-                        </StyledButton>
-                    </InputArea>
-                </ChatArea>
+                {(appService.width > 1380) && (this.renderChat())}
+                {(appService.width <= 1380) && (
+                    <ChatLogo>
+                        <div style={{ flex: 1 }} />
+                        123
+                    </ChatLogo>
+                )}
             </Container>
         );
     }
+
+    private renderChat = () => (
+        <ChatArea>
+            <Title>Discussion</Title>
+            <Messages />
+            <InputArea>
+                <StyledInput
+                    value={this.state.input}
+                    onChange={this.inputOnChanged}
+                />
+                <StyledButton
+                    onClick={this.sendMessage}
+                >
+                    Send
+                </StyledButton>
+            </InputArea>
+        </ChatArea>
+    )
 
     private inputOnChanged = (e) => {
         this.setState({ input: e.target.value });

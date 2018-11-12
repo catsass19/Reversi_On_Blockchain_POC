@@ -38,15 +38,43 @@ const Line = styled.hr`
     border: 1px solid rgba(255 ,255, 255, 0.2);
 `;
 
+const Hint = styled.div`
+    font-size: small;
+    margin-bottom: 20px;
+`;
+const Items = styled.div`
+    margin: 5px 0px;
+    color: rgba(255, 255, 255, 0.5);
+`;
 @observer
 export default class Proposals extends React.Component {
     public render() {
         const { contract } = networkService;
+        const forecastTeam = contract.forecastCurrentTeam;
         const proposals = contract.proposed.filter((it) => it.turn === contract.autoTurn);
         // const proposals = contract.proposed;
         return (
             <Container>
                 <Line />
+                <Hint>
+                    <Items>
+                        - Members of Team
+                        <span style={{ color: 'white', margin: '0px 5px' }}>{contract.getTeamName(forecastTeam)}</span>
+                        is now able to propose
+                    </Items>
+                    <Items>
+                        - The proposal which receives the most votes will be selected as the next step<br/>
+                    </Items>
+                    <Items>
+                        - Anyone (with or without a team) is able to vote on the proposals
+                    </Items>
+                    <Items>
+                        - 1 vote costs 1 share and 1 proposal costs 10 shares
+                    </Items>
+                    <Items>
+                        - You may vote as many times as you like
+                    </Items>
+                </Hint>
                 {(proposals.length > 0) && (
                     <div>{proposals.length} Proposals:</div>
                 )}

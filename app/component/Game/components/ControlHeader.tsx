@@ -18,13 +18,14 @@ const Item = styled.div`
     padding: 10px 0px;
     font-size: xx-large;
     display: flex;
+    align-items: center;
 `;
 const Padding = styled.div`
     flex: 1;
 `;
 const Time = styled.div`
     font-size: large;
-    color: gray;
+    color: white;
 `;
 const Color = styled.div`
     background-color: ${(p) => p.color};
@@ -32,6 +33,11 @@ const Color = styled.div`
     width: 40px;
     border-radius: 5px;
     border: 1px solid white;
+    margin-right: 10px;
+`;
+const TimeText = styled.span`
+    font-size: large;
+    color: gray;
     margin-right: 10px;
 `;
 @observer
@@ -53,6 +59,9 @@ export default class ControlHeader extends React.Component {
                             {contract.autoTurnEndTime && (
                                 <Item>
                                     <Padding />
+                                    <TimeText>
+                                        Current Turn Ends
+                                    </TimeText>
                                     <Time>
                                         <CountDown time={contract.autoTurnEndTime} />
                                     </Time>
