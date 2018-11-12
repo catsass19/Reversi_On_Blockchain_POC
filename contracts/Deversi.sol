@@ -83,8 +83,8 @@ contract Deversi {
         inGame = false;
         configure(
             6, // size
-            120, // funding period // seconds for Ethereum, ms for Dexon
-            1200,  // turn period // seconds for Ethereum, ms for Dexon
+            120000, // funding period // seconds for Ethereum, ms for Dexon
+            120000,  // turn period // seconds for Ethereum, ms for Dexon
             100000000000000000,
             100000000000000000,
             10
