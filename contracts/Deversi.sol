@@ -72,7 +72,7 @@ contract Deversi {
     event voted(uint round, uint turn, address proposer, address voter, uint256 shares);
     event proposalSelected(uint round, uint turn, address proposer, uint256 vote);
     event flipEvent(uint turn, uint x, uint y);
-    event messagePost(string msg, address sender, uint round, uint time);
+    event messagePost(string msg, address sender, uint indexed round, uint time);
     event prizeTransfer(uint256 round, uint256 amount, address receiver);
     event winnerAnnounce(uint256 round, string winner);
     event prizeParam(uint256 userShare, uint256 winnerShare, uint256 totalFund);
@@ -84,7 +84,7 @@ contract Deversi {
         configure(
             6, // size
             10, // funding period // seconds for Ethereum, ms for Dexon
-            300, // turn period // seconds for Ethereum, ms for Dexon
+            30, // turn period // seconds for Ethereum, ms for Dexon
             100000000000000000,
             100000000000000000,
             10

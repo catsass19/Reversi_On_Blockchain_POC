@@ -107,7 +107,7 @@ export default class Header extends React.Component {
                 <Requirement>
                     <PopupTitle>
                         Deversi is running on <Highlight>DEXON</Highlight> blocklattice<br />
-                        Get <Highlight>DekuSan</Highlight> wallet today and explore the power of Dexon
+                        Get <Highlight>DekuSan</Highlight> wallet today to explore the power of DEXON
                     </PopupTitle>
                     <LogoArea>
                         <Dexon onClick={() => openPage('https://dexon.org')}>

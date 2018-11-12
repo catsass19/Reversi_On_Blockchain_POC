@@ -301,8 +301,10 @@ class Contract implements ContractInterface {
                         { filter: { round: gameRound }, fromBlock: 0, toBlock: 'latest' }
                     );
                     runInAction(() => {
-                        pastMessages.map(({ returnValues}) => {
-                            this.handleMessage(returnValues);
+                        pastMessages.map(({ returnValues }) => {
+                            if (this.gameRound === returnValues.round) {
+                                this.handleMessage(returnValues);
+                            }
                         });
                         this.getPastMessage = true;
                     });

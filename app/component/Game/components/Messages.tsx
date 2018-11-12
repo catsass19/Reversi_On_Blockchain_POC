@@ -38,10 +38,10 @@ const Padding = styled.div`
     flex: 1;
 `;
 const Container = styled.div`
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
     flex: 1;
     display: flex;
     flex-direction: column;
-    border-left: rgba(255, 255, 255, 0.3);
     overflow-y: auto;
 `;
 

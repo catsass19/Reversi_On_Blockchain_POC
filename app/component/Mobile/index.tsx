@@ -92,7 +92,7 @@ const Mobile = () => (
           </Description>
       </Row>
       <Hint>
-          To play Deversi, please use desktop browser with width larger than 1000px
+          To play Deversi, please use desktop browser with width larger than 1200px
       </Hint>
       <Row />
       <Subtitle>More than just Reversi</Subtitle>
