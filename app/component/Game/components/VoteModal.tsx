@@ -62,7 +62,7 @@ const getRound = (num) => {
     }
 };
 
-export default class VoteModal extends React.PureComponent<Props, { shares : number }> {
+export default class VoteModal extends React.PureComponent<Props, { shares : number | string }> {
 
     public state = {
       shares: 1
@@ -90,7 +90,7 @@ export default class VoteModal extends React.PureComponent<Props, { shares : num
                     />
                     Shares
                     (total cost: <VariableText style={{ margin: '0px 5px' }}>
-                        {` ${getRound(shares *  Number(networkService.contract.currentSharePrice))} `}
+                        {` ${getRound(Number(shares) *  Number(networkService.contract.currentSharePrice))} `}
                     </VariableText> DEX)
 
                 </InputRow>
@@ -111,7 +111,7 @@ export default class VoteModal extends React.PureComponent<Props, { shares : num
     private inputOnchange = (e) => {
         let shares = e.target.value;
         shares = Math.floor(shares);
-        this.setState({ shares });
+        this.setState({ shares: `${shares}` });
     }
 
 }

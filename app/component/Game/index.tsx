@@ -100,12 +100,12 @@ export default class Game extends React.Component {
                     {contract.gameResolvedAuto && (<GameOver />)}
                 </ControlArea>
                 {(appService.width > 1380) && (this.renderChat())}
-                {(appService.width <= 1380) && (
+                {/* {(appService.width <= 1380) && (
                     <ChatLogo>
                         <div style={{ flex: 1 }} />
                         123
                     </ChatLogo>
-                )}
+                )} */}
             </Container>
         );
     }

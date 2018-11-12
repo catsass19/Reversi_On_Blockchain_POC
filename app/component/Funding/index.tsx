@@ -95,6 +95,9 @@ export default class Funding extends React.Component {
                     </Profile>
                 </TeamArea>
                 <Section>
+                    Please fund and join one team. If you are a member of a team, you will be eligible to make proposal. Otherwise you can only vote on proposals.
+                </Section>
+                <Section>
                     {(contract.fundRaisingCountingDown) && (
                         <CountDownText>Game Starts
                             <CountDownStyle>

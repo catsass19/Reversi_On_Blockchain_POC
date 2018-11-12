@@ -61,10 +61,10 @@ const round = (num) => {
     }
 };
 
-export default class FundingModal extends React.PureComponent<Props, { shares : number }> {
+export default class FundingModal extends React.PureComponent<Props, { shares : number | string }> {
 
     public state = {
-      shares: 1
+      shares: '1'
     };
 
     public render() {
@@ -90,7 +90,7 @@ export default class FundingModal extends React.PureComponent<Props, { shares : 
                     />
                     Shares
                     (total cost: <VariableText style={{ margin: '0px 5px' }}>
-                        {` ${round(shares *  Number(networkService.contract.currentSharePrice))} `}
+                        {` ${round(Number(shares) *  Number(networkService.contract.currentSharePrice))} `}
                     </VariableText> DEX)
 
                 </InputRow>
@@ -111,7 +111,7 @@ export default class FundingModal extends React.PureComponent<Props, { shares : 
     private inputOnchange = (e) => {
         let shares = e.target.value;
         shares = Math.floor(shares);
-        this.setState({ shares });
+        this.setState({ shares: `${shares}` });
     }
 
 }

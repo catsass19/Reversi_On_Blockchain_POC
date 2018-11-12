@@ -65,9 +65,9 @@ const Subtitle = styled.div`
 `;
 const List = styled.div`
     text-align: center;
-    padding: 20px;
+    padding: 20px 40px;
     background-color: rgba(255, 255, 255, 0.1);
-    margin: 10px 20px;
+    margin: 10px 80px;
 `;
 const PoweredBy = styled.div`
     font-size: x-large;
@@ -109,7 +109,7 @@ const Mobile = () => (
       <List>
           Each round is like a <Variable>Marathon</Variable> and the result is <Variable>Unpredictable</Variable>
       </List>
-      <PoweredBy>Running on</PoweredBy>
+      <PoweredBy>Deversi is running on</PoweredBy>
       <Row>
           <Dexon
             src={dexon}
