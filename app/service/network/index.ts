@@ -171,7 +171,7 @@ class Network implements NetworkInterface {
             default: {
                 return (window.location.hostname === 'localhost')
                     ? 'ws://testnet.dexon.org:8546'
-                    : 'wss://ws-testnet.dexscan.org/v2/ws';
+                    : 'wss://ws-proxy.dexon.org';
             }
         }
     }
