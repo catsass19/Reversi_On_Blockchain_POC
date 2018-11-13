@@ -94,7 +94,7 @@ const Button = styled.div`
     margin-top: 20px;
     cursor: pointer;
     &:hover {
-        background-color: rgba(255, 255, 255, 0.2);
+        background-color: rgba(255, 255, 255, 0.1);
     }
 `;
 

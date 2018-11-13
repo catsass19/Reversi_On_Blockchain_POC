@@ -472,64 +472,73 @@ class Contract implements ContractInterface {
         return infoOnNetwork ? infoOnNetwork.address : '';
     }
 
+    private wsHandler = (fn) => {
+        return (err, ...arg) => {
+            if (err) {
+                console.log('Websocket Error: ', err);
+            } else {
+                fn(err, ...arg);
+            }
+        }
+    }
+
     private eventListener() {
         if (this.contractHandler) {
-            this.contractHandler.events.NewGameStarted({}, (...arr) => {
-                // console.log('NewGameStarted');
+            this.contractHandler.events.NewGameStarted({}, this.wsHandler((...arr) => {
                 toast('New Game Started!');
                 runInAction(() => {
                     this.proposalStatus = {};
                     this.getContractState();
                     this.startLoop();
                 });
-            });
-            this.contractHandler.events.funded({}, (...arr) => {
+            }));
+            this.contractHandler.events.funded({}, this.wsHandler((...arr) => {
                 toast('Someone funded!');
                 this.getContractState();
-            });
-            this.contractHandler.events.fundRaisingCountdown({}, (...arr) => {
+            }));
+            this.contractHandler.events.fundRaisingCountdown({}, this.wsHandler((...arr) => {
                 toast('Both team are funded, start counting down!');
                 this.getContractState();
-            });
+            }));
             // this.contractHandler.events.turnStart({}, (...arr) => {
             //     console.log('new turn start!', arr);
             //     this.getContractState();
             // });
-            this.contractHandler.events.proposed({}, (t, { returnValues }) => {
+            this.contractHandler.events.proposed({}, this.wsHandler((t, { returnValues }) => {
                 const { round, turn, proposer } = returnValues;
                 this.getContractState();
                 // console.log('someonehad proposed', round, turn, proposer);
                 toast('New proposal has been made');
-            });
-            this.contractHandler.events.gameCleared({}, (t, { returnValues }) => {
+            }));
+            this.contractHandler.events.gameCleared({}, this.wsHandler((t, { returnValues }) => {
                 const { round, clearer } = returnValues;
                 this.getContractState();
                 toast(`Game is cleared`);
-            });
-            this.contractHandler.events.voted({}, (t, { returnValues }) => {
+            }));
+            this.contractHandler.events.voted({}, this.wsHandler((t, { returnValues }) => {
                 // console.log('voted', returnValues.shares);
                 // toast('Someone voted', { type: toast.TYPE.INFO });
                 this.getContractState();
-            });
+            }));
             // this.contractHandler.events.proposalSelected({}, (t, { returnValues }) => {
             //     // console.log('gsdf', returnValues);
             // });
             // this.contractHandler.events.flipEvent({}, (t, { returnValues }) => {
             //     console.log('FLIP!', returnValues);
             // });
-            this.contractHandler.events.messagePost({}, (t, { returnValues }) => {
+            this.contractHandler.events.messagePost({}, this.wsHandler((t, { returnValues }) => {
                 toast('New message arrived',  { type: toast.TYPE.INFO });
                 this.handleMessage(returnValues);
-            });
-            this.contractHandler.events.prizeTransfer({}, (t, { returnValues }) => {
+            }));
+            this.contractHandler.events.prizeTransfer({}, this.wsHandler((t, { returnValues }) => {
                 const { receiver, amount } = returnValues;
                 console.log('prizeTransfer', this.network.web3.utils.fromWei(amount), receiver);
-            });
-            this.contractHandler.events.winnerAnnounce({}, (t, { returnValues }) => {
+            }));
+            this.contractHandler.events.winnerAnnounce({}, this.wsHandler((t, { returnValues }) => {
                 console.log('winner', returnValues.winner);
                 // toast('Received Prize!');
-            });
-            this.contractHandler.events.prizeParam({}, (t, { returnValues }) => {
+            }));
+            this.contractHandler.events.prizeParam({}, this.wsHandler((t, { returnValues }) => {
                 const { totalFund, userShare, winnerShare } = returnValues;
                 // console.log(
                 //     'prizeParam',
@@ -538,7 +547,7 @@ class Contract implements ContractInterface {
                 //     winnerShare
                 // );
                 // toast('Received Prize!');
-            });
+            }));
         }
     }
 
