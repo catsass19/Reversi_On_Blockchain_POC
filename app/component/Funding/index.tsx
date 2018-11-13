@@ -35,7 +35,7 @@ const Profile : any = styled.div`
     }
 `;
 const TeamLogo = styled.img`
-    height: 300px;
+    height: 200px;
 `;
 const TeamName = styled.div`
     font-size: 40px;
@@ -52,7 +52,7 @@ const Versus = styled.div`
 const TeamArea = styled.div`
     display: flex;
     align-items: center;
-    margin-top: 120px;
+    margin-top: 80px;
 `;
 const CountDownText = styled.div`
     font-size: 40px;
@@ -66,7 +66,7 @@ const Check = styled.span`
 const Description = styled.div`
     font-size: 20px;
     text-align: center;
-    margin-top: 60px;
+    margin-top: 40px;
 `;
 const White = styled.span`
     color: white;
