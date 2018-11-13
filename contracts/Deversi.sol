@@ -84,7 +84,7 @@ contract Deversi {
         configure(
             8, // size
             86400000, // funding period // seconds for Ethereum, ms for Dexon
-            43200, // turn period // seconds for Ethereum, ms for Dexon
+            43200000, // turn period // seconds for Ethereum, ms for Dexon
             100000000000000000,
             10000000000000000,
             10

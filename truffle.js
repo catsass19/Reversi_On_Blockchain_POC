@@ -34,8 +34,8 @@ module.exports = {
     dexonTestnet: {
       provider: () => new HDWalletProvider(dexonMnemonic, dexonTestnet),
       network_id: "*",
-      gas: 4500000,
-      gasPrice: 10000000000,
+      // gas: 4500000,
+      // gasPrice: 10000000000,
     },
   }
 };
