@@ -476,9 +476,8 @@ class Contract implements ContractInterface {
         return (err, ...arg) => {
             if (err) {
                 console.log('Websocket Error: ', err);
-            } else {
-                fn(err, ...arg);
             }
+            fn(err, ...arg);
         };
     }
 
