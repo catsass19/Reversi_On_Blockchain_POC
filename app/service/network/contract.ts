@@ -479,7 +479,7 @@ class Contract implements ContractInterface {
             } else {
                 fn(err, ...arg);
             }
-        }
+        };
     }
 
     private eventListener() {
