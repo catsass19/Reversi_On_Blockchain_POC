@@ -77373,5 +77373,9 @@
     }
   },
   "schemaVersion": "2.0.1",
+<<<<<<< HEAD
   "updatedAt": "2018-11-15T10:17:24.963Z"
+=======
+  "updatedAt": "2018-11-15T14:35:43.965Z"
+>>>>>>> update contract
 }
