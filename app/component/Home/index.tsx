@@ -11,6 +11,7 @@ import deversi from '@/assets/deversi.svg';
 import 'react-toastify/dist/ReactToastify.min.css';
 import appService from '@/service/app';
 import dekusan from '@/assets/dekusan.svg';
+import Chat from '@/component/Game/components/Chat';
 
 const Logo = styled.img`
     width: 50px;
@@ -89,6 +90,11 @@ const LoadingArea = styled.div`
     display: flex;
 `;
 
+const MainArea = styled.div`
+    display: flex;
+    flex: 1;
+`;
+
 @observer
 class Home extends React.Component<{}, { dev : boolean }> {
 
@@ -119,8 +125,11 @@ class Home extends React.Component<{}, { dev : boolean }> {
                         {!dev && (
                             <>
                                 <Header />
-                                {(contract.autoTurn === '0') && <Funding />}
-                                {(Number(contract.autoTurn) > 0) && <Game />}
+                                <MainArea>
+                                    {(contract.autoTurn === '0') && <Funding />}
+                                    {(Number(contract.autoTurn) > 0) && <Game />}
+                                    {(appService.width > 1380) && <Chat />}
+                                </MainArea>
                                 {!networkService.hasWallet && (
                                     <InstallWallet
                                         onClick={() => {
