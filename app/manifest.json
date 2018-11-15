@@ -1,7 +1,7 @@
 {
   "name": "Deversi",
   "short_name": "Deversi",
-  "description": "Deversi - Decentrailized Reversi",
+  "description": "Deversi is a multi-player Reversi game based on DEXON blocklattice. Join now and win the prize!",
   "background_color": "#ffffff",
   "crossorigin": "use-credentials",
   "ios": true
