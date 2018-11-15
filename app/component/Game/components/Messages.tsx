@@ -14,7 +14,8 @@ const Message = styled.div`
 `;
 const Text = styled.div`
     font-size: larger;
-    word-break: break-all;
+    word-wrap: break-word;
+    overflow:hidden;
 `;
 const MessageInfo = styled.div`
     display: flex;
