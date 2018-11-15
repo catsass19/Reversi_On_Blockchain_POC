@@ -128,7 +128,7 @@ class Home extends React.Component<{}, { dev : boolean }> {
                                 <MainArea>
                                     {(contract.autoTurn === '0') && <Funding />}
                                     {(Number(contract.autoTurn) > 0) && <Game />}
-                                    {(appService.width > 1380) && <Chat />}
+                                    {(appService.width > 1200) && <Chat />}
                                 </MainArea>
                                 {!networkService.hasWallet && (
                                     <InstallWallet
