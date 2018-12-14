@@ -14,11 +14,11 @@
     "build": "webpack --mode production --progress",
     "electron": "npm run test && export BASE_URL=./ && webpack --mode production --target electron-renderer && electron ./electron.js",
     "dev-chain": "ganache-cli -b",
-    "build-contract": "truffle compile",
-    "migrate-contract-dev": "truffle migrate --network development --reset",
-    "migrate-contract-rinkeby": "truffle migrate --network rinkeby --reset",
-    "migrate-contract-dexonTestnet": "truffle migrate --network dexonTestnet --reset",
-    "test-contract": "truffle test"
+    "build-contract": "dexon-truffle compile",
+    "migrate-contract-dev": "dexon-truffle migrate --network development --reset",
+    "migrate-contract-rinkeby": "dexon-truffle migrate --network rinkeby --reset",
+    "migrate-contract-dexonTestnet": "dexon-truffle migrate --network dexonTestnet --reset",
+    "test-contract": "dexon-truffle test"
   },
   "jest": {
     "globals": {
@@ -71,6 +71,7 @@
     "clean-webpack-plugin": "^0.1.19",
     "css-loader": "^1.0.0",
     "duplicate-package-checker-webpack-plugin": "^3.0.0",
+    "@dexon-foundation/truffle": "^4.1.16",
     "favicons-webpack-plugin": "0.0.9",
     "file-loader": "^1.1.11",
     "fork-ts-checker-webpack-plugin": "^0.4.9",
@@ -81,7 +82,7 @@
     "style-loader": "^0.23.1",
     "thread-loader": "^1.2.0",
     "truffle": "^4.1.14",
-    "truffle-hdwallet-provider": "0.0.6",
+    "truffle-hdwallet-provider": "github:trufflesuite/truffle-hdwallet-provider",
     "ts-jest": "^23.1.4",
     "ts-loader": "^4.5.0",
     "tslint": "^5.11.0",
