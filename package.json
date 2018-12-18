@@ -18,6 +18,7 @@
     "migrate-contract-dev": "dexon-truffle migrate --network development --reset",
     "migrate-contract-rinkeby": "dexon-truffle migrate --network rinkeby --reset",
     "migrate-contract-dexonTestnet": "dexon-truffle migrate --network dexonTestnet --reset",
+    "migrate-contract-dexonTestnet2": "dexon-truffle migrate --network dexonTestnet2 --reset",
     "test-contract": "dexon-truffle test"
   },
   "jest": {
